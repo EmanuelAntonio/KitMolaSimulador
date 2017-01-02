@@ -20,13 +20,16 @@ class WindowClass(wx.Frame):
     """
     def basic_gui(self):
 
+        global drawArea
+
         self.CreateStatusBar()
         self.SetStatusText('Hello World!')
+        self.SetTitle("Janela de Teste")
 
 
         boxMain = wx.BoxSizer(wx.HORIZONTAL)
         box = wx.BoxSizer(wx.HORIZONTAL)
-        boxBtn = wx.BoxSizer(wx.HORIZONTAL)
+        boxBtn = wx.BoxSizer(wx.VERTICAL)
 
         notebook = Tabs(self)
         boxBtn.Add(notebook, 1, wx.ALIGN_CENTRE | wx.EXPAND, 10)
@@ -47,24 +50,44 @@ class WindowClass(wx.Frame):
         menuBar.Append(aboutMenu, '&Sobre')
 
         c = CubeCanvas(self)
-        c.SetMinSize((1280, 720))
-        box.Add(c, 0, wx.ALIGN_CENTER | wx.EXPAND, 15)
+        drawArea = c
+        box.Add(c,0, wx.ALIGN_CENTRE | wx.EXPAND, 15)
 
         boxMain.Add(box, 0, wx.ALIGN_LEFT | wx.EXPAND,15)
         boxMain.Add(boxBtn,1, wx.ALIGN_RIGHT | wx.EXPAND, 15)
 
         self.SetMenuBar(menuBar)
+        self.Bind(wx.EVT_SIZE, self.onSize, self)
         self.Bind(wx.EVT_MENU, self.onQuit, exitItem)
         self.Bind(wx.EVT_MENU, self.onEdit, editItem)
         self.Bind(wx.EVT_MENU, self.onHelp, helpItem)
         self.Bind(wx.EVT_MENU, self.version, versionItem)
 
+        self.Maximize(True)
         self.SetSizer(boxMain)
-        self.SetTitle("Janela de Teste")
-        self.Centre()
-        #self.SetAutoLayout(True)
+        self.SetAutoLayout(True)
         self.Layout()
         self.Show()
+
+
+    """
+        ->Função onSize:
+            Função que trata o evento de RESIZE da janela.
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+
+    """
+    def onSize(self,e):
+        global tamJanela
+        global drawArea
+        global drawSize
+        print(self.GetSize())
+        tamJanela = self.GetSize()
+        resize = tamJanela
+        resize[0] = resize[0]*drawSize
+        drawArea.SetMinSize(resize)
+        self.Layout()
 
 
     """
@@ -192,11 +215,11 @@ class TabPanel(wx.Panel):
 
     # ----------------------------------------------------------------------
     def __init__(self, parent):
-        """"""
+
 
         wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
 
-        #sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer = wx.BoxSizer(wx.VERTICAL)
         txtOne = wx.TextCtrl(self, wx.ID_ANY, "")
         txtTwo = wx.TextCtrl(self, wx.ID_ANY, "")
 

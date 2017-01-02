@@ -13,9 +13,9 @@ except ImportError:
 try:
     # The Python OpenGL package can be found at
     # http://PyOpenGL.sourceforge.net/
-    from OpenGL.GL import *
     from OpenGL.GLUT import *
     from OpenGL.GLU import *
+    from OpenGL.GL import *
 
     haveOpenGL = True
 except ImportError:
@@ -49,7 +49,8 @@ class MyCanvasBase(glcanvas.GLCanvas):
         pass  # Do nothing, to avoid flashing on MSW.
 
     def OnSize(self, event):
-        wx.CallAfter(self.DoSetViewport)
+        #wx.CallAfter(self.DoSetViewport)
+        self.DoSetViewport()
         event.Skip()
 
     def DoSetViewport(self):
