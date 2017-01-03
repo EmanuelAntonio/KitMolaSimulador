@@ -1,26 +1,6 @@
 # -*- coding: UTF-8 -*-
 from VarsAmbient import *
 
-import wx
-
-try:
-    from wx import glcanvas
-
-    haveGLCanvas = True
-except ImportError:
-    haveGLCanvas = False
-
-try:
-    # The Python OpenGL package can be found at
-    # http://PyOpenGL.sourceforge.net/
-    from OpenGL.GL import *
-    from OpenGL.GLUT import *
-    from OpenGL.GLU import *
-
-    haveOpenGL = True
-except ImportError:
-    haveOpenGL = False
-import math
 
 
 """
@@ -49,7 +29,8 @@ class MyCanvasBase(glcanvas.GLCanvas):
         pass  # Do nothing, to avoid flashing on MSW.
 
     def OnSize(self, event):
-        wx.CallAfter(self.DoSetViewport)
+        #wx.CallAfter(self.DoSetViewport)
+        self.DoSetViewport()
         event.Skip()
 
     def DoSetViewport(self):
@@ -70,10 +51,21 @@ class MyCanvasBase(glcanvas.GLCanvas):
         self.x, self.y = self.lastx, self.lasty = evt.GetPosition()
 
     def OnMouseUp(self, evt):
-        self.ReleaseMouse()
+        try:
+            self.ReleaseMouse()
+        except:
+            pass
 
     def OnMouseMotion(self, evt):
+
         if evt.Dragging() and evt.LeftIsDown():
             self.lastx, self.lasty = self.x, self.y
             self.x, self.y = evt.GetPosition()
+            Vars.theta = Vars.theta + (self.lastx - self.x)/100
+            Vars.phi = Vars.phi + (self.lasty - self.y)/100
+
+            if Vars.phi > math.pi / 2:
+                Vars.phi = math.pi / 2
+            elif Vars.phi < -math.pi / 2:
+                Vars.phi = -math.pi / 2
             self.Refresh(False)

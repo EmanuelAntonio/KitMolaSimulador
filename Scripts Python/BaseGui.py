@@ -1,4 +1,5 @@
 from OpenGLObjects import *
+from VarsAmbient import *
 
 """
     -> WindowClass:
@@ -11,7 +12,6 @@ class WindowClass(wx.Frame):
 
         self.basic_gui()
 
-
     """
         -> Função basic_gui:
             Função que instância todos os objetos da interface, futuramente será quebrado em mais funções auxiliares.
@@ -20,51 +20,86 @@ class WindowClass(wx.Frame):
     """
     def basic_gui(self):
 
+
         self.CreateStatusBar()
-        self.SetStatusText('Hello World!')
+        #self.SetStatusText('Hello World!')
+        self.SetTitle("Janela de Teste")
 
-
+        #definição dos sizers
         boxMain = wx.BoxSizer(wx.HORIZONTAL)
         box = wx.BoxSizer(wx.HORIZONTAL)
-        boxBtn = wx.BoxSizer(wx.HORIZONTAL)
+        boxBtn = wx.BoxSizer(wx.VERTICAL)
 
+        #Criação da area das tabs
         notebook = Tabs(self)
         boxBtn.Add(notebook, 1, wx.ALIGN_CENTRE | wx.EXPAND, 10)
 
+        #Definição dos menus
         menuBar = wx.MenuBar()
         fileMenu = wx.Menu()
         editMenu = wx.Menu()
         aboutMenu = wx.Menu()
+
+        #Criação dos itens dos menus
         exitItem = fileMenu.Append(wx.ID_EXIT, 'Sair', 'Fechar Programa')
         editItem = editMenu.Append(wx.ID_EDIT, 'Editar', 'Editar')
         copyItem = editMenu.Append(wx.ID_COPY, 'Copiar', 'Copiar')
         pasteItem = editMenu.Append(wx.ID_PASTE, 'Colar', 'Colar')
         helpItem = aboutMenu.Append(wx.ID_ABOUT, 'Ajuda', 'Ajuda')
-        versionItem = aboutMenu.Append(wx.ID_DEFAULT, 'Versão', 'Informações sobre a versão')
 
+        #Criação do label de visao(ao lado esquerdo)
+        versionItem = aboutMenu.Append(wx.ID_DEFAULT, 'Versão', 'Informações sobre a versão')
+        visionItem = wx.StaticText(self,0,Vars.visionModes[0], pos=(10,10), style=wx.ALIGN_CENTER)
+        visionItem.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD))
+        visionItem.SetBackgroundColour((128,128,128))
+        visionItem.SetForegroundColour((255,255,255))
+
+        #Adição dos menus à barra de menus
         menuBar.Append(fileMenu, '&Arquivo')
         menuBar.Append(editMenu, '&Editar')
         menuBar.Append(aboutMenu, '&Sobre')
 
+        #Criação da area de desenho
         c = CubeCanvas(self)
-        c.SetMinSize((1280, 720))
-        box.Add(c, 0, wx.ALIGN_CENTER | wx.EXPAND, 15)
+        Vars.drawArea = c
+        box.Add(c,0, wx.ALIGN_CENTRE | wx.EXPAND, 15)
 
-        boxMain.Add(box, 0, wx.ALIGN_LEFT | wx.EXPAND,15)
-        boxMain.Add(boxBtn,1, wx.ALIGN_RIGHT | wx.EXPAND, 15)
+        #Junção dos sizers das tabs com o sizer principal
+        boxMain.Add(box, 1, wx.ALIGN_LEFT | wx.EXPAND,0)
+        boxMain.Add(boxBtn,0, wx.ALIGN_RIGHT | wx.EXPAND, 0)
 
+        #Setar as funções de controle dos menus
         self.SetMenuBar(menuBar)
+        self.Bind(wx.EVT_SIZE, self.onSize, self)
         self.Bind(wx.EVT_MENU, self.onQuit, exitItem)
         self.Bind(wx.EVT_MENU, self.onEdit, editItem)
         self.Bind(wx.EVT_MENU, self.onHelp, helpItem)
         self.Bind(wx.EVT_MENU, self.version, versionItem)
 
+        #Configurações finais
+        self.Maximize(True)
         self.SetSizer(boxMain)
-        self.SetTitle("Janela de Teste")
-        self.Centre()
-        #self.SetAutoLayout(True)
+        self.SetAutoLayout(True)
         self.Layout()
         self.Show()
+
+
+    """
+        ->Função onSize:
+            Função que trata o evento de RESIZE da janela.
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+
+    """
+    def onSize(self,e):
+
+        print(self.GetSize())
+        tamJanela = self.GetSize()
+        resize = tamJanela
+        resize[0] = resize[0]*Vars.drawSize
+        Vars.drawArea.SetMinSize(resize)
+        self.Layout()
 
 
     """
@@ -125,7 +160,7 @@ class WindowClass(wx.Frame):
     """
     def version(self,e):
 
-        ver = wx.MessageDialog(None, "Versão: " + version + "\nData de modificação: " + dateModificacao, "Versão",  wx.OK)
+        ver = wx.MessageDialog(None, "Versão: " + Vars.version + "\nData de modificação: " + Vars.dateModificacao, "Versão",  wx.OK)
         ver.ShowModal()
         ver.Destroy()
 
@@ -192,16 +227,16 @@ class TabPanel(wx.Panel):
 
     # ----------------------------------------------------------------------
     def __init__(self, parent):
-        """"""
+
 
         wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
 
-        #sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer = wx.BoxSizer(wx.VERTICAL)
         txtOne = wx.TextCtrl(self, wx.ID_ANY, "")
         txtTwo = wx.TextCtrl(self, wx.ID_ANY, "")
 
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(txtOne, 0, wx.ALL, 5)
-        sizer.Add(txtTwo, 0, wx.ALL, 5)
+        sizer.Add(txtOne, 0, wx.ALIGN_CENTER, 5)
+        sizer.Add(txtTwo, 0, wx.ALIGN_CENTER, 5)
 
         self.SetSizer(sizer)
