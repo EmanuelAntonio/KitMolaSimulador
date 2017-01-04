@@ -1,4 +1,4 @@
-from OpenGLObjects import *
+from OpenGLCanvas import *
 from VarsAmbient import *
 
 """

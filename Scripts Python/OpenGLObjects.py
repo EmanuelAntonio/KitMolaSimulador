@@ -1,48 +1,4 @@
-from OpenGLCanvas import *
-
-"""
-    -> Classe CubeCanvas:
-        Classe para desenhar em OpenGL futuramente será substituida.
-
-"""
-
-class CubeCanvas(MyCanvasBase):
-
-    def InitGL(self):
-
-        glClearColor(0.5, 0.5, 0.5, 0.0)
-        # set viewing projection
-        glMatrixMode(GL_PROJECTION)
-        #glFrustum(-0.5, 0.5, -0.5, 0.5, 1.0, 3.0)
-
-        # position viewer
-        #glMatrixMode(GL_MODELVIEW)
-
-        glEnable(GL_DEPTH_TEST)
-        glEnable(GL_LIGHTING)
-        glEnable(GL_LIGHT0)
-
-    def OnDraw(self):
-
-        eye = (Vars.camZoom*math.cos(Vars.theta)*math.sin(Vars.phi), Vars.camZoom*math.sin(Vars.theta)*math.sin(Vars.phi), Vars.camZoom*math.cos(Vars.phi))
-        up = (0, 0, 1)
-        center = (0, 0, 0)
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glViewport(0, 0, self.GetClientSize()[0], self.GetClientSize()[1])
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        gluPerspective(60.0, self.GetClientSize()[0] / self.GetClientSize()[1], 0.1, 50)
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
-        gluLookAt(eye[0], eye[1], eye[2], center[0], center[1], center[2], up[0],up[1],up[2])
-        #gluLookAt(2, 2, 2, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0)
-
-
-        #drawSphere((0, 0, 0), 1, 32)
-        drawCubeZero()
-
-        self.SwapBuffers()
-
+from VarsAmbient import *
 
 """
     ->Função drawSphere:
@@ -73,16 +29,28 @@ def drawSphere(centro, raio, resolucao):
 
     glEnable(GL_LIGHTING)
 
+"""
+    ->FUnção drawCubeZero:
+        Desenha um cubo de aresta 1 sobre a origem
+    ->Parâmetros: vazio
+    ->Retorno: vazio
+
+    *Será apagado após a fase de testes
+
+
+"""
+
 def drawCubeZero():
 
+    glColor3f(1.0,1.0,1.0)
     #up
     glBegin(GL_QUADS)
 
     glNormal3f(0,0,1)
     glVertex3f(0.5, 0.5, 0.5)
-    glVertex3f(0.5, -0.5, 0.5)
-    glVertex3f(-0.5, -0.5, 0.5)
     glVertex3f(-0.5, 0.5, 0.5)
+    glVertex3f(-0.5, -0.5, 0.5)
+    glVertex3f(0.5, -0.5, 0.5)
 
     glEnd()
 
@@ -91,9 +59,9 @@ def drawCubeZero():
 
     glNormal3f(0, 0, -1)
     glVertex3f(0.5, 0.5, -0.5)
-    glVertex3f(0.5, -0.5, -0.5)
-    glVertex3f(-0.5, -0.5, -0.5)
     glVertex3f(-0.5, 0.5, -0.5)
+    glVertex3f(-0.5, -0.5, -0.5)
+    glVertex3f(0.5, -0.5, -0.5)
 
     glEnd()
 
@@ -101,9 +69,9 @@ def drawCubeZero():
     glBegin(GL_QUADS)
 
     glNormal3f(-1, 0, 0)
-    glVertex3f(-0.5, 0.5, 0.5)
+    glVertex3f(-0.5, -0.5, -0.5)
     glVertex3f(-0.5, -0.5, 0.5)
-    glVertex3f(-0.5, -0.5,- 0.5)
+    glVertex3f(-0.5, 0.5, 0.5)
     glVertex3f(-0.5, 0.5, -0.5)
 
     glEnd()
@@ -123,10 +91,10 @@ def drawCubeZero():
     glBegin(GL_QUADS)
 
     glNormal3f(0, -1, 0)
-    glVertex3f(-0.5, -0.5, 0.5)
-    glVertex3f(0.5, -0.5, 0.5)
-    glVertex3f(0.5, -0.5, -0.5)
     glVertex3f(-0.5, -0.5, -0.5)
+    glVertex3f(0.5, -0.5, -0.5)
+    glVertex3f(0.5, -0.5, 0.5)
+    glVertex3f(-0.5, -0.5, 0.5)
 
     glEnd()
 
@@ -135,9 +103,140 @@ def drawCubeZero():
     glBegin(GL_QUADS)
 
     glNormal3f(0, 1, 0)
-    glVertex3f(0.5, 0.5, 0.5)
-    glVertex3f(-0.5, 0.5, 0.5)
-    glVertex3f(-0.5, 0.5, -0.5)
     glVertex3f(0.5, 0.5, -0.5)
+    glVertex3f(-0.5, 0.5, -0.5)
+    glVertex3f(-0.5, 0.5, 0.5)
+    glVertex3f(0.5, 0.5, 0.5)
 
     glEnd()
+
+"""
+    ->Função drawAxis:
+        Desenha os eixos cartesianos no centro do espaco R^3
+    ->Parâmetros: vazio
+    ->Retorno: vazio
+
+
+"""
+
+def drawAxis():
+
+    glDisable(GL_LIGHTING)
+
+    #X-axis
+    glColor3f(1.0,0.0,0.0)
+    glBegin(GL_LINES)
+
+    glVertex3f(0.0, 0.0, 0.0)
+    glVertex3f(1.0, 0.0, 0.0)
+
+    glEnd()
+
+    glBegin(GL_QUADS)
+
+    glNormal3f(-1.0,0.0,0.0)
+    glVertex3f(1.0, -0.05, -0.05)
+    glVertex3f(1.0, -0.05, 0.05)
+    glVertex3f(1.0, 0.05, 0.05)
+    glVertex3f(1.0, 0.05, -0.05)
+
+    glEnd()
+
+    glBegin(GL_TRIANGLE_FAN)
+
+    glVertex3f(1.2,0.0,0.0)
+    glVertex3f(1.0, 0.05, 0.05)
+    glVertex3f(1.0, -0.05, 0.05)
+    glVertex3f(1.0, -0.05, -0.05)
+    glVertex3f(1.0, 0.05, -0.05)
+    glVertex3f(1.0, 0.05, 0.05)
+
+    glEnd()
+
+    #Y-axis
+    glColor3f(0.0,1.0,0.0)
+    glBegin(GL_LINES)
+
+    glVertex3f(0.0, 0.0, 0.0)
+    glVertex3f(0.0, 1.0, 0.0)
+
+    glEnd()
+
+    glBegin(GL_QUADS)
+
+    glNormal3f(0.0, -1.0, 0.0)
+    glVertex3f(0.05, 1.0, 0.05)
+    glVertex3f(-0.05, 1.0, 0.05)
+    glVertex3f(-0.05, 1.0, -0.05)
+    glVertex3f(0.05, 1.0, -0.05)
+
+    glEnd()
+
+    glBegin(GL_TRIANGLE_FAN)
+
+    glVertex3f(0.0, 1.2, 0.0)
+    glVertex3f(-0.05, 1.0, -0.05)
+    glVertex3f(-0.05, 1.0, 0.05)
+    glVertex3f(0.05, 1.0, 0.05)
+    glVertex3f(0.05, 1.0, -0.05)
+    glVertex3f(-0.05, 1.0, -0.05)
+
+    glEnd()
+
+    #Z-axis
+    glColor3f(0.0,0.0,1.0)
+    glBegin(GL_LINES)
+
+    glVertex3f(0.0, 0.0, 0.0)
+    glVertex3f(0.0, 0.0, 1.0)
+
+    glEnd()
+
+    glBegin(GL_QUADS)
+
+    glNormal3f(0.0, 0.0, 1.0)
+    glVertex3f(-0.05, -0.05, 1.0)
+    glVertex3f(-0.05, 0.05, 1.0)
+    glVertex3f(0.05, 0.05, 1.0)
+    glVertex3f(0.05, -0.05, 1.0)
+
+    glEnd()
+
+    glBegin(GL_TRIANGLE_FAN)
+
+    glVertex3f(0.0, 0.0, 1.2)
+    glVertex3f(0.05, 0.05, 1.0)
+    glVertex3f(-0.05, 0.05, 1.0)
+    glVertex3f(-0.05, -0.05, 1.0)
+    glVertex3f(0.05, -0.05, 1.0)
+    glVertex3f(0.05, 0.05, 1.0)
+
+    glEnd()
+
+    glDisable(GL_LIGHTING)
+
+
+def drawGrid():
+
+    espacoGrid = 0.5
+    tamGrid = 20
+    iniGrid = -tamGrid/(2/espacoGrid)
+
+    glDisable(GL_LIGHTING)
+    glColor3f(0.8,0.8,0.8)
+    for i in range(tamGrid+1):
+        glBegin(GL_LINES)
+
+        glVertex3f(iniGrid + (i*espacoGrid),iniGrid,0.0)
+        glVertex3f(iniGrid + (i * espacoGrid), iniGrid+(tamGrid*espacoGrid), 0.0)
+
+        glEnd()
+
+        glBegin(GL_LINES)
+
+        glVertex3f(iniGrid,iniGrid + (i*espacoGrid), 0.0)
+        glVertex3f( iniGrid+(tamGrid*espacoGrid),iniGrid + (i * espacoGrid), 0.0)
+
+        glEnd()
+
+    glEnable(GL_LIGHTING)
