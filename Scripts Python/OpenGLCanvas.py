@@ -57,18 +57,28 @@ class MyCanvasBase(glcanvas.GLCanvas):
         except:
             pass
 
+
+    """
+        -> Função OnMouseMotion:
+            Função para manipular a localização da camera assim que o botão esquerdo do mouse for pressionado e o mouse for arrastado
+            -> 'evt' : instância de evento, pode ou não ser usado para o tratamento do evento de mouseScroll
+        -> Retorno: vazio
+    """
     def OnMouseMotion(self, evt):
 
         if evt.Dragging() and evt.LeftIsDown():
             self.lastx, self.lasty = self.x, self.y
             self.x, self.y = evt.GetPosition()
-            Vars.theta = Vars.theta + (self.lastx - self.x)/100
-            Vars.phi = Vars.phi + (self.lasty - self.y)/100
 
-            if Vars.phi > math.pi / 2:
-                Vars.phi = math.pi / 2
-            elif Vars.phi < 0:
-                Vars.phi = 0.001
+            if Vars.visionOption == 0:
+                Vars.theta = Vars.theta + (self.lastx - self.x) / 100
+                Vars.phi = Vars.phi + (self.lasty - self.y) / 100
+                if Vars.phi > math.pi / 2:
+                    Vars.phi = math.pi / 2
+                elif Vars.phi < 0:
+                    Vars.phi = 0.001
+            else:
+                Vars.orthoCenter = ((self.lasty - self.y) / 60 + Vars.orthoCenter[0],(self.lastx - self.x) / 60 + Vars.orthoCenter[1])
             self.Refresh(False)
 
     """
@@ -79,17 +89,30 @@ class MyCanvasBase(glcanvas.GLCanvas):
     """
     def OnMouseScroll(self, evt):
 
-        zoom = 0.3
-        if evt.GetWheelRotation() > 0:
+        if Vars.visionOption == 0:
 
-            Vars.camZoom += zoom
+            zoom = 0.3
+            if evt.GetWheelRotation() > 0:
 
+                Vars.camZoom += zoom
+
+            else:
+
+                Vars.camZoom -= zoom
+                if Vars.camZoom < 0:
+                    Vars.camZoom = 0
         else:
+            zoom = 0.3
+            if evt.GetWheelRotation() > 0:
 
-            Vars.camZoom -= zoom
-            if Vars.camZoom < 0:
+                Vars.orthoZoom += zoom
 
-                Vars.camZoom = 0
+            else:
+
+                Vars.orthoZoom -= zoom
+                if Vars.orthoZoom < 0:
+                    Vars.orthoZoom = 0.1
+
 
         self.Refresh(False)
 
@@ -102,6 +125,7 @@ class MyCanvasBase(glcanvas.GLCanvas):
         -> Retorno: vazio
     """
     def OnRightDown(self,e):
+        Vars.rightMouse = (e.GetPosition()[0],e.GetPosition()[1])
         self.PopupMenu(RightMenu(self.parent), e.GetPosition())
         self.Refresh()
 
@@ -119,28 +143,59 @@ class CubeCanvas(MyCanvasBase):
         glClearColor(0.5, 0.5, 0.5, 0.0)
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_CULL_FACE)
+        glEnable(GL_NORMALIZE)
+
         glEnable(GL_LIGHTING)
         glEnable(GL_LIGHT0)
+        glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST)
 
     def OnDraw(self):
 
-        eye = (Vars.camZoom*math.cos(Vars.theta)*math.sin(Vars.phi), Vars.camZoom*math.sin(Vars.theta)*math.sin(Vars.phi), Vars.camZoom*math.cos(Vars.phi))
-        up = (-Vars.camZoom*math.cos(Vars.theta)*math.cos(Vars.phi), -Vars.camZoom*math.sin(Vars.theta)*math.cos(Vars.phi), Vars.camZoom*math.sin(Vars.phi))
-        center = (0, 0, 0)
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        glViewport(0, 0, self.GetClientSize()[0], self.GetClientSize()[1])
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        gluPerspective(60.0, self.GetClientSize()[0] / self.GetClientSize()[1], 0.1, 50)
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
-        gluLookAt(eye[0], eye[1], eye[2], center[0], center[1], center[2], up[0],up[1],up[2])
+        #Definições de câmera perspectiva
+        if Vars.visionOption == 0:
+            eye = (Vars.camZoom * math.cos(Vars.theta) * math.sin(Vars.phi),
+                   Vars.camZoom * math.sin(Vars.theta) * math.sin(Vars.phi), Vars.camZoom * math.cos(Vars.phi))
+            up = (-Vars.camZoom * math.cos(Vars.theta) * math.cos(Vars.phi),
+                  -Vars.camZoom * math.sin(Vars.theta) * math.cos(Vars.phi), Vars.camZoom * math.sin(Vars.phi))
+            center = (0, 0, 0)
+
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            glViewport(0, 0, self.GetClientSize()[0], self.GetClientSize()[1])
+            glMatrixMode(GL_PROJECTION)
+            glLoadIdentity()
+            gluPerspective(60.0, self.GetClientSize()[0] / self.GetClientSize()[1], 0.1, 50)
+            glMatrixMode(GL_MODELVIEW)
+            glLoadIdentity()
+            gluLookAt(eye[0], eye[1], eye[2], center[0], center[1], center[2], up[0], up[1], up[2])
+
+        #Definições de câmera ortho positiva
+        elif Vars.visionOption == 5 or Vars.visionOption == 1 or Vars.visionOption == 3:
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            glViewport(0, 0, self.GetClientSize()[0], self.GetClientSize()[1])
+            glMatrixMode(GL_PROJECTION)
+            glLoadIdentity()
+            glOrtho(-Vars.orthoZoom*self.GetClientSize()[0]/self.GetClientSize()[1] + Vars.orthoCenter[1],
+                    Vars.orthoZoom*self.GetClientSize()[0]/self.GetClientSize()[1] + Vars.orthoCenter[1],
+                    -Vars.orthoZoom - Vars.orthoCenter[0], Vars.orthoZoom - Vars.orthoCenter[0], -100, 100.0)
+            glMatrixMode(GL_MODELVIEW)
+            glLoadIdentity()
+        #Definições de câmera ortho negativa
+        elif Vars.visionOption == 2 or Vars.visionOption == 4:
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            glViewport(0, 0, self.GetClientSize()[0], self.GetClientSize()[1])
+            glMatrixMode(GL_PROJECTION)
+            glLoadIdentity()
+            glOrtho(Vars.orthoZoom*self.GetClientSize()[0]/self.GetClientSize()[1] - Vars.orthoCenter[1],
+                    -Vars.orthoZoom*self.GetClientSize()[0]/self.GetClientSize()[1] - Vars.orthoCenter[1],
+                    -Vars.orthoZoom - Vars.orthoCenter[0], Vars.orthoZoom - Vars.orthoCenter[0], -100, 100.0)
+            glMatrixMode(GL_MODELVIEW)
+            glLoadIdentity()
 
         drawAxis()
         drawGrid()
 
-        if Vars.cube:
-            drawCubeZero()
+        if Vars.cube != None:
+            drawCube(Vars.cube)
 
         self.SwapBuffers()
 
@@ -164,6 +219,29 @@ class RightMenu(wx.Menu):
         self.AppendSubMenu(addMenu,'Adicionar')
         self.Bind(wx.EVT_MENU, self.OnAddCube, addCube)
 
+        #Submenu camera
+        camMenu = wx.Menu()
+        persp = wx.MenuItem(self, wx.NewId(), 'Perspectiva')
+        cima = wx.MenuItem(self, wx.NewId(), 'Cima')
+        frente = wx.MenuItem(self, wx.NewId(), 'Frente')
+        atras = wx.MenuItem(self, wx.NewId(), 'Atrás')
+        direita = wx.MenuItem(self, wx.NewId(), 'Direita')
+        esquerda = wx.MenuItem(self, wx.NewId(), 'Esquerda')
+        camMenu.Append(persp)
+        camMenu.Append(cima)
+        camMenu.Append(frente)
+        camMenu.Append(atras)
+        camMenu.Append(direita)
+        camMenu.Append(esquerda)
+        self.AppendSubMenu(camMenu, 'Câmera')
+        self.Bind(wx.EVT_MENU, self.OnPerspectiva, persp)
+        self.Bind(wx.EVT_MENU, self.OnTop, cima)
+        self.Bind(wx.EVT_MENU, self.OnFront, frente)
+        self.Bind(wx.EVT_MENU, self.OnBack, atras)
+        self.Bind(wx.EVT_MENU, self.OnRight, direita)
+        self.Bind(wx.EVT_MENU, self.OnLeft, esquerda)
+
+
         #ItemMenu minimizar
         mmi = wx.MenuItem(self, wx.NewId(), 'Minimizar')
         self.Append(mmi)
@@ -181,4 +259,61 @@ class RightMenu(wx.Menu):
         self.parent.Close()
 
     def OnAddCube(self,e):
-        Vars.cube = True
+        #Vars.cube = True
+        x,y = Vars.rightMouse
+
+        y = self.parent.GetClientSize()[1] - y
+
+        if Vars.visionOption != 0:
+            x = x / (Vars.drawArea.GetClientSize()[0])
+            y = y / (Vars.drawArea.GetClientSize()[1])
+
+            x = (x * 2 * Vars.orthoZoom * Vars.drawArea.GetClientSize()[0] / Vars.drawArea.GetClientSize()[1]) - (Vars.orthoZoom * Vars.drawArea.GetClientSize()[0] / Vars.drawArea.GetClientSize()[1])
+            y = y * 2 * Vars.orthoZoom - Vars.orthoZoom
+
+            if Vars.visionAxis == 'z':
+                Vars.cube = (x, y, 0)
+            elif Vars.visionAxis == 'x':
+                Vars.cube = (0, x, y)
+            elif Vars.visionAxis == 'y':
+                Vars.cube = (x, 0, y)
+
+
+    def OnPerspectiva(self, evt):
+
+        Vars.visionOption = 0
+        Vars.visionItem.SetLabelText(Vars.visionModes[0])
+        Vars.visionAxis = 'z'
+        Vars.drawArea.Refresh()
+
+    def OnTop(self, evt):
+
+        Vars.visionOption = 5
+        Vars.visionItem.SetLabelText(Vars.visionModes[5])
+        Vars.visionAxis = 'z'
+        Vars.drawArea.Refresh()
+
+    def OnFront(self, evt):
+
+        Vars.visionOption = 1
+        Vars.visionItem.SetLabelText(Vars.visionModes[1])
+        Vars.visionAxis = 'x'
+        Vars.drawArea.Refresh()
+
+    def OnBack(self, evt):
+        Vars.visionOption = 2
+        Vars.visionItem.SetLabelText(Vars.visionModes[2])
+        Vars.visionAxis = 'x'
+        Vars.drawArea.Refresh()
+
+    def OnRight(self, evt):
+        Vars.visionOption = 3
+        Vars.visionItem.SetLabelText(Vars.visionModes[3])
+        Vars.visionAxis = 'y'
+        Vars.drawArea.Refresh()
+
+    def OnLeft(self, evt):
+        Vars.visionOption = 4
+        Vars.visionItem.SetLabelText(Vars.visionModes[4])
+        Vars.visionAxis = 'y'
+        Vars.drawArea.Refresh()

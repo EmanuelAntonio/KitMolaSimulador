@@ -22,7 +22,7 @@ class WindowClass(wx.Frame):
 
 
         self.CreateStatusBar()
-        #self.SetStatusText('Hello World!')
+        Vars.status = self.GetStatusBar()
         self.SetTitle("Janela de Teste")
 
         #definição dos sizers
@@ -32,7 +32,9 @@ class WindowClass(wx.Frame):
 
         #Criação da area das tabs
         notebook = Tabs(self)
-        boxBtn.Add(notebook, 1, wx.ALIGN_CENTRE | wx.EXPAND, 10)
+        cam = CamOp(self)
+        boxBtn.Add(notebook, 1, wx.ALIGN_TOP | wx.EXPAND, 10)
+        boxBtn.Add(cam,1,wx.ALIGN_BOTTOM | wx.EXPAND,10)
 
         #Definição dos menus
         menuBar = wx.MenuBar()
@@ -53,6 +55,7 @@ class WindowClass(wx.Frame):
         visionItem.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD))
         visionItem.SetBackgroundColour((128,128,128))
         visionItem.SetForegroundColour((255,255,255))
+        Vars.visionItem = visionItem
 
         #Adição dos menus à barra de menus
         menuBar.Append(fileMenu, '&Arquivo')
@@ -66,7 +69,7 @@ class WindowClass(wx.Frame):
 
         #Junção dos sizers das tabs com o sizer principal
         boxMain.Add(box, 1, wx.ALIGN_LEFT | wx.EXPAND,0)
-        boxMain.Add(boxBtn,0, wx.ALIGN_RIGHT | wx.EXPAND, 0)
+        boxMain.Add(boxBtn,1, wx.ALIGN_RIGHT | wx.EXPAND, 0)
 
         #Setar as funções de controle dos menus
         self.SetMenuBar(menuBar)
@@ -188,17 +191,28 @@ class Tabs(wx.Notebook):
         # Create the first tab and add it to the notebook
         tabOne = TabPanel(self)
         #tabOne.SetBackgroundColour("Gray")
-        self.AddPage(tabOne, "TabOne")
+        self.AddPage(tabOne, "Objetos")
+        imL = wx.ImageList(32,32)
 
         # Create and add the second tab
         tabTwo = TabPanel(self)
-        self.AddPage(tabTwo, "TabTwo")
+        self.AddPage(tabTwo, "Ferramentas")
 
         # Create and add the third tab
-        self.AddPage(TabPanel(self), "TabThree")
+        self.AddPage(TabPanel(self), "Configurações")
 
-        self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnPageChanged)
-        self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGING, self.OnPageChanging)
+        # Adiciona os icones nas tabs
+        imgObj = imL.Add(wx.Bitmap('obj.ico'))
+        imgTool = imL.Add(wx.Bitmap('tool.ico'))
+        imgConfig = imL.Add(wx.Bitmap('config.ico'))
+        self.AssignImageList(imL)
+        self.SetPageImage(0, imgObj)
+        self.SetPageImage(1, imgTool)
+        self.SetPageImage(2, imgConfig)
+
+        #self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnPageChanged)
+        #self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGING, self.OnPageChanging)
+
 
     def OnPageChanged(self, event):
         old = event.GetOldSelection()
@@ -235,8 +249,122 @@ class TabPanel(wx.Panel):
         txtOne = wx.TextCtrl(self, wx.ID_ANY, "")
         txtTwo = wx.TextCtrl(self, wx.ID_ANY, "")
 
-        sizer = wx.BoxSizer(wx.VERTICAL)
+        #sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(txtOne, 0, wx.ALIGN_CENTER, 5)
         sizer.Add(txtTwo, 0, wx.ALIGN_CENTER, 5)
 
         self.SetSizer(sizer)
+
+
+
+"""
+    -> Classe CamOp:
+        Classe responsável pela manipulação de troca dos tipos de visão
+
+"""
+
+class CamOp(wx.Notebook):
+    """
+    Notebook class
+    """
+
+    # ----------------------------------------------------------------------
+    def __init__(self, parent):
+        wx.Notebook.__init__(self, parent, id=wx.ID_ANY, style=
+        #wx.BK_DEFAULT
+                             # wx.BK_TOP
+                             # wx.BK_BOTTOM
+                              wx.BK_LEFT
+                             # wx.BK_RIGHT
+                             )
+
+        # Create the first tab and add it to the notebook
+        tabOne = CamPanel(self)
+        #tabOne.SetBackgroundColour("Gray")
+        self.AddPage(tabOne, "Câmera")
+        imL = wx.ImageList(32,32)
+        # Adiciona os icones nas tabs
+        imgObj = imL.Add(wx.Bitmap('cam.ico'))
+        self.AssignImageList(imL)
+        self.SetPageImage(0, imgObj)
+
+
+"""
+    ->Classe CamPanel:
+        Classe utilizada para instânciar os objetos da aba camera do menu principal.
+
+"""
+class CamPanel(wx.Panel):
+
+
+    # ----------------------------------------------------------------------
+    def __init__(self, parent):
+
+
+        wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+
+        btnPerspectiva = wx.Button(self,wx.ID_ANY,"Perspectiva")
+        btnTop = wx.Button(self, wx.ID_ANY, "Cima")
+        btnFront = wx.Button(self, wx.ID_ANY, "Frente")
+        btnBack = wx.Button(self, wx.ID_ANY, "Atrás")
+        btnRight = wx.Button(self, wx.ID_ANY, "Direita")
+        btnLeft = wx.Button(self, wx.ID_ANY, "Esquerda")
+
+
+        sizer.Add(btnPerspectiva, 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        sizer.Add(btnTop, 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        sizer.Add(btnFront, 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        sizer.Add(btnBack, 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        sizer.Add(btnRight, 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        sizer.Add(btnLeft, 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+
+        self.Bind(wx.EVT_BUTTON, self.OnPerspectiva, btnPerspectiva)
+        self.Bind(wx.EVT_BUTTON, self.OnTop, btnTop)
+        self.Bind(wx.EVT_BUTTON, self.OnFront, btnFront)
+        self.Bind(wx.EVT_BUTTON, self.OnBack, btnBack)
+        self.Bind(wx.EVT_BUTTON, self.OnRight, btnRight)
+        self.Bind(wx.EVT_BUTTON, self.OnLeft, btnLeft)
+
+
+        self.SetSizer(sizer)
+
+    def OnPerspectiva(self, evt):
+
+        Vars.visionOption = 0
+        Vars.visionItem.SetLabelText(Vars.visionModes[0])
+        Vars.visionAxis = 'z'
+        Vars.drawArea.Refresh()
+
+    def OnTop(self, evt):
+
+        Vars.visionOption = 5
+        Vars.visionItem.SetLabelText(Vars.visionModes[5])
+        Vars.visionAxis = 'z'
+        Vars.drawArea.Refresh()
+
+    def OnFront(self, evt):
+
+        Vars.visionOption = 1
+        Vars.visionItem.SetLabelText(Vars.visionModes[1])
+        Vars.visionAxis = 'x'
+        Vars.drawArea.Refresh()
+
+    def OnBack(self, evt):
+        Vars.visionOption = 2
+        Vars.visionItem.SetLabelText(Vars.visionModes[2])
+        Vars.visionAxis = 'x'
+        Vars.drawArea.Refresh()
+
+    def OnRight(self, evt):
+        Vars.visionOption = 3
+        Vars.visionItem.SetLabelText(Vars.visionModes[3])
+        Vars.visionAxis = 'y'
+        Vars.drawArea.Refresh()
+
+    def OnLeft(self, evt):
+        Vars.visionOption = 4
+        Vars.visionItem.SetLabelText(Vars.visionModes[4])
+        Vars.visionAxis = 'y'
+        Vars.drawArea.Refresh()
