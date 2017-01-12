@@ -36,8 +36,8 @@ class MyCanvasBase(glcanvas.GLCanvas):
 
     def DoSetViewport(self):
         size = self.size = self.GetClientSize()
-        self.SetCurrent(self.context)
-        glViewport(0, 0, size.width, size.height)
+        #self.SetCurrent(self.context)
+        #glViewport(0, 0, size.width, size.height)
 
     def OnPaint(self, event):
         dc = wx.PaintDC(self)
@@ -144,7 +144,6 @@ class CubeCanvas(MyCanvasBase):
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_CULL_FACE)
         glEnable(GL_NORMALIZE)
-
         glEnable(GL_LIGHTING)
         glEnable(GL_LIGHT0)
         glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST)
@@ -191,11 +190,10 @@ class CubeCanvas(MyCanvasBase):
             glMatrixMode(GL_MODELVIEW)
             glLoadIdentity()
 
-        drawAxis()
-        drawGrid()
 
-        if Vars.cube != None:
-            drawCube(Vars.cube)
+        Vars.KitLib.drawAxis()
+        Vars.KitLib.drawGrid()
+        Vars.KitLib.drawCena()
 
         self.SwapBuffers()
 
@@ -213,11 +211,12 @@ class RightMenu(wx.Menu):
         self.parent = parent
 
         #Submenu adicionar
-        addMenu = wx.Menu()
-        addCube = wx.MenuItem(self, wx.NewId(), 'Cubo')
-        addMenu.Append(addCube)
-        self.AppendSubMenu(addMenu,'Adicionar')
-        self.Bind(wx.EVT_MENU, self.OnAddCube, addCube)
+        if Vars.visionOption != 0:
+            addMenu = wx.Menu()
+            addCube = wx.MenuItem(self, wx.NewId(), 'Cubo')
+            addMenu.Append(addCube)
+            self.AppendSubMenu(addMenu, 'Adicionar')
+            self.Bind(wx.EVT_MENU, self.OnAddCube, addCube)
 
         #Submenu camera
         camMenu = wx.Menu()
@@ -241,7 +240,6 @@ class RightMenu(wx.Menu):
         self.Bind(wx.EVT_MENU, self.OnRight, direita)
         self.Bind(wx.EVT_MENU, self.OnLeft, esquerda)
 
-
         #ItemMenu minimizar
         mmi = wx.MenuItem(self, wx.NewId(), 'Minimizar')
         self.Append(mmi)
@@ -251,6 +249,7 @@ class RightMenu(wx.Menu):
         cmi = wx.MenuItem(self, wx.NewId(), 'Fechar')
         self.Append(cmi)
         self.Bind(wx.EVT_MENU, self.OnClose, cmi)
+
 
     def OnMinimize(self, e):
         self.parent.Iconize()
@@ -271,49 +270,48 @@ class RightMenu(wx.Menu):
             x = (x * 2 * Vars.orthoZoom * Vars.drawArea.GetClientSize()[0] / Vars.drawArea.GetClientSize()[1]) - (Vars.orthoZoom * Vars.drawArea.GetClientSize()[0] / Vars.drawArea.GetClientSize()[1])
             y = y * 2 * Vars.orthoZoom - Vars.orthoZoom
 
-            if Vars.visionAxis == 'z':
-                Vars.cube = (x, y, 0)
-            elif Vars.visionAxis == 'x':
-                Vars.cube = (0, x, y)
-            elif Vars.visionAxis == 'y':
-                Vars.cube = (x, 0, y)
-
+            if Vars.KitLib.getVisionAxis() == 122:
+                Vars.KitLib.addCubo(ctypes.c_float(x),ctypes.c_float(y),0)
+            elif Vars.KitLib.getVisionAxis() == 120:
+                Vars.KitLib.addCubo(0, ctypes.c_float(x), ctypes.c_float(y))
+            elif Vars.KitLib.getVisionAxis() == 121:
+                Vars.KitLib.addCubo(ctypes.c_float(x), 0, ctypes.c_float(y))
 
     def OnPerspectiva(self, evt):
 
         Vars.visionOption = 0
         Vars.visionItem.SetLabelText(Vars.visionModes[0])
-        Vars.visionAxis = 'z'
+        Vars.KitLib.setVisionAxis(122)
         Vars.drawArea.Refresh()
 
     def OnTop(self, evt):
 
         Vars.visionOption = 5
         Vars.visionItem.SetLabelText(Vars.visionModes[5])
-        Vars.visionAxis = 'z'
+        Vars.KitLib.setVisionAxis(122)
         Vars.drawArea.Refresh()
 
     def OnFront(self, evt):
 
         Vars.visionOption = 1
         Vars.visionItem.SetLabelText(Vars.visionModes[1])
-        Vars.visionAxis = 'x'
+        Vars.KitLib.setVisionAxis(120)
         Vars.drawArea.Refresh()
 
     def OnBack(self, evt):
         Vars.visionOption = 2
         Vars.visionItem.SetLabelText(Vars.visionModes[2])
-        Vars.visionAxis = 'x'
+        Vars.KitLib.setVisionAxis(120)
         Vars.drawArea.Refresh()
 
     def OnRight(self, evt):
         Vars.visionOption = 3
         Vars.visionItem.SetLabelText(Vars.visionModes[3])
-        Vars.visionAxis = 'y'
+        Vars.KitLib.setVisionAxis(121)
         Vars.drawArea.Refresh()
 
     def OnLeft(self, evt):
         Vars.visionOption = 4
         Vars.visionItem.SetLabelText(Vars.visionModes[4])
-        Vars.visionAxis = 'y'
+        Vars.KitLib.setVisionAxis(121)
         Vars.drawArea.Refresh()

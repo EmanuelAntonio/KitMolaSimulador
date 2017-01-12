@@ -1,3 +1,6 @@
+# -*- coding: UTF-8 -*-
+
+
 from OpenGLCanvas import *
 from VarsAmbient import *
 
@@ -97,7 +100,6 @@ class WindowClass(wx.Frame):
     """
     def onSize(self,e):
 
-        print(self.GetSize())
         tamJanela = self.GetSize()
         resize = tamJanela
         resize[0] = resize[0]*Vars.drawSize
@@ -202,9 +204,9 @@ class Tabs(wx.Notebook):
         self.AddPage(TabPanel(self), "Configurações")
 
         # Adiciona os icones nas tabs
-        imgObj = imL.Add(wx.Bitmap('obj.ico'))
-        imgTool = imL.Add(wx.Bitmap('tool.ico'))
-        imgConfig = imL.Add(wx.Bitmap('config.ico'))
+        imgObj = imL.Add(wx.Bitmap('icones/obj.ico'))
+        imgTool = imL.Add(wx.Bitmap('icones/tool.ico'))
+        imgConfig = imL.Add(wx.Bitmap('icones/config.ico'))
         self.AssignImageList(imL)
         self.SetPageImage(0, imgObj)
         self.SetPageImage(1, imgTool)
@@ -284,7 +286,7 @@ class CamOp(wx.Notebook):
         self.AddPage(tabOne, "Câmera")
         imL = wx.ImageList(32,32)
         # Adiciona os icones nas tabs
-        imgObj = imL.Add(wx.Bitmap('cam.ico'))
+        imgObj = imL.Add(wx.Bitmap('icones/cam.ico'))
         self.AssignImageList(imL)
         self.SetPageImage(0, imgObj)
 
@@ -334,37 +336,37 @@ class CamPanel(wx.Panel):
 
         Vars.visionOption = 0
         Vars.visionItem.SetLabelText(Vars.visionModes[0])
-        Vars.visionAxis = 'z'
+        Vars.KitLib.setVisionAxis(122)
         Vars.drawArea.Refresh()
 
     def OnTop(self, evt):
 
         Vars.visionOption = 5
         Vars.visionItem.SetLabelText(Vars.visionModes[5])
-        Vars.visionAxis = 'z'
+        Vars.KitLib.setVisionAxis(122)
         Vars.drawArea.Refresh()
 
     def OnFront(self, evt):
 
         Vars.visionOption = 1
         Vars.visionItem.SetLabelText(Vars.visionModes[1])
-        Vars.visionAxis = 'x'
+        Vars.KitLib.setVisionAxis(120)
         Vars.drawArea.Refresh()
 
     def OnBack(self, evt):
         Vars.visionOption = 2
         Vars.visionItem.SetLabelText(Vars.visionModes[2])
-        Vars.visionAxis = 'x'
+        Vars.KitLib.setVisionAxis(120)
         Vars.drawArea.Refresh()
 
     def OnRight(self, evt):
         Vars.visionOption = 3
         Vars.visionItem.SetLabelText(Vars.visionModes[3])
-        Vars.visionAxis = 'y'
+        Vars.KitLib.setVisionAxis(121)
         Vars.drawArea.Refresh()
 
     def OnLeft(self, evt):
         Vars.visionOption = 4
         Vars.visionItem.SetLabelText(Vars.visionModes[4])
-        Vars.visionAxis = 'y'
+        Vars.KitLib.setVisionAxis(121)
         Vars.drawArea.Refresh()

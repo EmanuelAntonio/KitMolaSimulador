@@ -1,5 +1,7 @@
+# -*- coding: UTF-8 -*-
+
 import math
-from ctypes import c_void_p
+import ctypes
 
 try:
     import wx
@@ -33,12 +35,12 @@ class Vars(object):
     visionModes = ("Perspectiva", "Frente Ortho", "Atrás Ortho", "Direita Ortho", "Esquerda Ortho", "Cima Ortho")  # Variável que armazena os modos de visão(Perspectiva, direita, esquerda, frente, atrás, cima, baixo)
     visionItem = None  # Variável que armazena o label que mostra na janela qual o tipo de visão que estamos utilizando
     visionOption = 0 # Variável que armazena qual a o tipo de visão que está selecionado
-    visionAxis = 'z' # Variável que armazena qual o eixo principal para visão, o eixo 'que está para cima', é definido a partir do visionOption
     camZoom = 5  # Variável que armazena o raio da coordenada esférica correspondente ao zoom da câmera
     theta = math.pi / 4  # Variável que armazena em radianos o ângulo XY da câmera
     phi = math.pi / 3  # Variável que armazena em radianos o ângulo do eixo Z com o plano XY
     orthoCenter = (0,0) #Tupla que armazena o ponto central da visão ortho
     orthoZoom = 5 #Variável que armazena a distancia do centro para visao ortho
     rightMouse = (0,0,0) #Variável que armazena a ultima posição do mouse ao clicar com o botao direito
-    cube = None #Variável temporaria, que define o se irá ser desenhado um cubo na drawArea
+    ctypes.WinDLL('libs/freeglut.dll')
+    KitLib = ctypes.CDLL('libs/kitmola.so')  # Variável que armazena uma referência ao núcleo do programa em C
 
