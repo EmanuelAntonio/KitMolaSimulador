@@ -112,7 +112,7 @@ extern "C"{
 
 	}
 
-	void drawAxisX(){
+	void drawAxisY(){
 
 		glDisable(GL_LIGHTING);
 
@@ -211,7 +211,7 @@ extern "C"{
 
 	}
 
-	void drawAxisY(){
+	void drawAxisX(){
 
 		glDisable(GL_LIGHTING);
 
@@ -322,8 +322,8 @@ extern "C"{
             if (i == tamGrid/2){
                 if (visionAxis == 'z'){
                     glColor3f(0.0, 1.0, 0.0);
-                }else if (visionAxis == 'x'){
-                    glColor3f(1.0, 0.0, 0.0);
+                }else if (visionAxis == 'y'){
+                    glColor3f(0.0, 0.0, 1.0);
                 }
                 else{
                     glColor3f(0.0, 0.0, 1.0);
@@ -338,8 +338,8 @@ extern "C"{
 
                 if (visionAxis == 'z'){
                     glColor3f(1.0, 0.0, 0.0);
-                }else if (visionAxis == 'x'){
-                    glColor3f(0.0, 0.0, 1.0);
+                }else if (visionAxis == 'y'){
+                    glColor3f(1.0, 0.0, 0.0);
                 }else{
                     glColor3d(0.0, 1.0, 0.0);
                 }
@@ -395,36 +395,42 @@ extern "C"{
 
         glBegin(GL_QUADS);
 
+            //z+
             glNormal3f(0.0,0.0,1.0);
             glVertex3f(0.5,0.5,0.5);
             glVertex3f(-0.5,0.5,0.5);
             glVertex3f(-0.5,-0.5,0.5);
             glVertex3f(0.5,-0.5,0.5);
 
-            glNormal3f(0.0,0.0,-1.0);
+            //z-
+            glNormal3f(0.0,0.0,1.0);
             glVertex3f(0.5,0.5,-0.5);
             glVertex3f(0.5,-0.5,-0.5);
             glVertex3f(-0.5,-0.5,-0.5);
             glVertex3f(-0.5,0.5,-0.5);
 
+            //x+
             glNormal3f(1.0,0.0,0.0);
             glVertex3f(0.5,0.5,0.5);
             glVertex3f(0.5,-0.5,0.5);
             glVertex3f(0.5,-0.5,-0.5);
             glVertex3f(0.5,0.5,-0.5);
 
+            //x-
             glNormal3f(-1.0,0.0,0.0);
             glVertex3f(-0.5,0.5,0.5);
             glVertex3f(-0.5,0.5,-0.5);
             glVertex3f(-0.5,-0.5,-0.5);
             glVertex3f(-0.5,-0.5,0.5);
 
+            //y+
             glNormal3f(0.0,1.0,0.0);
             glVertex3f(0.5,0.5,0.5);
             glVertex3f(0.5,0.5,-0.5);
             glVertex3f(-0.5,0.5,-0.5);
             glVertex3f(-0.5,0.5,0.5);
 
+            //y-
             glNormal3f(0.0,-1.0,0.0);
             glVertex3f(0.5,-0.5,0.5);
             glVertex3f(-0.5,-0.5,0.5);
@@ -469,6 +475,27 @@ extern "C"{
             aux = aux->getProx();
 
         }
+
+    }
+    void save(char* arquivo){
+
+        l->salvar(arquivo, visionAxis,visionOption);
+
+    }
+    void open(char* arquivo){
+
+        cabecalhoKMP *c = l->abrir(arquivo);
+        visionAxis = c->visionAxis;
+
+    }
+    int getVisionOption(){
+
+        return visionOption;
+
+    }
+    void setVisionOption(int p){
+
+        visionOption = p;
 
     }
 

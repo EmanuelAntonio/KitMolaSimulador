@@ -1,9 +1,12 @@
 #include "include/GL/glut.h"
 #include "ListaObjetos.cpp"
 
+
 extern "C"{
 
     char visionAxis = 'z';
+    int visionOption = 0;
+
     ListaObjetos *l = new ListaObjetos();
 	/**
 	*	->Função drawAxis:
@@ -55,12 +58,26 @@ extern "C"{
 	**/
     void setVisionAxis(char c);
     /**
-	*   ->Função setVisionAxis:
+	*   ->Função getVisionAxis:
 	*		Retorna a variável visionAxis
-	*	->Parâmetros: 'char', retorna o caracter armazenado em visionAxis
-	*	->Retorno: vazio
+	*	->Parâmetros: vazio
+	*	->Retorno: 'char', retorna o caracter armazenado em visionAxis
 	**/
     char getVisionAxis();
+    /**
+	*   ->Função setVisionOption:
+	*		Altera a variável visionOption
+	*	->Parâmetros: 'p' é o novo valor da variavel visionOption
+	*	->Retorno: vazio
+	**/
+    void setVisionOption(int p);
+    /**
+	*   ->Função getVisionOption:
+	*		Retorna a variável visionOption
+	*	->Parâmetros: vazio
+	*	->Retorno: 'int', retorna o modo de visao armazenado em visionAxis
+	**/
+    int getVisionOption();
     /**
 	*   ->Função addCubo:
 	*		Adiciona um cubo na lista de objetos com o centro em x,y,z
@@ -82,6 +99,19 @@ extern "C"{
 	*	->Retorno: 'int'
 	**/
     void drawCena();
-
+    /**
+	*   ->Função save:
+	*		Salva a lista de objetos em um arquivo .kmp
+	*	->Parâmetros: "char* arquivo" é o arquivo de destino
+	*	->Retorno: 'vazio'
+	**/
+    void save(char* arquivo);
+    /**
+	*   ->Função open:
+	*		Abre um projeto em um arquivo .kmp
+	*	->Parâmetros: "char*" é o arquivo a ser aberto
+	*	->Retorno: 'vazio'
+	**/
+    void open(char* arquivo);
 
 }

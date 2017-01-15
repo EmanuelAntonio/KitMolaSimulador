@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-from OpenGLObjects import *
+from VarsAmbient import *
 
 """
     ->Classe MyCanvasBase:
@@ -30,14 +30,14 @@ class MyCanvasBase(glcanvas.GLCanvas):
         pass  # Do nothing, to avoid flashing on MSW.
 
     def OnSize(self, event):
-        #wx.CallAfter(self.DoSetViewport)
+        wx.CallAfter(self.DoSetViewport)
         self.DoSetViewport()
         event.Skip()
 
     def DoSetViewport(self):
         size = self.size = self.GetClientSize()
-        #self.SetCurrent(self.context)
-        #glViewport(0, 0, size.width, size.height)
+        self.SetCurrent(self.context)
+        glViewport(0, 0, size.width, size.height)
 
     def OnPaint(self, event):
         dc = wx.PaintDC(self)
@@ -70,7 +70,7 @@ class MyCanvasBase(glcanvas.GLCanvas):
             self.lastx, self.lasty = self.x, self.y
             self.x, self.y = evt.GetPosition()
 
-            if Vars.visionOption == 0:
+            if Vars.KitLib.getVisionOption() == 0:
                 Vars.theta = Vars.theta + (self.lastx - self.x) / 100
                 Vars.phi = Vars.phi + (self.lasty - self.y) / 100
                 if Vars.phi > math.pi / 2:
@@ -89,7 +89,7 @@ class MyCanvasBase(glcanvas.GLCanvas):
     """
     def OnMouseScroll(self, evt):
 
-        if Vars.visionOption == 0:
+        if Vars.KitLib.getVisionOption() == 0:
 
             zoom = 0.3
             if evt.GetWheelRotation() > 0:
@@ -151,7 +151,7 @@ class CubeCanvas(MyCanvasBase):
     def OnDraw(self):
 
         #Definições de câmera perspectiva
-        if Vars.visionOption == 0:
+        if Vars.KitLib.getVisionOption() == 0:
             eye = (Vars.camZoom * math.cos(Vars.theta) * math.sin(Vars.phi),
                    Vars.camZoom * math.sin(Vars.theta) * math.sin(Vars.phi), Vars.camZoom * math.cos(Vars.phi))
             up = (-Vars.camZoom * math.cos(Vars.theta) * math.cos(Vars.phi),
@@ -162,13 +162,13 @@ class CubeCanvas(MyCanvasBase):
             glViewport(0, 0, self.GetClientSize()[0], self.GetClientSize()[1])
             glMatrixMode(GL_PROJECTION)
             glLoadIdentity()
-            gluPerspective(60.0, self.GetClientSize()[0] / self.GetClientSize()[1], 0.1, 50)
+            gluPerspective(60.0, self.GetClientSize()[0] / self.GetClientSize()[1], 0.01, 50)
             glMatrixMode(GL_MODELVIEW)
             glLoadIdentity()
             gluLookAt(eye[0], eye[1], eye[2], center[0], center[1], center[2], up[0], up[1], up[2])
 
         #Definições de câmera ortho positiva
-        elif Vars.visionOption == 5 or Vars.visionOption == 1 or Vars.visionOption == 3:
+        elif Vars.KitLib.getVisionOption() == 5 or Vars.KitLib.getVisionOption() == 1 or Vars.KitLib.getVisionOption() == 4:
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             glViewport(0, 0, self.GetClientSize()[0], self.GetClientSize()[1])
             glMatrixMode(GL_PROJECTION)
@@ -179,7 +179,7 @@ class CubeCanvas(MyCanvasBase):
             glMatrixMode(GL_MODELVIEW)
             glLoadIdentity()
         #Definições de câmera ortho negativa
-        elif Vars.visionOption == 2 or Vars.visionOption == 4:
+        elif Vars.KitLib.getVisionOption() == 2 or Vars.KitLib.getVisionOption() == 3:
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             glViewport(0, 0, self.GetClientSize()[0], self.GetClientSize()[1])
             glMatrixMode(GL_PROJECTION)
@@ -211,7 +211,7 @@ class RightMenu(wx.Menu):
         self.parent = parent
 
         #Submenu adicionar
-        if Vars.visionOption != 0:
+        if Vars.KitLib.getVisionOption() != 0:
             addMenu = wx.Menu()
             addCube = wx.MenuItem(self, wx.NewId(), 'Cubo')
             addMenu.Append(addCube)
@@ -251,67 +251,138 @@ class RightMenu(wx.Menu):
         self.Bind(wx.EVT_MENU, self.OnClose, cmi)
 
 
+    """
+        -> Função OnMinimize:
+            Função para minimizar a janela com o botao direito do mouse
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
     def OnMinimize(self, e):
         self.parent.Iconize()
 
+    """
+        -> Função OnClose:
+            Função para fechar a janela com o botao direito do mouse
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
     def OnClose(self, e):
         self.parent.Close()
-
+    """
+        -> Função OnAddCube:
+            Função para adicionar a lista de objetos com o botão direito do mouse
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
     def OnAddCube(self,e):
         #Vars.cube = True
         x,y = Vars.rightMouse
 
         y = self.parent.GetClientSize()[1] - y
 
-        if Vars.visionOption != 0:
+        if Vars.KitLib.getVisionOption() != 0:
             x = x / (Vars.drawArea.GetClientSize()[0])
             y = y / (Vars.drawArea.GetClientSize()[1])
 
             x = (x * 2 * Vars.orthoZoom * Vars.drawArea.GetClientSize()[0] / Vars.drawArea.GetClientSize()[1]) - (Vars.orthoZoom * Vars.drawArea.GetClientSize()[0] / Vars.drawArea.GetClientSize()[1])
             y = y * 2 * Vars.orthoZoom - Vars.orthoZoom
 
-            if Vars.KitLib.getVisionAxis() == 122:
+            if Vars.KitLib.getVisionAxis() == 122: #122 Codigo ASCII para 'z'
                 Vars.KitLib.addCubo(ctypes.c_float(x),ctypes.c_float(y),0)
-            elif Vars.KitLib.getVisionAxis() == 120:
-                Vars.KitLib.addCubo(0, ctypes.c_float(x), ctypes.c_float(y))
-            elif Vars.KitLib.getVisionAxis() == 121:
-                Vars.KitLib.addCubo(ctypes.c_float(x), 0, ctypes.c_float(y))
+            elif Vars.KitLib.getVisionAxis() == 120:#120 Codigo ASCII para 'x'
+                if Vars.KitLib.getVisionOption() == 1:
+                    Vars.KitLib.addCubo(0, ctypes.c_float(y), ctypes.c_float(x))
+                else:
+                    Vars.KitLib.addCubo(0, ctypes.c_float(y), ctypes.c_float(-x))
+            elif Vars.KitLib.getVisionAxis() == 121:#121 Codigo ASCII para 'y'
+                if Vars.KitLib.getVisionOption() == 3:
+                    Vars.KitLib.addCubo(ctypes.c_float(-x), 0, ctypes.c_float(y))
+                else:
+                    Vars.KitLib.addCubo(ctypes.c_float(x), 0, ctypes.c_float(y))
+
+    """
+            -> Função OnPerspectiva:
+                Função para alternar o modo de visão para perspectiva com o botao direito do mouse
+            -> Parâmetros:
+                -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+            -> Retorno: vazio
+        """
 
     def OnPerspectiva(self, evt):
-
-        Vars.visionOption = 0
+        Vars.KitLib.setVisionOption(0)
         Vars.visionItem.SetLabelText(Vars.visionModes[0])
-        Vars.KitLib.setVisionAxis(122)
+        Vars.KitLib.setVisionAxis(122)  # 122 Codigo ASCII para 'z'
         Vars.drawArea.Refresh()
+
+    """
+        -> Função OnTop:
+            Função para alternar o modo de visão para ortogonal de cima com o botao direito do mouse
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
 
     def OnTop(self, evt):
-
-        Vars.visionOption = 5
+        Vars.KitLib.setVisionOption(5)
         Vars.visionItem.SetLabelText(Vars.visionModes[5])
-        Vars.KitLib.setVisionAxis(122)
+        Vars.KitLib.setVisionAxis(122)  # 122 Codigo ASCII para 'z'
         Vars.drawArea.Refresh()
+
+    """
+        -> Função OnFront:
+            Função para alternar o modo de visão para ortogonal em x positivo com o botao direito do mouse
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
 
     def OnFront(self, evt):
-
-        Vars.visionOption = 1
+        Vars.KitLib.setVisionOption(1)
         Vars.visionItem.SetLabelText(Vars.visionModes[1])
-        Vars.KitLib.setVisionAxis(120)
+        Vars.KitLib.setVisionAxis(120)  # 120 Codigo ASCII para 'x'
         Vars.drawArea.Refresh()
+
+    """
+        -> Função OnBack:
+            Função para alternar o modo de visão para ortogonal em x negativo com o botao direito do mouse
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
 
     def OnBack(self, evt):
-        Vars.visionOption = 2
+        Vars.KitLib.setVisionOption(2)
         Vars.visionItem.SetLabelText(Vars.visionModes[2])
-        Vars.KitLib.setVisionAxis(120)
+        Vars.KitLib.setVisionAxis(120)  # 120 Codigo ASCII para 'x'
         Vars.drawArea.Refresh()
+
+    """
+        -> Função OnRight:
+            Função para alternar o modo de visão para ortogonal em y positivo com o botao direito do mouse
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
 
     def OnRight(self, evt):
-        Vars.visionOption = 3
+        Vars.KitLib.setVisionOption(3)
         Vars.visionItem.SetLabelText(Vars.visionModes[3])
-        Vars.KitLib.setVisionAxis(121)
+        Vars.KitLib.setVisionAxis(121)  # 121 Codigo ASCII para 'y'
         Vars.drawArea.Refresh()
 
+    """
+        -> Função OnLeft:
+            Função para alternar o modo de visão para ortogonal em y negativo com o botao direito do mouse
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
+
     def OnLeft(self, evt):
-        Vars.visionOption = 4
+        Vars.KitLib.setVisionOption(4)
         Vars.visionItem.SetLabelText(Vars.visionModes[4])
-        Vars.KitLib.setVisionAxis(121)
+        Vars.KitLib.setVisionAxis(121)  # 121 Codigo ASCII para 'y'
         Vars.drawArea.Refresh()

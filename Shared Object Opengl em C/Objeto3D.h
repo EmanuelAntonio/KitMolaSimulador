@@ -3,15 +3,32 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-class Ponto{
+/**Struct cabecalhoKMP: cabeçalho do arquivo binario do projeto .kmp**/
+struct cabecalhoKMP{
 
-    public:
-        float x;
-        float y;
-        float z;
+    int numObj;
+    char visionAxis;
+    int visionOption;
 
 };
+/**Struct Ponto: armazena um ponto em R^3**/
+struct Ponto{
 
+    float x;
+    float y;
+    float z;
+
+};
+/**Struct objeto: armazena um objeto3d para armazenamento no arquivo binario do projeto .kmp**/
+struct objeto{
+
+    int obj;
+    Ponto centro;
+    Ponto MBR[2];
+    Ponto extremidades[2];
+
+};
+/** Classe Objeto3D: um nó da lista de objetos, armazena informacoes essenciais sobre um objeto da cena**/
 class Objeto3D
 {
     public:
