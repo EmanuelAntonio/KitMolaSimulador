@@ -17,7 +17,6 @@ class MyCanvasBase(glcanvas.GLCanvas):
         self.lastx = self.x = 30
         self.lasty = self.y = 30
         self.size = None
-        self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnEraseBackground)
         self.Bind(wx.EVT_SIZE, self.OnSize)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_LEFT_DOWN, self.OnMouseDown)
@@ -26,9 +25,13 @@ class MyCanvasBase(glcanvas.GLCanvas):
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnMouseScroll)
         self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
 
-    def OnEraseBackground(self, event):
-        pass  # Do nothing, to avoid flashing on MSW.
 
+    """
+        -> Função OnSize:
+            Função para reoganizar a viewport da drawArea assim que sofrer um resize na janela
+            -> 'evt' : instância de evento, pode ou não ser usado para o tratamento do evento size
+        -> Retorno: vazio
+    """
     def OnSize(self, event):
         wx.CallAfter(self.DoSetViewport)
         self.DoSetViewport()
@@ -50,13 +53,16 @@ class MyCanvasBase(glcanvas.GLCanvas):
     def OnMouseDown(self, evt):
         self.CaptureMouse()
         self.x, self.y = self.lastx, self.lasty = evt.GetPosition()
+        ponto = Vars.KitLib.getPonto3D(c_int(self.x), c_int(self.y))
+        op = Vars.KitLib.select(ponto)
+        print(op)
+        print("entrou")
 
     def OnMouseUp(self, evt):
         try:
             self.ReleaseMouse()
         except:
             pass
-
 
     """
         -> Função OnMouseMotion:
@@ -126,9 +132,23 @@ class MyCanvasBase(glcanvas.GLCanvas):
     """
     def OnRightDown(self,e):
         Vars.rightMouse = (e.GetPosition()[0],e.GetPosition()[1])
-        self.PopupMenu(RightMenu(self.parent), e.GetPosition())
+        try:
+            self.PopupMenu(RightMenu(self.parent), e.GetPosition())
+        except:
+            pass
         self.Refresh()
 
+    """
+        -> Função OnKeyDown:
+            Função para monitorar as teclas que são precionadas sob a drawArea na execução do programa
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de key_down
+        -> Retorno: vazio
+    """
+    def OnKeyDown(self, e):
+        print("entrou nessa merda")
+        e.Skip()
+
+#########################################################################################################################################################################################
 
 """
     -> Classe CubeCanvas:
@@ -162,7 +182,7 @@ class CubeCanvas(MyCanvasBase):
             glViewport(0, 0, self.GetClientSize()[0], self.GetClientSize()[1])
             glMatrixMode(GL_PROJECTION)
             glLoadIdentity()
-            gluPerspective(60.0, self.GetClientSize()[0] / self.GetClientSize()[1], 0.01, 50)
+            gluPerspective(60.0, self.GetClientSize()[0] / self.GetClientSize()[1], 0.01, 500)
             glMatrixMode(GL_MODELVIEW)
             glLoadIdentity()
             gluLookAt(eye[0], eye[1], eye[2], center[0], center[1], center[2], up[0], up[1], up[2])
@@ -190,13 +210,14 @@ class CubeCanvas(MyCanvasBase):
             glMatrixMode(GL_MODELVIEW)
             glLoadIdentity()
 
-
+        Vars.KitLib.drawCena()
         Vars.KitLib.drawAxis()
         Vars.KitLib.drawGrid()
-        Vars.KitLib.drawCena()
+
 
         self.SwapBuffers()
 
+#########################################################################################################################################################################################
 
 """
     ->Classe PopupMenu:
@@ -294,7 +315,7 @@ class RightMenu(wx.Menu):
                 Vars.KitLib.addCubo(ctypes.c_float(x),ctypes.c_float(y),0)
             elif Vars.KitLib.getVisionAxis() == 120:#120 Codigo ASCII para 'x'
                 if Vars.KitLib.getVisionOption() == 1:
-                    Vars.KitLib.addCubo(0, ctypes.c_float(y), ctypes.c_float(x))
+                    Vars.KitLib.addCubo(0, ctypes.c_float(x),ctypes.c_float(y))
                 else:
                     Vars.KitLib.addCubo(0, ctypes.c_float(y), ctypes.c_float(-x))
             elif Vars.KitLib.getVisionAxis() == 121:#121 Codigo ASCII para 'y'

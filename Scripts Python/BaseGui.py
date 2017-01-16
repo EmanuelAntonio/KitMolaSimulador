@@ -11,7 +11,7 @@ class WindowClass(wx.Frame):
     def __init__(self, *args, **kwargs):
         super(WindowClass,self).__init__(*args, **kwargs)
 
-        self.basic_gui()
+        self.base_gui()
 
     """
         -> Função basic_gui:
@@ -19,10 +19,10 @@ class WindowClass(wx.Frame):
          -> Parâmetros: vazio
         -> Retorno: vazio
     """
-    def basic_gui(self):
-
+    def base_gui(self):
 
         self.CreateStatusBar()
+
         Vars.status = self.GetStatusBar()
         self.SetTitle("Simulador KitMola")
 
@@ -32,9 +32,9 @@ class WindowClass(wx.Frame):
         boxBtn = wx.BoxSizer(wx.VERTICAL)
 
         #Criação da area das tabs
-        notebook = Tabs(self)
+        tabs = Tabs(self)
         cam = CamOp(self)
-        boxBtn.Add(notebook, 1, wx.ALIGN_TOP | wx.EXPAND, 10)
+        boxBtn.Add(tabs, 1, wx.ALIGN_TOP | wx.EXPAND, 10)
         boxBtn.Add(cam,1,wx.ALIGN_BOTTOM | wx.EXPAND,10)
 
         #Definição dos menus
@@ -87,6 +87,7 @@ class WindowClass(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onEdit, editItem)
         self.Bind(wx.EVT_MENU, self.onHelp, helpItem)
         self.Bind(wx.EVT_MENU, self.version, versionItem)
+        #boxMain.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
 
         #Configurações finais
         self.Maximize(True)
@@ -231,6 +232,15 @@ class WindowClass(wx.Frame):
             c_s = arquivo.encode("utf-8")
             Vars.KitLib.save(c_s)
 
+    """
+        -> Função OnKeyDown:
+            Função para monitorar as teclas que são precionadas sob a drawArea na execução do programa
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de key_down
+        -> Retorno: vazio
+    """
+    def OnKeyDown(self, e):
+        print("entrou nessa merda")
+        e.Skip()
 
 #########################################################################################################################################################################################
 """
@@ -264,7 +274,7 @@ class Tabs(wx.Notebook):
         self.AddPage(tabTwo, "Ferramentas")
 
         # Create and add the third tab
-        self.AddPage(TabPanel(self), "Configurações")
+        self.AddPage(TabConfig(self), "Configurações")
 
         # Adiciona os icones nas tabs
         imgObj = imL.Add(wx.Bitmap('icones/obj.ico'))
@@ -278,7 +288,7 @@ class Tabs(wx.Notebook):
         #self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnPageChanged)
         #self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGING, self.OnPageChanging)
 
-
+#########################################################################################################################################################################################
 """
     ->Classe TabPanel:
         Classe utilizada para instânciar uma das abas, será substituida futuramente por classes específicas para cada aba.
@@ -306,7 +316,69 @@ class TabPanel(wx.Panel):
         self.SetSizer(sizer)
 
 
+################################################################################################################################################################################################
+"""
+    ->Classe TabConfig:
+        Classe utilizada para instânciar a aba configurações no menu Principal.
 
+"""
+class TabConfig(wx.Panel):
+
+    # ----------------------------------------------------------------------
+    def __init__(self, parent):
+
+
+        wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        lblTamGrid = wx.StaticText(self,wx.ID_ANY,"Tamanho do grid: ")
+        lblTamGrid.SetExtraStyle(wx.TE_CENTRE)
+        self.txtTamGrid = wx.TextCtrl(self, wx.ID_ANY, str(Vars.KitLib.getTamGrid()),style=wx.TE_PROCESS_ENTER)
+        self.txtTamGrid.Bind(wx.EVT_KEY_DOWN, self.OnEnter)
+        btnTamGrid = wx.Button(self,wx.ID_ANY,"Ok")
+
+        sizer.Add(lblTamGrid, 0, wx.ALIGN_CENTER,5)
+        sizer.Add(self.txtTamGrid, 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        sizer.Add(btnTamGrid, 0, wx.ALIGN_CENTER, 5)
+        sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+
+        self.Bind(wx.EVT_BUTTON, self.OnTamGrid,btnTamGrid)
+        self.Bind(wx.EVT_TEXT_ENTER, self.OnTamGrid,self.txtTamGrid)
+
+        self.SetSizer(sizer)
+
+    """
+        -> Função OnTamGrid:
+            Função para alternar o tamanho do grid a ser exibido na cena
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
+    def OnTamGrid(self, e):
+
+        if int(self.txtTamGrid.GetValue())%2 == 0:
+            Vars.KitLib.setTamGrid(c_int(int(self.txtTamGrid.GetValue())))
+        else:
+            Vars.KitLib.setTamGrid(c_int(int(self.txtTamGrid.GetValue())+1))
+            self.txtTamGrid.SetValue(str(int(self.txtTamGrid.GetValue())+1))
+        Vars.drawArea.Refresh()
+    """
+        -> Função OnEnter:
+            Função para tratar o pressionamento da tecla enter sob o txtTamGrid
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
+    def OnEnter(self,e):
+
+        keycode = e.GetKeyCode()
+        if keycode == wx.WXK_RETURN or keycode == wx.WXK_NUMPAD_ENTER or keycode == wx.WXK_TAB:
+            self.OnTamGrid(e)
+            e.EventObject.Navigate()
+        e.Skip()
+
+
+################################################################################################################################################################################################
 """
     -> Classe CamOp:
         Classe responsável pela manipulação de troca dos tipos de visão
@@ -339,6 +411,8 @@ class CamOp(wx.Notebook):
         self.SetPageImage(0, imgObj)
 
 
+################################################################################################################################################################################################
+
 """
     ->Classe CamPanel:
         Classe utilizada para instânciar os objetos da aba camera do menu principal.
@@ -363,12 +437,12 @@ class CamPanel(wx.Panel):
         btnLeft = wx.Button(self, wx.ID_ANY, "Esquerda")
 
 
-        sizer.Add(btnPerspectiva, 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
-        sizer.Add(btnTop, 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
-        sizer.Add(btnFront, 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
-        sizer.Add(btnBack, 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
-        sizer.Add(btnRight, 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
-        sizer.Add(btnLeft, 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        sizer.Add(btnPerspectiva, 1, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        sizer.Add(btnTop, 1, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        sizer.Add(btnFront, 1, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        sizer.Add(btnBack, 1, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        sizer.Add(btnRight, 1, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        sizer.Add(btnLeft, 1, wx.ALIGN_CENTER | wx.EXPAND, 5)
 
         self.Bind(wx.EVT_BUTTON, self.OnPerspectiva, btnPerspectiva)
         self.Bind(wx.EVT_BUTTON, self.OnTop, btnTop)

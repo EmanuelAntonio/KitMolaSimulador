@@ -15,6 +15,7 @@ void ListaObjetos::addCubo(float x, float y, float z){
         pri = new Objeto3D();
         pri->setObjeto(0);
         pri->setCentro(x,y,z);
+        pri->setMBR(-0.5+x,-0.5+y,-0.5+z,0.5+x,0.5+y,0.5+z);
 
     }else{
 
@@ -22,6 +23,7 @@ void ListaObjetos::addCubo(float x, float y, float z){
         aux->setObjeto(0);
         aux->setCentro(x,y,z);
         aux->setProx(pri);
+        aux->setMBR(-0.5+x,-0.5+y,-0.5+z,0.5+x,0.5+y,0.5+z);
         pri = aux;
 
     }
@@ -103,12 +105,47 @@ cabecalhoKMP* ListaObjetos::abrir(char* arquivo){
 }
 ListaObjetos::~ListaObjetos()
 {
+    clear();
+
+}
+void ListaObjetos::clear(){
+
     Objeto3D *aux = NULL;
     while(pri != NULL){
 
         aux = pri;
         pri = pri->getProx();
         delete aux;
+
+    }
+
+}
+bool ListaObjetos::select(float x, float y, float z){
+
+    Objeto3D *aux = pri;
+    while(aux != NULL){
+
+        if((aux->getMBR()[0].x <= x) && (aux->getMBR()[0].y <= y) && (aux->getMBR()[0].z <= z)){
+
+            if((aux->getMBR()[1].x >= x) && (aux->getMBR()[1].y >= y) && (aux->getMBR()[1].z >= z)){
+
+                aux->setSelecionado(!aux->getSelecionado());
+                return true;
+
+            }
+
+        }
+        aux = aux->getProx();
+    }
+    return false;
+}
+void ListaObjetos::deSelectAll(){
+
+    Objeto3D *aux = pri;
+    while(pri != NULL){
+
+        aux->setSelecionado(false);
+        aux = aux->getProx();
 
     }
 

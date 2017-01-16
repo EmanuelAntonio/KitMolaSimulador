@@ -26,8 +26,8 @@ except ImportError:
 
 class Vars(object):
 
-    version = "0.2.1"  # Variável de controle de versão
-    dateModificacao = "13/01/2017"  # Data da última atualização do programa
+    version = "0.3"  # Variável de controle de versão
+    dateModificacao = "16/01/2017"  # Data da última atualização do programa
     tamJanela = (0, 0)  # Tupla respomsável por guardar o tamanho atual da janela
     drawArea = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
     drawSize = 0.88  # Variável que armazena a porcentagem, normalizada de 0 a 1, do quanto que a drawArea irá pegar do tamanho da janela
@@ -42,6 +42,7 @@ class Vars(object):
     orthoZoom = 5 #Variável que armazena a distancia do centro para visao ortho
     rightMouse = (0,0,0) #Variável que armazena a ultima posição do mouse ao clicar com o botao direito
     arquivoProjeto = "" #Variável que armazena o diretorio com o nome do projeto que está aberto atualmente
+    shiftPress = False #Variável que armazena se o shift está sendo pressionado nesse exato momento
     ctypes.WinDLL('libs/freeglut.dll') #Importa a dll freeglut.dll, usado apenas no windows, a versão para linux não terá esta linha
     KitLib = ctypes.CDLL('libs/kitmola.dll')  # Variável que armazena uma referência ao núcleo do programa em C
 

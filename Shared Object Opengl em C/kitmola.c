@@ -312,7 +312,6 @@ extern "C"{
 	void drawGrid(){
 
         float espacoGrid = 1;
-        int tamGrid = 10;
         float iniGrid = -tamGrid/(2/espacoGrid);
 
         glDisable(GL_LIGHTING);
@@ -450,7 +449,7 @@ extern "C"{
 
             }else if(visionAxis == 'x'){
 
-                glTranslatef(z,y,x);
+                glTranslatef(y,z,x);
 
             }else{
 
@@ -496,6 +495,36 @@ extern "C"{
     void setVisionOption(int p){
 
         visionOption = p;
+
+    }
+    void setTamGrid(int p){
+
+        tamGrid = p;
+
+    }
+    int getTamGrid(){
+
+        return tamGrid;
+
+    }
+    double* getPonto3D(int x, int y){
+
+        double modelview[16], projection[16];
+        int viewport[4];
+        float z = 1;
+        double *ponto = new double[3];
+        glGetDoublev( GL_PROJECTION_MATRIX, projection );
+        glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+        glGetIntegerv( GL_VIEWPORT, viewport );
+        glReadPixels( x, viewport[3]-y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z );
+        gluUnProject( x, viewport[3]-y, z, modelview, projection, viewport, &ponto[0], &ponto[1], &ponto[2]);
+
+        return ponto;
+
+    }
+    bool select(double *ponto){
+
+        return l->select(ponto[0], ponto[1], ponto[2]);
 
     }
 

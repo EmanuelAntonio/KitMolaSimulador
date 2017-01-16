@@ -36,10 +36,12 @@ class Objeto3D
 
             objeto = 0;
             prox = NULL;
+            selecionado = false;
 
         }
         void setObjeto(int p){objeto = p;}
         void setProx(Objeto3D *p){prox = p;}
+        void setSelecionado(bool sel){selecionado = sel;}
         void setCentro(float x, float y, float z){
 
             centro.x = x;
@@ -72,6 +74,7 @@ class Objeto3D
         Ponto *getMBR(){return MBR;}
         Ponto *getCentro(){return &centro;}
         Ponto *getExtremidades(){return extremidades;}
+        bool getSelecionado(){return selecionado;}
         ~Objeto3D(){}
     private:
         int objeto;/**Referência a qual objeto este nó da lista se refere
@@ -80,7 +83,8 @@ class Objeto3D
                     **/
         Ponto centro;/**Parâmetro de desenho, para objetos que precisem**/
         Ponto extremidades[2];/**Parâmetro de desenho, para objetos que precisem**/
-        Ponto MBR[2];/**Menor paralelepipedo que engloba todo o objeto**/
+        Ponto MBR[2];/**Menor paralelepipedo que engloba todo o objeto, menor ponto e maior ponto repectivamente**/
+        bool selecionado;/**Variavel que armazena se este objeto está selecionado**/
         Objeto3D *prox;/**Ponteiro para o proximo nó da lista**/
 };
 #endif // OBJETO3D_H

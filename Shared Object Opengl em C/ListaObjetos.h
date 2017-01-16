@@ -31,6 +31,22 @@ class ListaObjetos
                     *   Parâmetros: vazio
                     *   Retorno: vazio
                     **/
+        void clear();/**
+                        *   Função clear: apaga a lista de objetos
+                        *   Parâmetros: vazio
+                        *   Retorno: vazio
+                        **/
+        bool select(float x, float y, float z);/**
+                                                *   Função select: seleciona o objeto que contêm o ponto (x,y,z)
+                                                *   Parâmetros: (x,y,z), ponto que foi clicado na interface
+                                                *   Retorno: 'bool' se foi selecionado algum objeto
+                                                **/
+        void deSelectAll();/**
+                            *   Função deSelectAll: deseleciona todos os objetos que estavam selecionados
+                            *   Parâmetros: vazio
+                            *   Retorno: vazio
+                            **/
+
         ~ListaObjetos();
     private:
         Objeto3D *pri;

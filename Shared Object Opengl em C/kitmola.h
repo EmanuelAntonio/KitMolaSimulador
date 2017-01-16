@@ -4,8 +4,9 @@
 
 extern "C"{
 
-    char visionAxis = 'z';
+    char visionAxis = 'z'; ///Eixo para
     int visionOption = 0;
+    int tamGrid = 50;
 
     ListaObjetos *l = new ListaObjetos();
 	/**
@@ -79,6 +80,20 @@ extern "C"{
 	**/
     int getVisionOption();
     /**
+	*   ->Função setTamGrid:
+	*		Altera a variável tamGrid
+	*	->Parâmetros: 'p' é o novo valor da variavel tamGrid
+	*	->Retorno: vazio
+	**/
+    void setTamGrid(int p);
+    /**
+	*   ->Função getTamGrid:
+	*		Retorna a variável visionOption
+	*	->Parâmetros: vazio
+	*	->Retorno: 'int', retorna o modo de visao armazenado em tamGrid
+	**/
+    int getTamGrid();
+    /**
 	*   ->Função addCubo:
 	*		Adiciona um cubo na lista de objetos com o centro em x,y,z
 	*	->Parâmetros: x,y,z, centro do cubo
@@ -113,5 +128,19 @@ extern "C"{
 	*	->Retorno: 'vazio'
 	**/
     void open(char* arquivo);
+    /**
+	*   ->Função getPonto3D:
+	*		Converte um ponto da janela em seu respectivo ponto 3d da cena
+	*	->Parâmetros: (x,y) ponto da janela
+	*	->Retorno: (float[3])(x,y,z) ponto em 3d da cena
+	**/
+    double* getPonto3D(int x, int y);
+    /**
+	*   ->Função select:
+	*       Seleciona um objeto da sena de acordo com o ponto passado cmo parametro
+	*	->Parâmetros: 'double*' um ponto em R^3
+	*	->Retorno: 'bool' se o select encontrou algum objeto que corresponde ao ponto passado
+	**/
+    bool select(double *ponto);
 
 }
