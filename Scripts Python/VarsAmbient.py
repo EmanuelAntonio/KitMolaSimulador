@@ -30,6 +30,7 @@ class Vars(object):
     dateModificacao = "17/01/2017"  # Data da última atualização do programa
     tamJanela = (0, 0)  # Tupla respomsável por guardar o tamanho atual da janela
     drawArea = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
+    toolBox = None # Variável que armazena uma refência
     drawSize = 0.88  # Variável que armazena a porcentagem, normalizada de 0 a 1, do quanto que a drawArea irá pegar do tamanho da janela
     status = None # Varável que armazena uma referência ao 'status bar', pode ser utilizado em usos futuros
     visionModes = ("Perspectiva", "Frente Ortho", "Atrás Ortho", "Direita Ortho", "Esquerda Ortho", "Cima Ortho")  # Variável que armazena os modos de visão(Perspectiva, direita, esquerda, frente, atrás, cima, baixo)

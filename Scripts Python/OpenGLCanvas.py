@@ -52,13 +52,17 @@ class MyCanvasBase(glcanvas.GLCanvas):
         self.OnDraw()
 
     def OnScrollClick(self,e):
+        Vars.toolBox.SetFocus()
         self.x, self.y = self.lastx, self.lasty = e.GetPosition()
         ponto = Vars.KitLib.getPonto3D(c_int(self.x), c_int(self.y))
+        if not(Vars.shiftPress):
+            Vars.KitLib.deSelectAll()
         op = Vars.KitLib.select(ponto)
         if(op):
             self.Refresh()
 
     def OnMouseDown(self, evt):
+        Vars.toolBox.SetFocus()
         self.CaptureMouse()
         self.x, self.y = self.lastx, self.lasty = evt.GetPosition()
 
@@ -136,22 +140,13 @@ class MyCanvasBase(glcanvas.GLCanvas):
         -> Retorno: vazio
     """
     def OnRightDown(self,e):
+        Vars.toolBox.SetFocus()
         Vars.rightMouse = (e.GetPosition()[0],e.GetPosition()[1])
         try:
             self.PopupMenu(RightMenu(self.parent), e.GetPosition())
         except:
             pass
         self.Refresh()
-
-    """
-        -> Função OnKeyDown:
-            Função para monitorar as teclas que são precionadas sob a drawArea na execução do programa
-            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de key_down
-        -> Retorno: vazio
-    """
-    def OnKeyDown(self, e):
-        print("entrou nessa merda")
-        e.Skip()
 
 #########################################################################################################################################################################################
 

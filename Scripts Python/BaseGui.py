@@ -87,7 +87,11 @@ class WindowClass(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onEdit, editItem)
         self.Bind(wx.EVT_MENU, self.onHelp, helpItem)
         self.Bind(wx.EVT_MENU, self.version, versionItem)
-        #boxMain.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
+        cam.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
+        cam.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
+        tabs.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
+        tabs.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
+        Vars.toolBox = tabs
 
         #Configurações finais
         self.Maximize(True)
@@ -151,17 +155,15 @@ class WindowClass(wx.Frame):
     """
     def onHelp(self,e):
 
-        help = wx.MessageDialog(None, "Help", "Ajuda?", wx.OK)
-        yesNo = help.ShowModal()
+        hlp = "Comandos básicos:\n" \
+              "     ->Clique e arraste do mouse para movimentar a câmera;\n" \
+              "     ->Rolar o botão domeio do mouse ajusta o zoom;\n" \
+              "     ->Botão direito do mouse abre um menu com varias opções de manipulação objetos e ajustes de câmera;\n" \
+              "     ->Clique com o botão do meio do mouse para selecionar um objeto e segure shift para selecionar varios;\n" \
+              "     ->A toolbox à esquerda contêm varias opções de objetos, câmeras e configurações\n"
+        help = wx.MessageDialog(None, hlp, "Ajuda", wx.OK)
+        help.ShowModal()
         help.Destroy()
-        if yesNo == wx.ID_YES:
-            helpYes = wx.MessageDialog(None, "Você disse sim!", "Help", wx.OK)
-            helpYes.ShowModal()
-            helpYes.Destroy()
-        else:
-            helpNo = wx.MessageDialog(None, "Você disse não!", "Help", wx.OK)
-            helpNo.ShowModal()
-            helpNo.Destroy()
 
     """
         -> Função version:
@@ -239,8 +241,20 @@ class WindowClass(wx.Frame):
         -> Retorno: vazio
     """
     def OnKeyDown(self, e):
-        print("entrou nessa merda")
+
+        if(e.GetKeyCode() == wx.WXK_SHIFT):
+            Vars.shiftPress = True
+        elif(e.GetKeyCode() == wx.WXK_DELETE):
+            Vars.KitLib.removeAll()
+            Vars.drawArea.Refresh()
         e.Skip()
+
+    def OnKeyUp(self, e):
+
+        if(e.GetKeyCode() == wx.WXK_SHIFT):
+            Vars.shiftPress = False
+        e.Skip()
+
 
 #########################################################################################################################################################################################
 """
@@ -361,6 +375,7 @@ class TabConfig(wx.Panel):
         else:
             Vars.KitLib.setTamGrid(c_int(int(self.txtTamGrid.GetValue())+1))
             self.txtTamGrid.SetValue(str(int(self.txtTamGrid.GetValue())+1))
+        self.Parent.SetFocus()
         Vars.drawArea.Refresh()
     """
         -> Função OnEnter:
@@ -465,6 +480,7 @@ class CamPanel(wx.Panel):
         Vars.KitLib.setVisionOption(0)
         Vars.visionItem.SetLabelText(Vars.visionModes[0])
         Vars.KitLib.setVisionAxis(122)#122 Codigo ASCII para 'z'
+        self.Parent.SetFocus()
         Vars.drawArea.Refresh()
     """
         -> Função OnTop:
@@ -477,7 +493,9 @@ class CamPanel(wx.Panel):
         Vars.KitLib.setVisionOption(5)
         Vars.visionItem.SetLabelText(Vars.visionModes[5])
         Vars.KitLib.setVisionAxis(122)#122 Codigo ASCII para 'z'
+        self.Parent.SetFocus()
         Vars.drawArea.Refresh()
+
     """
         -> Função OnFront:
             Função para alternar o modo de visão para ortogonal em x positivo com o botao direito do mouse
@@ -489,7 +507,9 @@ class CamPanel(wx.Panel):
         Vars.KitLib.setVisionOption(1)
         Vars.visionItem.SetLabelText(Vars.visionModes[1])
         Vars.KitLib.setVisionAxis(120)#120 Codigo ASCII para 'x'
+        self.Parent.SetFocus()
         Vars.drawArea.Refresh()
+
     """
         -> Função OnBack:
             Função para alternar o modo de visão para ortogonal em x negativo com o botao direito do mouse
@@ -501,6 +521,7 @@ class CamPanel(wx.Panel):
         Vars.KitLib.setVisionOption(2)
         Vars.visionItem.SetLabelText(Vars.visionModes[2])
         Vars.KitLib.setVisionAxis(120)#120 Codigo ASCII para 'x'
+        self.Parent.SetFocus()
         Vars.drawArea.Refresh()
     """
         -> Função OnRight:
@@ -513,7 +534,9 @@ class CamPanel(wx.Panel):
         Vars.KitLib.setVisionOption(3)
         Vars.visionItem.SetLabelText(Vars.visionModes[3])
         Vars.KitLib.setVisionAxis(121)#121 Codigo ASCII para 'y'
+        self.Parent.SetFocus()
         Vars.drawArea.Refresh()
+
     """
         -> Função OnLeft:
             Função para alternar o modo de visão para ortogonal em y negativo com o botao direito do mouse
@@ -525,4 +548,5 @@ class CamPanel(wx.Panel):
         Vars.KitLib.setVisionOption(4)
         Vars.visionItem.SetLabelText(Vars.visionModes[4])
         Vars.KitLib.setVisionAxis(121)#121 Codigo ASCII para 'y'
+        self.Parent.SetFocus()
         Vars.drawArea.Refresh()

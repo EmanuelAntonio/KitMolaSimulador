@@ -602,6 +602,11 @@ extern "C"{
         return l->select(ponto[0], ponto[1], ponto[2]);
 
     }
+    void deSelectAll(){
+
+        l->deSelectAll();
+
+    }
     bool remover(double *ponto){
 
         return l->remover(ponto[0], ponto[1], ponto[2]);

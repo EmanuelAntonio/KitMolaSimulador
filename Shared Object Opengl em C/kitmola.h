@@ -137,11 +137,18 @@ extern "C"{
     double* getPonto3D(int x, int y);
     /**
 	*   ->Função select:
-	*       Seleciona um objeto da sena de acordo com o ponto passado cmo parametro
+	*       Seleciona um objeto da cena de acordo com o ponto passado cmo parametro
 	*	->Parâmetros: 'double*' um ponto em R^3
 	*	->Retorno: 'bool' se o select encontrou algum objeto que corresponde ao ponto passado
 	**/
     bool select(double *ponto);
+    /**
+	*   ->Função deSelectAll:
+	*       Desseleciona todos os objetos da cena
+	*	->Parâmetros: 'vazio'
+	*	->Retorno: 'vazio'
+	**/
+    void deSelectAll();
     /**
 	*   ->Função remove:
 	*       Deleta um objeto da cena
