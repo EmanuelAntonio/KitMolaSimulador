@@ -24,6 +24,7 @@ class MyCanvasBase(glcanvas.GLCanvas):
         self.Bind(wx.EVT_MOTION, self.OnMouseMotion)
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnMouseScroll)
         self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
+        self.Bind(wx.EVT_MIDDLE_DOWN, self.OnScrollClick)
 
 
     """
@@ -50,13 +51,17 @@ class MyCanvasBase(glcanvas.GLCanvas):
             self.init = True
         self.OnDraw()
 
+    def OnScrollClick(self,e):
+        self.x, self.y = self.lastx, self.lasty = e.GetPosition()
+        ponto = Vars.KitLib.getPonto3D(c_int(self.x), c_int(self.y))
+        op = Vars.KitLib.select(ponto)
+        if(op):
+            self.Refresh()
+
     def OnMouseDown(self, evt):
         self.CaptureMouse()
         self.x, self.y = self.lastx, self.lasty = evt.GetPosition()
-        ponto = Vars.KitLib.getPonto3D(c_int(self.x), c_int(self.y))
-        op = Vars.KitLib.select(ponto)
-        print(op)
-        print("entrou")
+
 
     def OnMouseUp(self, evt):
         try:
@@ -261,6 +266,17 @@ class RightMenu(wx.Menu):
         self.Bind(wx.EVT_MENU, self.OnRight, direita)
         self.Bind(wx.EVT_MENU, self.OnLeft, esquerda)
 
+        #ItemMenu excluir
+        delItem = wx.MenuItem(self, wx.NewId(), 'Excluir')
+        delAllItem = wx.MenuItem(self, wx.NewId(), 'Excluir Selecionados')
+        removeAll = wx.MenuItem(self,wx.NewId(), 'Limpar Cena')
+        self.Append(delItem)
+        self.Append(delAllItem)
+        self.Append(removeAll)
+        self.Bind(wx.EVT_MENU, self.OnDel, delItem)
+        self.Bind(wx.EVT_MENU, self.OnDelAll, delAllItem)
+        self.Bind(wx.EVT_MENU, self.OnClear, removeAll)
+
         #ItemMenu minimizar
         mmi = wx.MenuItem(self, wx.NewId(), 'Minimizar')
         self.Append(mmi)
@@ -299,7 +315,7 @@ class RightMenu(wx.Menu):
         -> Retorno: vazio
     """
     def OnAddCube(self,e):
-        #Vars.cube = True
+
         x,y = Vars.rightMouse
 
         y = self.parent.GetClientSize()[1] - y
@@ -325,13 +341,12 @@ class RightMenu(wx.Menu):
                     Vars.KitLib.addCubo(ctypes.c_float(x), 0, ctypes.c_float(y))
 
     """
-            -> Função OnPerspectiva:
-                Função para alternar o modo de visão para perspectiva com o botao direito do mouse
-            -> Parâmetros:
-                -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
-            -> Retorno: vazio
-        """
-
+        -> Função OnPerspectiva:
+            Função para alternar o modo de visão para perspectiva com o botao direito do mouse
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
     def OnPerspectiva(self, evt):
         Vars.KitLib.setVisionOption(0)
         Vars.visionItem.SetLabelText(Vars.visionModes[0])
@@ -345,7 +360,6 @@ class RightMenu(wx.Menu):
             -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
         -> Retorno: vazio
     """
-
     def OnTop(self, evt):
         Vars.KitLib.setVisionOption(5)
         Vars.visionItem.SetLabelText(Vars.visionModes[5])
@@ -359,7 +373,6 @@ class RightMenu(wx.Menu):
             -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
         -> Retorno: vazio
     """
-
     def OnFront(self, evt):
         Vars.KitLib.setVisionOption(1)
         Vars.visionItem.SetLabelText(Vars.visionModes[1])
@@ -373,7 +386,6 @@ class RightMenu(wx.Menu):
             -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
         -> Retorno: vazio
     """
-
     def OnBack(self, evt):
         Vars.KitLib.setVisionOption(2)
         Vars.visionItem.SetLabelText(Vars.visionModes[2])
@@ -387,7 +399,6 @@ class RightMenu(wx.Menu):
             -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
         -> Retorno: vazio
     """
-
     def OnRight(self, evt):
         Vars.KitLib.setVisionOption(3)
         Vars.visionItem.SetLabelText(Vars.visionModes[3])
@@ -401,9 +412,40 @@ class RightMenu(wx.Menu):
             -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
         -> Retorno: vazio
     """
-
     def OnLeft(self, evt):
         Vars.KitLib.setVisionOption(4)
         Vars.visionItem.SetLabelText(Vars.visionModes[4])
         Vars.KitLib.setVisionAxis(121)  # 121 Codigo ASCII para 'y'
         Vars.drawArea.Refresh()
+
+    """
+        -> Função OnDel:
+            Função para deletar um objeto da cena
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
+    def OnDel(self,evt):
+        x, y = Vars.rightMouse
+        ponto = Vars.KitLib.getPonto3D(c_int(x), c_int(y))
+        Vars.KitLib.remover(ponto)
+
+    """
+        -> Função OnDelAll:
+            Função para deletar todos os objetos selecionados da cena
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
+    def OnDelAll(self, evt):
+        Vars.KitLib.removeAll()
+
+    """
+        -> Função OnClear:
+            Função para deletar todos os objetos da cena
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
+    def OnClear(self, evt):
+        Vars.KitLib.clear()

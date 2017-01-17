@@ -390,10 +390,62 @@ extern "C"{
         return l->size();
 
     }
-    void drawCubeZero(){
+    void drawCubeZero(bool selected){
 
+        GLfloat object_difusa[] = {0.0,1.0,0.0};
+        if(selected){
+
+            object_difusa[0] = 1.0;
+            object_difusa[1] = 0.3;
+            object_difusa[2] = 0.3;
+            if(visionOption == 0){
+
+                glColor3f(0.0,0.0,1.0);
+
+                glDisable(GL_LIGHTING);
+
+                glBegin(GL_LINE_STRIP);
+
+                    glVertex3f(0.501,0.501,0.501);
+                    glVertex3f(-0.501,0.501,0.501);
+                    glVertex3f(-0.501,-0.501,0.501);
+                    glVertex3f(0.501,-0.501,0.501);
+                    glVertex3f(0.501,0.501,0.501);
+                    glVertex3f(0.501,0.501,-0.501);
+                    glVertex3f(0.501,-0.501,-0.501);
+                    glVertex3f(-0.501,-0.501,-0.501);
+                    glVertex3f(-0.501,0.501,-0.501);
+                    glVertex3f(0.501,0.501,-0.501);
+
+                glEnd();
+                glBegin(GL_LINES);
+
+                    glVertex3f(-0.501,-0.501,-0.501);
+                    glVertex3f(-0.501,-0.501,0.501);
+
+                    glVertex3f(0.501,-0.501,0.501);
+                    glVertex3f(0.501,-0.501,-0.501);
+
+                    glVertex3f(-0.501,0.501,0.501);
+                    glVertex3f(-0.501,0.501,-0.501);
+
+                glEnd();
+
+                glEnable(GL_LIGHTING);
+
+            }
+
+
+        }else{
+
+            object_difusa[0] = 1.0;
+            object_difusa[1] = 1.0;
+            object_difusa[2] = 1.0;
+
+        }
         glBegin(GL_QUADS);
 
+            glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
             //z+
             glNormal3f(0.0,0.0,1.0);
             glVertex3f(0.5,0.5,0.5);
@@ -439,7 +491,7 @@ extern "C"{
         glEnd();
 
     }
-    void drawCube(float x, float y, float z){
+    void drawCube(float x, float y, float z, bool selected){
 
         glPushMatrix();
 
@@ -456,7 +508,7 @@ extern "C"{
                 glTranslatef(x,z,y);
 
             }
-            drawCubeZero();
+            drawCubeZero(selected);
 
         glPopMatrix();
 
@@ -468,7 +520,7 @@ extern "C"{
 
             if(aux->getObjeto() == 0){
 
-                drawCube(aux->getCentro()->x,aux->getCentro()->y,aux->getCentro()->z);
+                drawCube(aux->getCentro()->x, aux->getCentro()->y, aux->getCentro()->z, aux->getSelecionado());
 
             }
             aux = aux->getProx();
@@ -519,12 +571,50 @@ extern "C"{
         glReadPixels( x, viewport[3]-y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z );
         gluUnProject( x, viewport[3]-y, z, modelview, projection, viewport, &ponto[0], &ponto[1], &ponto[2]);
 
+        if(visionAxis == 'x'){
+
+            double X,Y,Z;
+            X = ponto[0];
+            Y = ponto[1];
+            Z = ponto[2];
+
+            ponto[0] = Z;
+            ponto[1] = X;
+            ponto[2] = Y;
+
+        }else if(visionAxis == 'y'){
+
+            double X,Y,Z;
+            X = ponto[0];
+            Y = ponto[1];
+            Z = ponto[2];
+
+            ponto[0] = X;
+            ponto[1] = Z;
+            ponto[2] = Y;
+
+        }
         return ponto;
 
     }
     bool select(double *ponto){
 
         return l->select(ponto[0], ponto[1], ponto[2]);
+
+    }
+    bool remover(double *ponto){
+
+        return l->remover(ponto[0], ponto[1], ponto[2]);
+
+    }
+    void removeAll(){
+
+        l->removeAll();
+
+    }
+    void clear(){
+
+        l->clear();
 
     }
 

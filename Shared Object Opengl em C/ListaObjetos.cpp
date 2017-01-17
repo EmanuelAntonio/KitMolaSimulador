@@ -125,9 +125,9 @@ bool ListaObjetos::select(float x, float y, float z){
     Objeto3D *aux = pri;
     while(aux != NULL){
 
-        if((aux->getMBR()[0].x <= x) && (aux->getMBR()[0].y <= y) && (aux->getMBR()[0].z <= z)){
+        if((aux->getMBR()[0].x - 0.05 <= x) && (aux->getMBR()[0].y - 0.05 <= y) && (aux->getMBR()[0].z - 0.05 <= z)){
 
-            if((aux->getMBR()[1].x >= x) && (aux->getMBR()[1].y >= y) && (aux->getMBR()[1].z >= z)){
+            if((aux->getMBR()[1].x + 0.05>= x) && (aux->getMBR()[1].y + 0.05 >= y) && (aux->getMBR()[1].z + 0.05 >= z)){
 
                 aux->setSelecionado(!aux->getSelecionado());
                 return true;
@@ -142,11 +142,75 @@ bool ListaObjetos::select(float x, float y, float z){
 void ListaObjetos::deSelectAll(){
 
     Objeto3D *aux = pri;
-    while(pri != NULL){
+    while(aux != NULL){
 
         aux->setSelecionado(false);
         aux = aux->getProx();
 
+    }
+
+}
+bool ListaObjetos::remover(float x, float y, float z){
+
+    Objeto3D *aux = pri;
+    Objeto3D *ant = NULL;
+    while(aux != NULL){
+
+        if((aux->getMBR()[0].x - 0.05 <= x) && (aux->getMBR()[0].y - 0.05 <= y) && (aux->getMBR()[0].z - 0.05 <= z)){
+
+            if((aux->getMBR()[1].x + 0.05>= x) && (aux->getMBR()[1].y + 0.05 >= y) && (aux->getMBR()[1].z + 0.05 >= z)){
+
+                if(ant == NULL){
+
+                    pri = aux->getProx();
+                    delete aux;
+
+                }else{
+
+                    ant->setProx(aux->getProx());
+                    delete aux;
+
+                }
+                return true;
+
+            }
+
+        }
+        ant = aux;
+        aux = aux->getProx();
+    }
+    return false;
+
+}
+void ListaObjetos::removeAll(){
+
+    Objeto3D *aux = pri;
+    Objeto3D *ant = NULL;
+    while(aux != NULL){
+
+        if(aux->getSelecionado()){
+
+            if(ant == NULL){
+
+                pri = aux->getProx();
+                delete aux;
+                ant = NULL;
+                aux = pri;
+
+            }else{
+
+                ant->setProx(aux->getProx());
+                delete aux;
+                aux = ant->getProx();
+
+            }
+
+        }else{
+
+            ant = aux;
+            aux = aux->getProx();
+
+        }
     }
 
 }

@@ -4,7 +4,7 @@
 
 extern "C"{
 
-    char visionAxis = 'z'; ///Eixo para
+    char visionAxis = 'z'; ///Eixo principal para visao, usado na visao ortogonal
     int visionOption = 0;
     int tamGrid = 50;
 
@@ -40,17 +40,17 @@ extern "C"{
     /**
 	*   ->Função drawCube:
 	*		Desenha um cubo em uma posição do espaço
-	*	->Parâmetros: 'x','y','z' é a posição do centro do cubo
+	*	->Parâmetros: 'x','y','z' é a posição do centro do cubo e 'selected' se o cubo está selecionado
 	*	->Retorno: vazio
 	**/
-    void drawCube(float x, float y, float z);
+    void drawCube(float x, float y, float z, bool selected);
     /**
 	*   ->Função drawCubeZero:
 	*		Desenha um cubo na origem
-	*	->Parâmetros: vazio
+	*	->Parâmetros: 'bool', se o cubo está selecionado, se estiver desenha de uma outra cor
 	*	->Retorno: vazio
 	**/
-    void drawCubeZero();
+    void drawCubeZero(bool selected);
     /**
 	*   ->Função setVisionAxis:
 	*		Altera a variável visionAxis
@@ -142,5 +142,24 @@ extern "C"{
 	*	->Retorno: 'bool' se o select encontrou algum objeto que corresponde ao ponto passado
 	**/
     bool select(double *ponto);
+    /**
+	*   ->Função remove:
+	*       Deleta um objeto da cena
+	*	->Parâmetros: 'double*' um ponto em R^3 que pertence ao objeto
+	*	->Retorno: 'bool' se o remove encontrou algum objeto que corresponde ao ponto passado
+	**/
+    bool remover(double *ponto);
+    /**
+    *   Função removeAll: apaga todos os objetos que estao selecionados
+    *   Parâmetros: 'vazio'
+    *   Retorno: 'vazio'
+    **/
+    void removeAll();
+    /**
+    *   Função Clear: apaga todos os objetos da cena
+    *   Parâmetros: 'vazio'
+    *   Retorno: 'vazio'
+    **/
+    void clear();
 
 }

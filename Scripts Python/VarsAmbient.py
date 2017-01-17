@@ -26,15 +26,14 @@ except ImportError:
 
 class Vars(object):
 
-    version = "0.3"  # Variável de controle de versão
-    dateModificacao = "16/01/2017"  # Data da última atualização do programa
+    version = "0.3.5"  # Variável de controle de versão
+    dateModificacao = "17/01/2017"  # Data da última atualização do programa
     tamJanela = (0, 0)  # Tupla respomsável por guardar o tamanho atual da janela
     drawArea = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
     drawSize = 0.88  # Variável que armazena a porcentagem, normalizada de 0 a 1, do quanto que a drawArea irá pegar do tamanho da janela
     status = None # Varável que armazena uma referência ao 'status bar', pode ser utilizado em usos futuros
     visionModes = ("Perspectiva", "Frente Ortho", "Atrás Ortho", "Direita Ortho", "Esquerda Ortho", "Cima Ortho")  # Variável que armazena os modos de visão(Perspectiva, direita, esquerda, frente, atrás, cima, baixo)
     visionItem = None  # Variável que armazena o label que mostra na janela qual o tipo de visão que estamos utilizando
-    #visionOption = 0 # Variável que armazena qual a o tipo de visão que está selecionado
     camZoom = 5  # Variável que armazena o raio da coordenada esférica correspondente ao zoom da câmera
     theta = math.pi / 4  # Variável que armazena em radianos o ângulo XY da câmera
     phi = math.pi / 3  # Variável que armazena em radianos o ângulo do eixo Z com o plano XY
