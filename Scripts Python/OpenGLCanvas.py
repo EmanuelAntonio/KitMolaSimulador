@@ -57,9 +57,9 @@ class MyCanvasBase(glcanvas.GLCanvas):
         ponto = Vars.KitLib.getPonto3D(c_int(self.x), c_int(self.y))
         if not(Vars.shiftPress):
             Vars.KitLib.deSelectAll()
-        op = Vars.KitLib.select(ponto)
-        if(op):
-            self.Refresh()
+        Vars.KitLib.select(ponto)
+        self.Refresh()
+
 
     def OnMouseDown(self, evt):
         Vars.toolBox.SetFocus()

@@ -7,6 +7,8 @@ using namespace std;
 ListaObjetos::ListaObjetos()
 {
     pri = NULL;
+    indexId = new heapEsq();
+    idDis = 0;
 }
 void ListaObjetos::addCubo(float x, float y, float z){
 
@@ -16,6 +18,7 @@ void ListaObjetos::addCubo(float x, float y, float z){
         pri->setObjeto(0);
         pri->setCentro(x,y,z);
         pri->setMBR(-0.5+x,-0.5+y,-0.5+z,0.5+x,0.5+y,0.5+z);
+        pri->setId(idDis);
 
     }else{
 
@@ -27,6 +30,7 @@ void ListaObjetos::addCubo(float x, float y, float z){
         pri = aux;
 
     }
+    indexId->insere(idDis,pri);
 
 }
 Objeto3D* ListaObjetos::get(){
@@ -64,8 +68,8 @@ void ListaObjetos::salvar(char* arquivo, char visionAxis, int visionOption){
         obj.centro = *aux->getCentro();
         obj.MBR[0] = aux->getMBR()[0];
         obj.MBR[1] = aux->getMBR()[1];
-        obj.extremidades[0] = aux->getExtremidades()[0];
-        obj.extremidades[1] = aux->getExtremidades()[1];
+        obj.idExtremidades[0] = aux->getExtremidades()[0];
+        obj.idExtremidades[1] = aux->getExtremidades()[1];
         fwrite(&obj,sizeof(objeto),1,arq);
         aux = aux->getProx();
     }
@@ -80,14 +84,17 @@ cabecalhoKMP* ListaObjetos::abrir(char* arquivo){
     fread(c,sizeof(cabecalhoKMP),1,arq);
     objeto obj;
     Objeto3D *ant;
+    clear();
+    indexId = new heapEsq();
     if(c->numObj != 0){
 
         fread(&obj,sizeof(objeto),1,arq);
         pri = new Objeto3D();
         pri->setCentro(obj.centro.x,obj.centro.y,obj.centro.z);
         pri->setMBR(obj.MBR[0].x,obj.MBR[0].y,obj.MBR[0].z,obj.MBR[1].x,obj.MBR[1].y,obj.MBR[1].z);
-        pri->setExtremidades(obj.extremidades[0].x,obj.extremidades[0].y,obj.extremidades[0].z,obj.extremidades[1].x,obj.extremidades[1].y,obj.extremidades[1].z);
+        pri->setExtremidades(obj.idExtremidades[0], obj.idExtremidades[1]);
         ant = pri;
+        indexId->insere(pri->getId(),pri);
 
     }for(int i = 1; i < c->numObj; i++){
 
@@ -96,7 +103,8 @@ cabecalhoKMP* ListaObjetos::abrir(char* arquivo){
         ant = ant->getProx();
         ant->setCentro(obj.centro.x,obj.centro.y,obj.centro.z);
         ant->setMBR(obj.MBR[0].x,obj.MBR[0].y,obj.MBR[0].z,obj.MBR[1].x,obj.MBR[1].y,obj.MBR[1].z);
-        ant->setExtremidades(obj.extremidades[0].x,obj.extremidades[0].y,obj.extremidades[0].z,obj.extremidades[1].x,obj.extremidades[1].y,obj.extremidades[1].z);
+        ant->setExtremidades(obj.idExtremidades[0], obj.idExtremidades[1]);
+        indexId->insere(ant->getId(),ant);
 
     }
     fclose(arq);
@@ -106,6 +114,7 @@ cabecalhoKMP* ListaObjetos::abrir(char* arquivo){
 ListaObjetos::~ListaObjetos()
 {
     clear();
+
 
 }
 void ListaObjetos::clear(){
@@ -118,6 +127,7 @@ void ListaObjetos::clear(){
         delete aux;
 
     }
+    delete indexId;
 
 }
 bool ListaObjetos::select(float x, float y, float z){
@@ -163,14 +173,14 @@ bool ListaObjetos::remover(float x, float y, float z){
                 if(ant == NULL){
 
                     pri = aux->getProx();
-                    delete aux;
 
                 }else{
 
                     ant->setProx(aux->getProx());
-                    delete aux;
 
                 }
+                indexId->remover(aux->getId());
+                delete aux;
                 return true;
 
             }
@@ -193,6 +203,7 @@ void ListaObjetos::removeAll(){
             if(ant == NULL){
 
                 pri = aux->getProx();
+                indexId->remover(aux->getId());
                 delete aux;
                 ant = NULL;
                 aux = pri;
@@ -200,6 +211,7 @@ void ListaObjetos::removeAll(){
             }else{
 
                 ant->setProx(aux->getProx());
+                indexId->remover(aux->getId());
                 delete aux;
                 aux = ant->getProx();
 

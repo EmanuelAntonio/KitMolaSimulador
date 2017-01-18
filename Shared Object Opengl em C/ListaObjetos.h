@@ -1,6 +1,7 @@
 #ifndef LISTAOBJETOS_H
 #define LISTAOBJETOS_H
 #include "Objeto3D.h"
+#include "heapEsq.cpp"
 
 class ListaObjetos
 {
@@ -69,6 +70,9 @@ class ListaObjetos
         ~ListaObjetos();
     private:
         Objeto3D *pri;
+        heapEsq *indexId;
+        int idDis;
+
 };
 
 #endif // LISTAOBJETOS_H

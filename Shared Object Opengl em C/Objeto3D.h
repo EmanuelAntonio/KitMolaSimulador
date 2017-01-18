@@ -25,7 +25,7 @@ struct objeto{
     int obj;
     Ponto centro;
     Ponto MBR[2];
-    Ponto extremidades[2];
+    int idExtremidades[2];
 
 };
 /** Classe Objeto3D: um nó da lista de objetos, armazena informacoes essenciais sobre um objeto da cena**/
@@ -49,14 +49,10 @@ class Objeto3D
             centro.z = z;
 
         }
-        void setExtremidades(float x1, float y1, float z1, float x2, float y2, float z2){
+        void setExtremidades(int id1, int id2){
 
-            extremidades[0].x = x1;
-            extremidades[0].y = y1;
-            extremidades[0].z = z1;
-            extremidades[1].x = x2;
-            extremidades[1].y = y2;
-            extremidades[1].z = z2;
+            idExtremidades[0] = id1;
+            idExtremidades[1] = id2;
 
         }
         void setMBR(float x1, float y1, float z1, float x2, float y2, float z2){
@@ -73,8 +69,10 @@ class Objeto3D
         Objeto3D* getProx(){return prox;}
         Ponto *getMBR(){return MBR;}
         Ponto *getCentro(){return &centro;}
-        Ponto *getExtremidades(){return extremidades;}
+        int *getExtremidades(){return idExtremidades;}
         bool getSelecionado(){return selecionado;}
+        int getId(){return id;}
+        void setId(int i){id = i;}
         ~Objeto3D(){}
     private:
         int objeto;/**Referência a qual objeto este nó da lista se refere
@@ -82,7 +80,8 @@ class Objeto3D
 
                     **/
         Ponto centro;/**Parâmetro de desenho, para objetos que precisem**/
-        Ponto extremidades[2];/**Parâmetro de desenho, para objetos que precisem**/
+        int idExtremidades[2];/**Parâmetro de desenho, para objetos que precisem**/
+        int id;
         Ponto MBR[2];/**Menor paralelepipedo que engloba todo o objeto, menor ponto e maior ponto repectivamente**/
         bool selecionado;/**Variavel que armazena se este objeto está selecionado**/
         Objeto3D *prox;/**Ponteiro para o proximo nó da lista**/
