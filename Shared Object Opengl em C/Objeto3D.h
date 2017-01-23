@@ -36,6 +36,7 @@ class Objeto3D
 
             objeto = 0;
             prox = NULL;
+            ant = NULL;
             selecionado = false;
 
         }
@@ -73,6 +74,8 @@ class Objeto3D
         bool getSelecionado(){return selecionado;}
         int getId(){return id;}
         void setId(int i){id = i;}
+        Objeto3D *getAnt(){return ant;}
+        void setAnt(Objeto3D *o){ant = o;}
         ~Objeto3D(){}
     private:
         int objeto;/**Referência a qual objeto este nó da lista se refere
@@ -85,5 +88,6 @@ class Objeto3D
         Ponto MBR[2];/**Menor paralelepipedo que engloba todo o objeto, menor ponto e maior ponto repectivamente**/
         bool selecionado;/**Variavel que armazena se este objeto está selecionado**/
         Objeto3D *prox;/**Ponteiro para o proximo nó da lista**/
+        Objeto3D *ant;/**Ponteiro para o nó anterior da lista**/
 };
 #endif // OBJETO3D_H

@@ -52,7 +52,6 @@ class MyCanvasBase(glcanvas.GLCanvas):
         self.OnDraw()
 
     def OnScrollClick(self,e):
-        Vars.toolBox.SetFocus()
         self.x, self.y = self.lastx, self.lasty = e.GetPosition()
         ponto = Vars.KitLib.getPonto3D(c_int(self.x), c_int(self.y))
         if not(Vars.shiftPress):
@@ -85,15 +84,19 @@ class MyCanvasBase(glcanvas.GLCanvas):
             self.lastx, self.lasty = self.x, self.y
             self.x, self.y = evt.GetPosition()
 
-            if Vars.KitLib.getVisionOption() == 0:
-                Vars.theta = Vars.theta + (self.lastx - self.x) / 100
-                Vars.phi = Vars.phi + (self.lasty - self.y) / 100
-                if Vars.phi > math.pi / 2:
-                    Vars.phi = math.pi / 2
-                elif Vars.phi < 0:
-                    Vars.phi = 0.001
+            if Vars.ctrlPress and Vars.KitLib.getVisionOption() == 0:
+                pass
             else:
-                Vars.orthoCenter = ((self.lasty - self.y) / 60 + Vars.orthoCenter[0],(self.lastx - self.x) / 60 + Vars.orthoCenter[1])
+               if Vars.KitLib.getVisionOption() == 0:
+                   Vars.theta = Vars.theta + (self.lastx - self.x) / 100
+                   Vars.phi = Vars.phi + (self.lasty - self.y) / 100
+                   if Vars.phi > math.pi / 2:
+                       Vars.phi = math.pi / 2
+                   elif Vars.phi < 0:
+                       Vars.phi = 0.001
+               else:
+                   Vars.orthoCenter = (
+                   (self.lasty - self.y) / 60 + Vars.orthoCenter[0], (self.lastx - self.x) / 60 + Vars.orthoCenter[1])
             self.Refresh(False)
 
     """
@@ -114,8 +117,8 @@ class MyCanvasBase(glcanvas.GLCanvas):
             else:
 
                 Vars.camZoom -= zoom
-                if Vars.camZoom < 0:
-                    Vars.camZoom = 0
+                if Vars.camZoom <= 0:
+                    Vars.camZoom = 0.2
         else:
             zoom = 0.3
             if evt.GetWheelRotation() > 0:
@@ -125,8 +128,8 @@ class MyCanvasBase(glcanvas.GLCanvas):
             else:
 
                 Vars.orthoZoom -= zoom
-                if Vars.orthoZoom < 0:
-                    Vars.orthoZoom = 0.1
+                if Vars.orthoZoom <= 0:
+                    Vars.orthoZoom = 0.2
 
 
         self.Refresh(False)
@@ -172,11 +175,10 @@ class CubeCanvas(MyCanvasBase):
 
         #Definições de câmera perspectiva
         if Vars.KitLib.getVisionOption() == 0:
-            eye = (Vars.camZoom * math.cos(Vars.theta) * math.sin(Vars.phi),
-                   Vars.camZoom * math.sin(Vars.theta) * math.sin(Vars.phi), Vars.camZoom * math.cos(Vars.phi))
+            eye = (Vars.camZoom * math.cos(Vars.theta) * math.sin(Vars.phi) + Vars.centro[0],
+                   Vars.camZoom * math.sin(Vars.theta) * math.sin(Vars.phi) + Vars.centro[1], Vars.camZoom * math.cos(Vars.phi) + Vars.centro[2])
             up = (-Vars.camZoom * math.cos(Vars.theta) * math.cos(Vars.phi),
                   -Vars.camZoom * math.sin(Vars.theta) * math.cos(Vars.phi), Vars.camZoom * math.sin(Vars.phi))
-            center = (0, 0, 0)
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             glViewport(0, 0, self.GetClientSize()[0], self.GetClientSize()[1])
@@ -185,7 +187,7 @@ class CubeCanvas(MyCanvasBase):
             gluPerspective(60.0, self.GetClientSize()[0] / self.GetClientSize()[1], 0.01, 500)
             glMatrixMode(GL_MODELVIEW)
             glLoadIdentity()
-            gluLookAt(eye[0], eye[1], eye[2], center[0], center[1], center[2], up[0], up[1], up[2])
+            gluLookAt(eye[0], eye[1], eye[2], Vars.centro[0], Vars.centro[1], Vars.centro[2], up[0], up[1], up[2])
 
         #Definições de câmera ortho positiva
         elif Vars.KitLib.getVisionOption() == 5 or Vars.KitLib.getVisionOption() == 1 or Vars.KitLib.getVisionOption() == 4:
@@ -261,6 +263,11 @@ class RightMenu(wx.Menu):
         self.Bind(wx.EVT_MENU, self.OnRight, direita)
         self.Bind(wx.EVT_MENU, self.OnLeft, esquerda)
 
+        #ItemSelectAll
+        selectItem = wx.MenuItem(self, wx.NewId(), 'Selecionar Tudo')
+        self.Append(selectItem)
+        self.Bind(wx.EVT_MENU, self.OnSelectAll, selectItem)
+
         #ItemMenu excluir
         delItem = wx.MenuItem(self, wx.NewId(), 'Excluir')
         delAllItem = wx.MenuItem(self, wx.NewId(), 'Excluir Selecionados')
@@ -272,26 +279,16 @@ class RightMenu(wx.Menu):
         self.Bind(wx.EVT_MENU, self.OnDelAll, delAllItem)
         self.Bind(wx.EVT_MENU, self.OnClear, removeAll)
 
-        #ItemMenu minimizar
-        mmi = wx.MenuItem(self, wx.NewId(), 'Minimizar')
-        self.Append(mmi)
-        self.Bind(wx.EVT_MENU, self.OnMinimize, mmi)
+        #ItemMenu setFocus
+        focusItem = wx.MenuItem(self, wx.NewId(), 'Mudar Foco Para Objeto')
+        self.Append(focusItem)
+        self.Bind(wx.EVT_MENU, self.OnSetFocus, focusItem)
 
         #ItemMenu fechar
         cmi = wx.MenuItem(self, wx.NewId(), 'Fechar')
         self.Append(cmi)
         self.Bind(wx.EVT_MENU, self.OnClose, cmi)
 
-
-    """
-        -> Função OnMinimize:
-            Função para minimizar a janela com o botao direito do mouse
-        -> Parâmetros:
-            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
-        -> Retorno: vazio
-    """
-    def OnMinimize(self, e):
-        self.parent.Iconize()
 
     """
         -> Função OnClose:
@@ -313,27 +310,38 @@ class RightMenu(wx.Menu):
 
         x,y = Vars.rightMouse
 
-        y = self.parent.GetClientSize()[1] - y
-
         if Vars.KitLib.getVisionOption() != 0:
-            x = x / (Vars.drawArea.GetClientSize()[0])
-            y = y / (Vars.drawArea.GetClientSize()[1])
 
-            x = (x * 2 * Vars.orthoZoom * Vars.drawArea.GetClientSize()[0] / Vars.drawArea.GetClientSize()[1]) - (Vars.orthoZoom * Vars.drawArea.GetClientSize()[0] / Vars.drawArea.GetClientSize()[1])
-            y = y * 2 * Vars.orthoZoom - Vars.orthoZoom
-
+            ponto = [0, 0, 0]
+            ponto_size = len(ponto)
+            ponto = (ctypes.c_float * ponto_size)(*ponto)
+            Vars.KitLib.getPonto3DFloat(c_int(x), c_int(y), ponto)
             if Vars.KitLib.getVisionAxis() == 122: #122 Codigo ASCII para 'z'
+                x = ponto[0]
+                y = ponto[1]
                 Vars.KitLib.addCubo(ctypes.c_float(x),ctypes.c_float(y),0)
             elif Vars.KitLib.getVisionAxis() == 120:#120 Codigo ASCII para 'x'
+
                 if Vars.KitLib.getVisionOption() == 1:
+                    x = ponto[1]
+                    y = ponto[2]
                     Vars.KitLib.addCubo(0, ctypes.c_float(x),ctypes.c_float(y))
                 else:
-                    Vars.KitLib.addCubo(0, ctypes.c_float(y), ctypes.c_float(-x))
+                    x = ponto[2]
+                    y = ponto[1]
+                    Vars.KitLib.addCubo(0, ctypes.c_float(y), ctypes.c_float(x))
             elif Vars.KitLib.getVisionAxis() == 121:#121 Codigo ASCII para 'y'
+
                 if Vars.KitLib.getVisionOption() == 3:
-                    Vars.KitLib.addCubo(ctypes.c_float(-x), 0, ctypes.c_float(y))
-                else:
+                    x = ponto[0]
+                    y = ponto[2]
                     Vars.KitLib.addCubo(ctypes.c_float(x), 0, ctypes.c_float(y))
+                else:
+                    x = ponto[0]
+                    y = ponto[2]
+                    Vars.KitLib.addCubo(ctypes.c_float(x), 0, ctypes.c_float(y))
+
+        Vars.toolBar.EnableTool(wx.ID_UNDO, True)
 
     """
         -> Função OnPerspectiva:
@@ -414,6 +422,15 @@ class RightMenu(wx.Menu):
         Vars.drawArea.Refresh()
 
     """
+        -> Função OnSelectAll:
+            Função para selecionar todos os objetos da cena
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
+    def OnSelectAll(self,e):
+        Vars.KitLib.selectAll()
+    """
         -> Função OnDel:
             Função para deletar um objeto da cena
         -> Parâmetros:
@@ -444,3 +461,22 @@ class RightMenu(wx.Menu):
     """
     def OnClear(self, evt):
         Vars.KitLib.clear()
+
+    """
+        -> Função OnSetFocus:
+            Função para altear o foco da câmera para um objeto
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
+    def OnSetFocus(self,evt):
+        ponto = Vars.KitLib.getPonto3D(c_int(Vars.rightMouse[0]), c_int(Vars.rightMouse[1]))
+        centro = [0, 0, 0]
+        centro_size = len(centro)
+        centro = (ctypes.c_float * centro_size)(*centro)
+        if Vars.KitLib.getCenter(ponto, centro):
+            Vars.centro = (centro[0], centro[1], centro[2])
+            Vars.toolBox.tabThree.txtFocusX.SetValue(str(round(centro[0],3)))
+            Vars.toolBox.tabThree.txtFocusY.SetValue(str(round(centro[1],3)))
+            Vars.toolBox.tabThree.txtFocusZ.SetValue(str(round(centro[2],3)))
+        Vars.drawArea.Refresh()

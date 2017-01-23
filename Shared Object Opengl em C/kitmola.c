@@ -597,6 +597,14 @@ extern "C"{
         return ponto;
 
     }
+    void getPonto3DFloat(int x, int y, float *ponto){
+
+        double *p = getPonto3D(x,y);
+        ponto[0] = p[0];
+        ponto[1] = p[1];
+        ponto[2] = p[2];
+
+    }
     bool select(double *ponto){
 
         return l->select(ponto[0], ponto[1], ponto[2]);
@@ -622,5 +630,34 @@ extern "C"{
         l->clear();
 
     }
+    bool getCenter(double *ponto, float *center){
 
+        return l->getCenter(ponto[0],ponto[1],ponto[2], center);
+
+    }
+    void desfazer(){
+
+        l->desfazerAcao();
+
+    }
+    void refazer(){
+
+        l->refazerAcao();
+
+    }
+    int desfazerSize(){
+
+        return l->desfazerSize();
+
+    }
+    int refazerSize(){
+
+        return l->refazerSize();
+
+    }
+    void selectAll(){
+
+        l->selectAll();
+
+    }
 }

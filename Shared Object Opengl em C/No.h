@@ -10,7 +10,7 @@ class No
         No(){
             proximo = NULL;
             anterior = NULL;
-            obj = NULL;
+             obj = NULL;
         };
         ~No(){};
         No* getProx(){return proximo;}
@@ -23,7 +23,7 @@ class No
         void setMarca(int m){marca = m;}
         int getAltura(){return altura;}
         void setAltura(int p){altura = p;}
-        Objeto3D* getObj(){return obj;}
+        Objeto3D *getObj(){return obj;}
         void setObj(Objeto3D *o){obj = o;}
     private:
         No* proximo;

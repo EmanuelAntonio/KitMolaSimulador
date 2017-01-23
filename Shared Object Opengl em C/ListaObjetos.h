@@ -1,7 +1,7 @@
 #ifndef LISTAOBJETOS_H
 #define LISTAOBJETOS_H
-#include "Objeto3D.h"
-#include "heapEsq.cpp"
+#include "ListaAcao.cpp"
+#include "AVL.cpp"
 
 class ListaObjetos
 {
@@ -67,11 +67,52 @@ class ListaObjetos
         *   Retorno: 'vazio'
         **/
         void removeAll();
+        /**
+        *   Função getCenter: retorna o centro de um objeto que contem o ponto(x,y,z)
+        *   Parâmetros: (x,y,z) ponto que pertence a um objeto, 'center' é o vetor de trez coordenadas que pertence ao objeto
+        *   Retorno: 'vazio'
+        **/
+        bool getCenter(float x, float y, float z, float *center);
+        /**
+        *   Função desfazerAcao: desfaz a ultima ação feita pelo usuario
+        *   Parâmetros: 'vazio'
+        *   Retorno: 'vazio'
+        **/
+        void desfazerAcao();
+        /**
+        *   Função refazerAcao: refaz uma ultima ação desfeita
+        *   Parâmetros: 'vazio'
+        *   Retorno: 'vazio'
+        **/
+        void refazerAcao();
+        /**
+        *   Função desfazerSize: retorna o tamanho da lista de desfazerAcao
+        *   Parâmetros: 'vazio'
+        *   Retorno: 'int' tamanho da lista desfazerAcao
+        **/
+        int desfazerSize();
+        /**
+        *   Função refazerSize: retorna o tamanho da lista de refazerAcao
+        *   Parâmetros: 'vazio'
+        *   Retorno: 'int' tamanho da lista refazerAcao
+        **/
+        int refazerSize();
+        /**
+        *   Função selectAll: seleciona todos os objetos
+        *   Parâmetros: 'vazio'
+        *   Retorno: 'vazio'
+        **/
+        void selectAll();
         ~ListaObjetos();
     private:
+
+        Objeto3D *duplicarObj(Objeto3D *obj);
         Objeto3D *pri;
-        heapEsq *indexId;
         int idDis;
+        ListaAcao *desfazer;
+        ListaAcao *refazer;
+        AVL *indexId;
+        int tam;
 
 };
 

@@ -5,8 +5,8 @@
 extern "C"{
 
     char visionAxis = 'z'; ///Eixo principal para visao, usado na visao ortogonal
-    int visionOption = 0;
-    int tamGrid = 50;
+    int visionOption = 0; ///Define qual visão estpa ativa no momento
+    int tamGrid = 50; ///Define o tamanho do grid a ser exibido na tela
 
     ListaObjetos *l = new ListaObjetos();
 	/**
@@ -136,6 +136,13 @@ extern "C"{
 	**/
     double* getPonto3D(int x, int y);
     /**
+	*   ->Função getPonto3DFloat:
+	*		Converte um ponto da janela em seu respectivo ponto 3d da cena
+	*	->Parâmetros: (x,y) ponto da janela, 'ponto' ponto em 3d da cena
+	*	->Retorno: 'vazio'
+	**/
+    void getPonto3DFloat(int x, int y, float *ponto);
+    /**
 	*   ->Função select:
 	*       Seleciona um objeto da cena de acordo com o ponto passado cmo parametro
 	*	->Parâmetros: 'double*' um ponto em R^3
@@ -163,10 +170,46 @@ extern "C"{
     **/
     void removeAll();
     /**
+    *   Função selectAll: seleciona todos os objetos da cena
+    *   Parâmetros: 'vazio'
+    *   Retorno: 'vazio'
+    **/
+    void selectAll();
+    /**
     *   Função Clear: apaga todos os objetos da cena
     *   Parâmetros: 'vazio'
     *   Retorno: 'vazio'
     **/
     void clear();
+    /**
+    *   Função getCenter: retorna o centro de um objeto que contem o ponto(x,y,z)
+    *   Parâmetros: 'ponto' ponto que pertence a um objeto, 'center' é o vetor de trez coordenadas que pertence ao objeto
+    *   Retorno: 'vazio'
+    **/
+    bool getCenter(double *ponto, float *center);
+    /**
+    *   Função desfazer: desfaz a ultima ação feita pelo usuario
+    *   Parâmetros: 'vazio'
+    *   Retorno: 'vazio'
+    **/
+    void desfazer();
+    /**
+    *   Função refazer: refaz uma ultima ação desfeita
+    *   Parâmetros: 'vazio'
+    *   Retorno: 'vazio'
+    **/
+    void refazer();
+    /**
+    *   Função desfazerSize: retorna o tamanho da lista de desfazerAcao
+    *   Parâmetros: 'vazio'
+    *   Retorno: 'int' tamanho da lista desfazerAcao
+    **/
+    int desfazerSize();
+    /**
+    *   Função refazerSize: retorna o tamanho da lista de refazerAcao
+    *   Parâmetros: 'vazio'
+    *   Retorno: 'int' tamanho da lista refazerAcao
+    **/
+    int refazerSize();
 
 }
