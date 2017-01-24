@@ -26,8 +26,8 @@ except ImportError:
 
 class Vars(object):
 
-    version = "0.3.9"  # Variável de controle de versão
-    dateModificacao = "23/01/2017"  # Data da última atualização do programa
+    version = "0.4"  # Variável de controle de versão
+    dateModificacao = "24/01/2017"  # Data da última atualização do programa
     tamJanela = (0, 0)  # Tupla respomsável por guardar o tamanho atual da janela
     drawArea = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
     toolBar = None # Variável que armazena uma refência para a toolbar

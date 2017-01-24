@@ -90,7 +90,7 @@ void ListaObjetos::salvar(char* arquivo, char visionAxis, int visionOption){
 cabecalhoKMP* ListaObjetos::abrir(char* arquivo){
 
     FILE *arq;
-    arq = fopen(arquivo,"r+b");
+    arq = fopen(arquivo,"rb");
     cabecalhoKMP *c = new cabecalhoKMP;
     fread(c,sizeof(cabecalhoKMP),1,arq);
     objeto obj;
@@ -232,6 +232,7 @@ bool ListaObjetos::remover(float x, float y, float z){
                     aux->getProx()->setAnt(aux->getAnt());
 
                 }
+                desfazer->insere(REMOCAO_OBJETOS,duplicarObj(aux));
                 delete aux;
                 tam--;
                 return true;
@@ -247,6 +248,7 @@ bool ListaObjetos::remover(float x, float y, float z){
 void ListaObjetos::removeAll(){
 
     Objeto3D *aux = pri;
+    Objeto3D *refOut = NULL;
     while(aux != NULL){
 
         if(aux->getSelecionado()){
@@ -255,6 +257,20 @@ void ListaObjetos::removeAll(){
             if(aux->getAnt() == NULL && aux->getProx() != NULL){
 
                 pri = aux->getProx();
+                if(refOut == NULL){
+
+                    refOut = duplicarObj(aux);
+                    refOut->setProx(NULL);
+                    refOut->setAnt(NULL);
+
+                }else{
+
+                    Objeto3D *ant = duplicarObj(aux);
+                    ant->setProx(refOut);
+                    refOut->setAnt(ant);
+                    refOut = ant;
+
+                }
                 delete aux;
                 if(pri != NULL){
 
@@ -266,16 +282,42 @@ void ListaObjetos::removeAll(){
             }else if(aux->getProx() == NULL && aux->getAnt() != NULL){
 
                 aux->getAnt()->setProx(NULL);
+                if(refOut == NULL){
+
+                    refOut = duplicarObj(aux);
+                    refOut->setProx(NULL);
+                    refOut->setAnt(NULL);
+
+                }else{
+
+                    Objeto3D *ant = duplicarObj(aux);
+                    ant->setProx(refOut);
+                    refOut->setAnt(ant);
+                    refOut = ant;
+
+                }
                 delete aux;
                 aux = NULL;
-                return;
 
             }else if(aux->getProx() == NULL && aux->getAnt() == NULL){
 
                 pri = NULL;
+                if(refOut == NULL){
+
+                    refOut = duplicarObj(aux);
+                    refOut->setProx(NULL);
+                    refOut->setAnt(NULL);
+
+                }else{
+
+                    Objeto3D *ant = duplicarObj(aux);
+                    ant->setProx(refOut);
+                    refOut->setAnt(ant);
+                    refOut = ant;
+
+                }
                 delete aux;
                 aux = NULL;
-                return;
 
             }else{
 
@@ -283,6 +325,20 @@ void ListaObjetos::removeAll(){
                 prox = aux->getProx();
                 aux->getAnt()->setProx(aux->getProx());
                 aux->getProx()->setAnt(aux->getAnt());
+                if(refOut == NULL){
+
+                    refOut = duplicarObj(aux);
+                    refOut->setProx(NULL);
+                    refOut->setAnt(NULL);
+
+                }else{
+
+                    Objeto3D *ant = duplicarObj(aux);
+                    ant->setProx(refOut);
+                    refOut->setAnt(ant);
+                    refOut = ant;
+
+                }
                 delete aux;
                 aux = prox;
 
@@ -295,7 +351,7 @@ void ListaObjetos::removeAll(){
 
         }
     }
-
+    desfazer->insere(REMOCAO_OBJETOS,refOut);
 
 }
 bool ListaObjetos::getCenter(float x, float y, float z, float *center){
@@ -332,7 +388,16 @@ int ListaObjetos::refazerSize(){
 }
 void ListaObjetos::desfazerAcao(){
 
-    Acao *aux = desfazer->get();
+    Acao *aux = NULL;
+    if(desfazerSize() <= 0){
+
+        return;
+
+    }else{
+
+        aux = desfazer->get();
+
+    }
     if(aux->getAcao() == ADICAO_OBJETOS){
 
         /**Trata para desfazer a acao de adicionar objetos, ou seja, os remove**/
@@ -378,7 +443,26 @@ void ListaObjetos::desfazerAcao(){
 
     }else if(aux->getAcao() == REMOCAO_OBJETOS){
 
-        printf("REMOCAO_OBJETOS\n");
+        /**Trata para desfazer a acao de remover objetos selecionados, ou seja, os adiciona**/
+        Objeto3D *refObj = aux->getObjs();
+        Objeto3D *obj = NULL;
+        while(refObj != NULL){
+
+            obj = duplicarObj(refObj);
+            obj->setProx(pri);
+            if(pri != NULL){
+
+                pri->setAnt(obj);
+
+            }
+            pri = obj;
+            indexId->insere(obj->getId(),obj);
+            tam++;
+
+            refObj = refObj->getProx();
+
+        }
+        refazer->insere(ADICAO_OBJETOS,aux->getObjs());
 
     }else if(aux->getAcao() == SELECAO_OBJETOS){
 
@@ -397,7 +481,46 @@ void ListaObjetos::refazerAcao(){
 
     if(aux->getAcao() == ADICAO_OBJETOS){
 
-        printf("ADICAO_OBJETOS\n");
+        /**Trata para refazer a acao de remover objetos que vieram da opcao de desfazer anteriormente**/
+        Objeto3D *refObj = aux->getObjs();
+        Objeto3D *obj = NULL;
+        while(refObj != NULL){
+
+            obj = indexId->busca(refObj->getId());
+            indexId->remover(refObj->getId());
+            if(obj->getAnt() == NULL && obj->getProx() != NULL){
+
+                delete obj;
+                pri = pri->getProx();
+                if(pri != NULL){
+
+                    pri->setAnt(NULL);
+
+                }
+
+            }else if(obj->getProx() == NULL && obj->getAnt() != NULL){
+
+                obj->getAnt()->setProx(NULL);
+                delete obj;
+
+            }else if(obj->getProx() == NULL && obj->getAnt() == NULL){
+
+                pri = NULL;
+                delete obj;
+
+            }else{
+
+                obj->getAnt()->setProx(obj->getProx());
+                obj->getProx()->setAnt(obj->getAnt());
+                delete obj;
+
+            }
+
+            tam--;
+            refObj = refObj->getProx();
+
+        }
+        desfazer->insere(REMOCAO_OBJETOS, aux->getObjs());
 
     }else if(aux->getAcao() == REMOCAO_OBJETOS){
 
@@ -414,7 +537,6 @@ void ListaObjetos::refazerAcao(){
 
             }
             pri = obj;
-            printf("Centro (%f,%f,%f)", obj->getCentro()->x,obj->getCentro()->y,obj->getCentro()->z);
             indexId->insere(obj->getId(),obj);
             tam++;
 
