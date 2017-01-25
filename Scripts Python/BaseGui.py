@@ -61,7 +61,7 @@ class WindowClass(wx.Frame):
         #Criação do label de visao(ao lado esquerdo)
         versionItem = aboutMenu.Append(wx.ID_DEFAULT, 'Versão', 'Informações sobre a versão')
         visionItem = wx.StaticText(self,0,Vars.visionModes[0], pos=(10,10), style=wx.ALIGN_CENTER)
-        visionItem.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD))
+        visionItem.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD))
         visionItem.SetBackgroundColour((128,128,128))
         visionItem.SetForegroundColour((255,255,255))
         Vars.visionItem = visionItem
@@ -74,11 +74,11 @@ class WindowClass(wx.Frame):
         #Criação da area de desenho
         c = CubeCanvas(self)
         Vars.drawArea = c
-        box.Add(c,0, wx.ALIGN_CENTRE | wx.EXPAND, 15)
+        box.Add(c,0, wx.ALIGN_RIGHT | wx.EXPAND, 15)
 
         #Junção dos sizers das tabs com o sizer principal
-        boxMain.Add(box, 1, wx.ALIGN_LEFT | wx.EXPAND,0)
-        boxMain.Add(boxBtn,0, wx.ALIGN_RIGHT | wx.EXPAND, 0)
+        boxMain.Add(box, 1, wx.ALIGN_RIGHT | wx.EXPAND,0)
+        boxMain.Add(boxBtn,0, wx.ALIGN_LEFT | wx.EXPAND, 0)
 
         #adicionar atalhos de teclado
 
@@ -133,7 +133,7 @@ class WindowClass(wx.Frame):
         self.Maximize(True)
         self.SetSizer(boxMain)
         #self.SetAutoLayout(True)
-        self.Layout()
+        #self.Layout()
         self.Show()
 
     def createToolbar(self):
@@ -353,8 +353,9 @@ class WindowClass(wx.Frame):
                 self.toolbar.EnableTool(wx.ID_REDO, True)
             Vars.drawArea.Refresh()
         elif(e.GetKeyCode() == wx.WXK_CONTROL):
-            Vars.ctrlPress = True
-            Vars.centroAux = Vars.centro
+            if Vars.KitLib.getVisionOption() == 0:
+                Vars.ctrlPress = True
+                Vars.centroAux = Vars.centro
         e.Skip()
 
     """

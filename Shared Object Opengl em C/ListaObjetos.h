@@ -103,6 +103,12 @@ class ListaObjetos
         *   Retorno: 'vazio'
         **/
         void selectAll();
+        /**
+        *   Função setFocusToSelect: gera o centro gemometrico de todos os objetos selecionados
+        *   Parâmetros: 'vazio'
+        *   Retorno: 'Ponto' ponto onde se encontra o centro gemometrico dos objetos
+        **/
+        Ponto* setFocusToSelect();
         ~ListaObjetos();
     private:
 

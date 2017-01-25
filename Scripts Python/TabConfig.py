@@ -7,14 +7,14 @@ from VarsAmbient import *
         Classe utilizada para instânciar a aba configurações no menu Principal.
 
 """
-class TabConfig(wx.Panel):
+class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
 
     # ----------------------------------------------------------------------
     def __init__(self, parent):
 
 
-        wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
-
+        wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent=parent, id=wx.ID_ANY,style=wx.DOUBLE_BORDER)
+        self.SetupScrolling()
         sizer = wx.BoxSizer(wx.VERTICAL)
         lblTamGrid = wx.StaticText(self,wx.ID_ANY,"Tamanho do grid: ")
         lblTamGrid.SetExtraStyle(wx.TE_CENTRE)
@@ -111,23 +111,28 @@ class TabConfig(wx.Panel):
     def OnEnterFocusX(self, e):
 
         keycode = e.GetKeyCode()
-        if keycode == wx.WXK_RETURN or keycode == wx.WXK_NUMPAD_ENTER or keycode == wx.WXK_TAB:
-
+        if keycode == wx.WXK_RETURN or keycode == wx.WXK_NUMPAD_ENTER:
             e.EventObject.Navigate()
+        elif keycode == wx.WXK_TAB:
+            pass
         e.Skip()
 
     def OnEnterFocusY(self, e):
 
         keycode = e.GetKeyCode()
-        if keycode == wx.WXK_RETURN or keycode == wx.WXK_NUMPAD_ENTER or keycode == wx.WXK_TAB:
+        if keycode == wx.WXK_RETURN or keycode == wx.WXK_NUMPAD_ENTER:
             e.EventObject.Navigate()
+        elif keycode == wx.WXK_TAB:
+            pass
         e.Skip()
 
     def OnEnterFocusZ(self, e):
 
         keycode = e.GetKeyCode()
-        if keycode == wx.WXK_RETURN or keycode == wx.WXK_NUMPAD_ENTER or keycode == wx.WXK_TAB:
+        if keycode == wx.WXK_RETURN or keycode == wx.WXK_NUMPAD_ENTER:
             e.EventObject.Navigate()
+        elif keycode == wx.WXK_TAB:
+            pass
         e.Skip()
 
     def OnEnterFocus(self, e):

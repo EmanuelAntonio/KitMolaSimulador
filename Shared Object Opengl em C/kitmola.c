@@ -315,7 +315,7 @@ extern "C"{
         float iniGrid = -tamGrid/(2/espacoGrid);
 
         glDisable(GL_LIGHTING);
-        glColor3f(0.8,0.8,0.8);
+        glColor3f(0.65,0.65,0.65);
         for(int i = 0; i <= tamGrid; i++){
 
             if (i == tamGrid/2){
@@ -348,7 +348,7 @@ extern "C"{
                 glVertex3f(iniGrid + (tamGrid * espacoGrid), iniGrid + (i * espacoGrid), 0.0);
 
                 glEnd();
-                glColor3f(0.8, 0.8, 0.8);
+                glColor3f(0.65, 0.65, 0.65);
 
             }else{
                 glBegin(GL_LINES);
@@ -658,6 +658,24 @@ extern "C"{
     void selectAll(){
 
         l->selectAll();
+
+    }
+    bool setFocusToSelect(float* centro){
+
+        Ponto* aux = l->setFocusToSelect();
+        if(aux != NULL){
+
+            centro[0] = aux->x;
+            centro[1] = aux->y;
+            centro[2] = aux->z;
+            delete aux;
+            return true;
+
+        }else{
+
+            return false;
+
+        }
 
     }
 }

@@ -19,7 +19,18 @@ class ListaAcao
         *   Retorno: primeira posicao da pilha
         **/
         Acao* get();
+        /**
+        *   Função size: retorna o tamanho da pilha
+        *   Parâmetros: 'vazio'
+        *   Retorno: tamanho da pilha
+        **/
         int size();
+        /**
+        *   Função clear: limpa os parametros e apaga a pilha
+        *   Parâmetros: 'vazio'
+        *   Retorno: primeira posicao da pilha
+        **/
+        void clear();
         ~ListaAcao();
 
     private:

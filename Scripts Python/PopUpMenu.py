@@ -43,10 +43,7 @@ class RightMenu(wx.Menu):
         self.Bind(wx.EVT_MENU, self.OnRight, direita)
         self.Bind(wx.EVT_MENU, self.OnLeft, esquerda)
 
-        #ItemSelectAll
-        selectItem = wx.MenuItem(self, wx.NewId(), 'Selecionar Tudo')
-        self.Append(selectItem)
-        self.Bind(wx.EVT_MENU, self.OnSelectAll, selectItem)
+        self.AppendSeparator()
 
         #ItemMenu excluir
         delItem = wx.MenuItem(self, wx.NewId(), 'Excluir')
@@ -59,10 +56,24 @@ class RightMenu(wx.Menu):
         self.Bind(wx.EVT_MENU, self.OnDelAll, delAllItem)
         self.Bind(wx.EVT_MENU, self.OnClear, removeAll)
 
+        self.AppendSeparator()
+
+        #ItemSelectAll
+        selectItem = wx.MenuItem(self, wx.NewId(), 'Selecionar Tudo')
+        self.Append(selectItem)
+        self.Bind(wx.EVT_MENU, self.OnSelectAll, selectItem)
+
         #ItemMenu setFocus
         focusItem = wx.MenuItem(self, wx.NewId(), 'Mudar Foco Para Objeto')
         self.Append(focusItem)
         self.Bind(wx.EVT_MENU, self.OnSetFocus, focusItem)
+
+        #ItemMenu setFocusToSelect
+        focusItem = wx.MenuItem(self, wx.NewId(), 'Mudar Foco Para Seleção')
+        self.Append(focusItem)
+        self.Bind(wx.EVT_MENU, self.OnSetFocusAll, focusItem)
+
+        self.AppendSeparator()
 
         #ItemMenu fechar
         cmi = wx.MenuItem(self, wx.NewId(), 'Fechar')
@@ -263,4 +274,16 @@ class RightMenu(wx.Menu):
             Vars.toolBox.tabThree.txtFocusX.SetValue(str(round(centro[0],3)))
             Vars.toolBox.tabThree.txtFocusY.SetValue(str(round(centro[1],3)))
             Vars.toolBox.tabThree.txtFocusZ.SetValue(str(round(centro[2],3)))
+        Vars.drawArea.Refresh()
+
+    def OnSetFocusAll(self, e):
+
+        centro = [0, 0, 0]
+        centro_size = len(centro)
+        centro = (ctypes.c_float * centro_size)(*centro)
+        if Vars.KitLib.setFocusToSelect(centro):
+            Vars.centro = (centro[0], centro[1], centro[2])
+            Vars.toolBox.tabConfig.txtFocusX.SetValue(str(round(centro[0], 3)))
+            Vars.toolBox.tabConfig.txtFocusY.SetValue(str(round(centro[1], 3)))
+            Vars.toolBox.tabConfig.txtFocusZ.SetValue(str(round(centro[2], 3)))
         Vars.drawArea.Refresh()

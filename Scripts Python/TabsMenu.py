@@ -26,7 +26,6 @@ class Tabs(wx.Notebook):
 
         # Create the first tab and add it to the notebook
         self.tabOne = TabPanel(self)
-        #tabOne.SetBackgroundColour("Gray")
         self.AddPage(self.tabOne, "Objetos")
         imL = wx.ImageList(32,32)
 
@@ -35,8 +34,8 @@ class Tabs(wx.Notebook):
         self.AddPage(self.tabTwo, "Ferramentas")
 
         # Create and add the third tab
-        self.tabThree = TabConfig(self)
-        self.AddPage(self.tabThree, "Configurações")
+        self.tabConfig = TabConfig(self)
+        self.AddPage(self.tabConfig, "Configurações")
 
         # Adiciona os icones nas tabs
         imgObj = imL.Add(wx.Bitmap('icones/obj.ico'))
@@ -47,16 +46,13 @@ class Tabs(wx.Notebook):
         self.SetPageImage(1, imgTool)
         self.SetPageImage(2, imgConfig)
 
-        #self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnPageChanged)
-        #self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGING, self.OnPageChanging)
-
 #########################################################################################################################################################################################
 """
     ->Classe TabPanel:
         Classe utilizada para instânciar uma das abas, será substituida futuramente por classes específicas para cada aba.
 
 """
-class TabPanel(wx.Panel):
+class TabPanel(wx.lib.scrolledpanel.ScrolledPanel):
     """
     This will be the first notebook tab
     """
@@ -65,7 +61,9 @@ class TabPanel(wx.Panel):
     def __init__(self, parent):
 
 
-        wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
+
+        wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent=parent,size=(100,0), id=wx.ID_ANY,style=wx.DOUBLE_BORDER)
+        self.SetupScrolling()
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         txtOne = wx.TextCtrl(self, wx.ID_ANY, "")

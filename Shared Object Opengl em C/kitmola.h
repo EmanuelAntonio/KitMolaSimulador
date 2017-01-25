@@ -6,7 +6,7 @@ extern "C"{
 
     char visionAxis = 'z'; ///Eixo principal para visao, usado na visao ortogonal
     int visionOption = 0; ///Define qual visão estpa ativa no momento
-    int tamGrid = 50; ///Define o tamanho do grid a ser exibido na tela
+    int tamGrid = 16; ///Define o tamanho do grid a ser exibido na tela
 
     ListaObjetos *l = new ListaObjetos();
 	/**
@@ -211,5 +211,11 @@ extern "C"{
     *   Retorno: 'int' tamanho da lista refazerAcao
     **/
     int refazerSize();
+    /**
+    *   Função setFocusToSelect: gera o centro geometrico de todos os objetos selecionados
+    *   Parâmetros: 'float*' vetor de 3 posicoes que sera usado para retornar o "centro de massa"
+    *   Retorno: 'bool' retorna se havia algum objeto selecionado, se sim, centro contem o centro geometrico, se nao, desconsidera centro
+    **/
+    bool setFocusToSelect(float* centro);
 
 }

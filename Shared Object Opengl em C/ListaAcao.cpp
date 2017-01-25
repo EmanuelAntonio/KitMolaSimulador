@@ -46,8 +46,8 @@ int ListaAcao::size(){
     return tam;
 
 }
-ListaAcao::~ListaAcao()
-{
+void ListaAcao::clear(){
+
     Acao *aux = pri;
     while(pri != NULL){
 
@@ -56,4 +56,11 @@ ListaAcao::~ListaAcao()
         pri = pri->getProx();
 
     }
+    pri = NULL;
+    tam = 0;
+
+}
+ListaAcao::~ListaAcao()
+{
+    clear();
 }

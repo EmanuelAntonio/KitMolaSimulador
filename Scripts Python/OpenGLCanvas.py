@@ -64,6 +64,7 @@ class MyCanvasBase(glcanvas.GLCanvas):
         Vars.toolBox.SetFocus()
         self.CaptureMouse()
         self.x, self.y = self.lastx, self.lasty = evt.GetPosition()
+        Vars.centroAux = Vars.centro
 
 
     def OnMouseUp(self, evt):
@@ -85,7 +86,22 @@ class MyCanvasBase(glcanvas.GLCanvas):
             self.x, self.y = evt.GetPosition()
 
             if Vars.ctrlPress and Vars.KitLib.getVisionOption() == 0:
-                pass
+
+                dTheta = (-math.sin(Vars.theta),
+                         math.cos(Vars.theta), 0)
+
+                dPhi = (-math.cos(Vars.theta) * math.cos(Vars.phi),
+                        -math.sin(Vars.theta) * math.cos(Vars.phi),
+                        math.sin(Vars.phi))
+
+                xCentro = Vars.centro[0] + (dTheta[0] * (self.lastx - self.x)/50) + (dPhi[0] * (self.y - self.lasty)/50)
+                yCentro = Vars.centro[1] + (dTheta[1] * (self.lastx - self.x)/50) + (dPhi[1] * (self.y - self.lasty)/50)
+                zCentro = Vars.centro[2] - dPhi[2] * (self.lasty - self.y)/50
+
+                Vars.centro = (xCentro, yCentro, zCentro)
+                self.parent.tabs.tabConfig.txtFocusX.SetValue(str(round(Vars.centro[0],3)))
+                self.parent.tabs.tabConfig.txtFocusY.SetValue(str(round(Vars.centro[1],3)))
+                self.parent.tabs.tabConfig.txtFocusZ.SetValue(str(round(Vars.centro[2],3)))
             else:
                if Vars.KitLib.getVisionOption() == 0:
                    Vars.theta = Vars.theta + (self.lastx - self.x) / 100
@@ -109,7 +125,7 @@ class MyCanvasBase(glcanvas.GLCanvas):
 
         if Vars.KitLib.getVisionOption() == 0:
 
-            zoom = 0.3
+            zoom = 0.8
             if evt.GetWheelRotation() > 0:
 
                 Vars.camZoom += zoom
@@ -120,7 +136,7 @@ class MyCanvasBase(glcanvas.GLCanvas):
                 if Vars.camZoom <= 0:
                     Vars.camZoom = 0.2
         else:
-            zoom = 0.3
+            zoom = 0.8
             if evt.GetWheelRotation() > 0:
 
                 Vars.orthoZoom += zoom

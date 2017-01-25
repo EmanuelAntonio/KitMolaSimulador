@@ -49,6 +49,7 @@ void ListaObjetos::addCubo(float x, float y, float z){
     idDis++;
     indexId->insere(pri->getId(),pri);
     desfazer->insere(ADICAO_OBJETOS,duplicarObj(pri));
+    refazer->clear();
     tam++;
 
 }
@@ -553,5 +554,40 @@ void ListaObjetos::refazerAcao(){
         printf("DESELECAO_OBJETOS\n");
 
     }
+
+}
+Ponto* ListaObjetos::setFocusToSelect(){
+
+    Ponto *saida = new Ponto();
+    saida->x = 0;
+    saida->x = 0;
+    saida->x = 0;
+    Objeto3D *it = pri;
+    int cont = 0;
+    while(it != NULL){
+
+        if(it->getSelecionado()){
+
+            saida->x += (it->getMBR()[0].x + it->getMBR()[1].x)/2.0;
+            saida->y += (it->getMBR()[0].y + it->getMBR()[1].y)/2.0;
+            saida->z += (it->getMBR()[0].z + it->getMBR()[1].z)/2.0;
+            cont++;
+
+        }
+        it = it->getProx();
+    }
+    if(cont != 0){
+
+        saida->x /= cont;
+        saida->y /= cont;
+        saida->z /= cont;
+
+    }else{
+
+        delete saida;
+        return NULL;
+
+    }
+    return saida;
 
 }
