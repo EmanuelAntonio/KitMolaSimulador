@@ -24,6 +24,7 @@ class WindowClass(wx.Frame):
         self.CreateStatusBar()
 
         self.createToolbar()
+        Vars.KitLib.init()
 
         Vars.status = self.GetStatusBar()
         self.SetTitle("Simulador KitMola")
@@ -343,8 +344,15 @@ class WindowClass(wx.Frame):
     """
     def OnKeyDown(self, e):
 
+        W_PRESS = 87
+        S_PRESS = 83
+        G_PRESS = 71
+        A_PRESS = 65
+        D_PRESS = 68
+
         if(e.GetKeyCode() == wx.WXK_SHIFT):
             Vars.shiftPress = True
+
         elif(e.GetKeyCode() == wx.WXK_DELETE):
             Vars.KitLib.removeAll()
             if Vars.KitLib.desfazerSize() > 0:
@@ -352,10 +360,55 @@ class WindowClass(wx.Frame):
             if Vars.KitLib.refazerSize() > 0:
                 self.toolbar.EnableTool(wx.ID_REDO, True)
             Vars.drawArea.Refresh()
+
         elif(e.GetKeyCode() == wx.WXK_CONTROL):
             if Vars.KitLib.getVisionOption() == 0:
                 Vars.ctrlPress = True
                 Vars.centroAux = Vars.centro
+
+        elif(e.GetKeyCode() == W_PRESS and Vars.moveObjetos):
+
+            if(Vars.KitLib.getVisionOption() == 5):
+                Vars.KitLib.moveSelect(c_float(0.0), c_float(0.1), c_float(0.0))
+            elif(Vars.KitLib.getVisionOption() != 0):
+                Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(0.1))
+
+        elif (e.GetKeyCode() == S_PRESS and Vars.moveObjetos):
+
+            if (Vars.KitLib.getVisionOption() == 5):
+                Vars.KitLib.moveSelect(c_float(0.0), c_float(-0.1), c_float(0.0))
+            elif(Vars.KitLib.getVisionOption() != 0):
+                Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(-0.1))
+
+        elif (e.GetKeyCode() == A_PRESS and Vars.moveObjetos):
+            if (Vars.KitLib.getVisionOption() == 5):
+                Vars.KitLib.moveSelect(c_float(-0.1), c_float(0.0), c_float(0.0))
+            elif(Vars.KitLib.getVisionOption() == 1):
+                Vars.KitLib.moveSelect(c_float(0.0), c_float(-0.1), c_float(0.0))
+            elif(Vars.KitLib.getVisionOption() == 2):
+                Vars.KitLib.moveSelect(c_float(0.0), c_float(0.1), c_float(0.0))
+            elif(Vars.KitLib.getVisionOption() == 3):
+                Vars.KitLib.moveSelect(c_float(0.1), c_float(0.0), c_float(0.0))
+            elif(Vars.KitLib.getVisionOption() == 4):
+                Vars.KitLib.moveSelect(c_float(-0.1), c_float(0.0), c_float(0.0))
+
+        elif (e.GetKeyCode() == D_PRESS and Vars.moveObjetos):
+            if (Vars.KitLib.getVisionOption() == 5):
+                Vars.KitLib.moveSelect(c_float(0.1), c_float(0.0), c_float(0.0))
+            elif(Vars.KitLib.getVisionOption() == 1):
+                Vars.KitLib.moveSelect(c_float(0.0), c_float(0.1), c_float(0.0))
+            elif(Vars.KitLib.getVisionOption() == 2):
+                Vars.KitLib.moveSelect(c_float(0.0), c_float(-0.1), c_float(0.0))
+            elif(Vars.KitLib.getVisionOption() == 3):
+                Vars.KitLib.moveSelect(c_float(-0.1), c_float(0.0), c_float(0.0))
+            elif(Vars.KitLib.getVisionOption() == 4):
+                Vars.KitLib.moveSelect(c_float(0.1), c_float(0.0), c_float(0.0))
+
+        elif (e.GetKeyCode() == G_PRESS ):
+            Vars.moveObjetos = not(Vars.moveObjetos)
+        else:
+            print(e.GetKeyCode())
+
         e.Skip()
 
     """
@@ -413,3 +466,14 @@ class WindowClass(wx.Frame):
             Vars.toolBar.EnableTool(wx.ID_REDO, False)
 
         Vars.drawArea.Refresh()
+
+    """
+        -> Função OnKeyChar:
+            Função para tratar quando um caracter for pressionado
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de key_down
+        -> Retorno: vazio
+    """
+    def OnKeyChar(self, e):
+
+        print("entrou")
+        e.Skip()

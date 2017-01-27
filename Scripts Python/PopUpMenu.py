@@ -243,9 +243,9 @@ class RightMenu(wx.Menu):
     def OnDelAll(self, evt):
         Vars.KitLib.removeAll()
         if Vars.KitLib.desfazerSize() > 0:
-            Vars.toolbar.EnableTool(wx.ID_UNDO, True)
+            Vars.toolBar.EnableTool(wx.ID_UNDO, True)
         if Vars.KitLib.refazerSize() > 0:
-            Vars.toolbar.EnableTool(wx.ID_REDO, True)
+            Vars.toolBar.EnableTool(wx.ID_REDO, True)
 
     """
         -> Função OnClear:
@@ -271,9 +271,9 @@ class RightMenu(wx.Menu):
         centro = (ctypes.c_float * centro_size)(*centro)
         if Vars.KitLib.getCenter(ponto, centro):
             Vars.centro = (centro[0], centro[1], centro[2])
-            Vars.toolBox.tabThree.txtFocusX.SetValue(str(round(centro[0],3)))
-            Vars.toolBox.tabThree.txtFocusY.SetValue(str(round(centro[1],3)))
-            Vars.toolBox.tabThree.txtFocusZ.SetValue(str(round(centro[2],3)))
+            Vars.toolBox.tabConfig.txtFocusX.SetValue(str(round(centro[0],3)))
+            Vars.toolBox.tabConfig.txtFocusY.SetValue(str(round(centro[1],3)))
+            Vars.toolBox.tabConfig.txtFocusZ.SetValue(str(round(centro[2],3)))
         Vars.drawArea.Refresh()
 
     def OnSetFocusAll(self, e):

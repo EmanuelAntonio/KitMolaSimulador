@@ -1,6 +1,7 @@
 #include "ListaObjetos.h"
 #include <iostream>
 #include <fstream>
+#include <float.h>
 
 using namespace std;
 
@@ -163,7 +164,7 @@ void ListaObjetos::clear(){
     }
 
 }
-bool ListaObjetos::select(float x, float y, float z){
+bool ListaObjetos::select(float x, float y, float z, Ponto* MBRSelect){
 
     Objeto3D *aux = pri;
     while(aux != NULL){
@@ -173,6 +174,44 @@ bool ListaObjetos::select(float x, float y, float z){
             if((aux->getMBR()[1].x + 0.05>= x) && (aux->getMBR()[1].y + 0.05 >= y) && (aux->getMBR()[1].z + 0.05 >= z)){
 
                 aux->setSelecionado(!aux->getSelecionado());
+                if(aux->getSelecionado()){
+
+                    if(MBRSelect[0].x > aux->getMBR()[0].x){
+
+                        MBRSelect[0].x = aux->getMBR()[0].x;
+
+                    }
+                    if(MBRSelect[0].y > aux->getMBR()[0].y){
+
+                        MBRSelect[0].y = aux->getMBR()[0].y;
+
+                    }
+                    if(MBRSelect[0].z > aux->getMBR()[0].z){
+
+                        MBRSelect[0].z = aux->getMBR()[0].z;
+
+                    }
+                    if(MBRSelect[1].x < aux->getMBR()[1].x){
+
+                        MBRSelect[1].x = aux->getMBR()[1].x;
+
+                    }
+                    if(MBRSelect[1].y < aux->getMBR()[1].y){
+
+                        MBRSelect[1].y = aux->getMBR()[1].y;
+
+                    }
+                    if(MBRSelect[1].z < aux->getMBR()[1].z){
+
+                        MBRSelect[1].z = aux->getMBR()[1].z;
+
+                    }
+
+                }else{
+
+                    recalculaMBRSelect(MBRSelect);
+
+                }
                 return true;
 
             }
@@ -193,12 +232,42 @@ void ListaObjetos::deSelectAll(){
     }
 
 }
-void ListaObjetos::selectAll(){
+void ListaObjetos::selectAll(Ponto* MBRSelect){
 
     Objeto3D *aux = pri;
     while(aux != NULL){
 
         aux->setSelecionado(true);
+        if(MBRSelect[0].x > aux->getMBR()[0].x){
+
+            MBRSelect[0].x = aux->getMBR()[0].x;
+
+        }
+        if(MBRSelect[0].y > aux->getMBR()[0].y){
+
+            MBRSelect[0].y = aux->getMBR()[0].y;
+
+        }
+        if(MBRSelect[0].z > aux->getMBR()[0].z){
+
+            MBRSelect[0].z = aux->getMBR()[0].z;
+
+        }
+        if(MBRSelect[1].x < aux->getMBR()[1].x){
+
+            MBRSelect[1].x = aux->getMBR()[1].x;
+
+        }
+        if(MBRSelect[1].y < aux->getMBR()[1].y){
+
+            MBRSelect[1].y = aux->getMBR()[1].y;
+
+        }
+        if(MBRSelect[1].z < aux->getMBR()[1].z){
+
+            MBRSelect[1].z = aux->getMBR()[1].z;
+
+        }
         aux = aux->getProx();
 
     }
@@ -589,5 +658,72 @@ Ponto* ListaObjetos::setFocusToSelect(){
 
     }
     return saida;
+
+}
+void ListaObjetos::moveSelect(float x, float y, float z){
+
+    Objeto3D *aux = pri;
+    while(aux != NULL){
+
+        if(aux->getSelecionado()){
+
+            if(aux->getObjeto() == 0){
+
+                aux->setCentro(aux->getCentro()->x + x,aux->getCentro()->y + y,aux->getCentro()->z + z);
+
+            }
+
+        }
+        aux = aux->getProx();
+    }
+
+}
+void ListaObjetos::recalculaMBRSelect(Ponto* MBRSelect){
+
+    MBRSelect[0].x = FLT_MAX;
+    MBRSelect[0].y = FLT_MAX;
+    MBRSelect[0].z = FLT_MAX;
+    MBRSelect[1].x = -FLT_MAX;
+    MBRSelect[1].y = -FLT_MAX;
+    MBRSelect[1].z = -FLT_MAX;
+
+    Objeto3D *aux = pri;
+    while(aux != NULL){
+
+        if(aux->getSelecionado()){
+            if(MBRSelect[0].x > aux->getMBR()[0].x){
+
+                MBRSelect[0].x = aux->getMBR()[0].x;
+
+            }
+            if(MBRSelect[0].y > aux->getMBR()[0].y){
+
+                MBRSelect[0].y = aux->getMBR()[0].y;
+
+            }
+            if(MBRSelect[0].z > aux->getMBR()[0].z){
+
+                MBRSelect[0].z = aux->getMBR()[0].z;
+
+            }
+            if(MBRSelect[1].x < aux->getMBR()[1].x){
+
+                MBRSelect[1].x = aux->getMBR()[1].x;
+
+            }
+            if(MBRSelect[1].y < aux->getMBR()[1].y){
+
+                MBRSelect[1].y = aux->getMBR()[1].y;
+
+            }
+            if(MBRSelect[1].z < aux->getMBR()[1].z){
+
+                MBRSelect[1].z = aux->getMBR()[1].z;
+
+            }
+
+        }
+        aux = aux->getProx();
+    }
 
 }

@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 import math
-import ctypes
+from ctypes import *
 
 try:
     import wx
@@ -27,8 +27,8 @@ except ImportError:
 
 class Vars(object):
 
-    version = "0.3.9"  # Variável de controle de versão
-    dateModificacao = "23/01/2017"  # Data da última atualização do programa
+    version = "0.5"  # Variável de controle de versão
+    dateModificacao = "27/01/2017"  # Data da última atualização do programa
     tamJanela = (0, 0)  # Tupla respomsável por guardar o tamanho atual da janela
     drawArea = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
     toolBar = None # Variável que armazena uma refência para a toolbar
@@ -47,7 +47,7 @@ class Vars(object):
     arquivoProjeto = "" #Variável que armazena o diretorio com o nome do projeto que está aberto atualmente
     shiftPress = False #Variável que armazena se o shift está sendo pressionado nesse exato momento
     ctrlPress = False #Variável que armazena se o control está sendo pressionado nesse exato momento
-
+    moveObjetos = False #Variável que armazena se a opção de mover objetos está ativa
     ctypes.WinDLL('libs/freeglut.dll') #Importa a dll freeglut.dll, usado apenas no windows, a versão para linux não terá esta linha
     KitLib = ctypes.CDLL('libs/kitmola.dll')  # Variável que armazena uma referência ao núcleo do programa em C
 

@@ -25,8 +25,11 @@ class MyCanvasBase(glcanvas.GLCanvas):
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnMouseScroll)
         self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
         self.Bind(wx.EVT_MIDDLE_DOWN, self.OnScrollClick)
+        self.Bind(wx.EVT_IDLE, self.OnIdle)
 
-
+    def OnIdle(self, e):
+        self.Refresh(True)
+        e.Skip()
     """
         -> Função OnSize:
             Função para reoganizar a viewport da drawArea assim que sofrer um resize na janela
@@ -65,6 +68,9 @@ class MyCanvasBase(glcanvas.GLCanvas):
         self.CaptureMouse()
         self.x, self.y = self.lastx, self.lasty = evt.GetPosition()
         Vars.centroAux = Vars.centro
+        if(Vars.moveObjetos):
+            ponto = Vars.KitLib.getPonto3D(c_int(self.x), c_int(self.y))
+            print(Vars.KitLib.selectMoveSeta(ponto))
 
 
     def OnMouseUp(self, evt):
@@ -231,6 +237,8 @@ class CubeCanvas(MyCanvasBase):
         Vars.KitLib.drawCena()
         Vars.KitLib.drawAxis()
         Vars.KitLib.drawGrid()
+        if Vars.moveObjetos:
+            Vars.KitLib.drawMoveAxis()
 
 
         self.SwapBuffers()

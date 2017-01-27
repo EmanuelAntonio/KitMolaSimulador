@@ -4,11 +4,23 @@
 
 extern "C"{
 
-    char visionAxis = 'z'; ///Eixo principal para visao, usado na visao ortogonal
-    int visionOption = 0; ///Define qual visão estpa ativa no momento
-    int tamGrid = 16; ///Define o tamanho do grid a ser exibido na tela
+    char visionAxis; ///Eixo principal para visao, usado na visao ortogonal
+    int visionOption; ///Define qual visão estpa ativa no momento
+    int tamGrid; ///Define o tamanho do grid a ser exibido na tela
+    Ponto MBRSelect[2]; ///MBR que engloba todos os objetos que estao selecionados
+    ListaObjetos *l;
+    Ponto MBRMoveX[4]; ///MBR que engloba as setas de movimento no eixo X(posicoes 0 e 1 para positivo, 2 e 3 para negativo)
+    Ponto MBRMoveY[4]; ///MBR que engloba as setas de movimento no eixo Y(posicoes 0 e 1 para positivo, 2 e 3 para negativo)
+    Ponto MBRMoveZ[4]; ///MBR que engloba as setas de movimento no eixo Z(posicoes 0 e 1 para positivo, 2 e 3 para negativo)
 
-    ListaObjetos *l = new ListaObjetos();
+
+    /**
+	*	->Função init:
+	*		Inicializa todos as variaveis do kit
+	*	->Parâmetros: vazio
+	*	->Retorno: vazio
+	**/
+    void init();
 	/**
 	*	->Função drawAxis:
 	*		Desenha os eixos cartesianos no centro do espaco R^3
@@ -217,5 +229,48 @@ extern "C"{
     *   Retorno: 'bool' retorna se havia algum objeto selecionado, se sim, centro contem o centro geometrico, se nao, desconsidera centro
     **/
     bool setFocusToSelect(float* centro);
+    /**
+    *   Função moveSelect: move todos os objetos selecionados
+    *   Parâmetros: (x,y,z) a quantidade que sera movido por eixo
+    *   Retorno: 'vazio'
+    **/
+    void moveSelect(float x, float y, float z);
+    /**
+    *   Função drawMoveAxis: desenha os eixos de movimento dos objetos na cena, para isso utiliza a MBRSelect
+    *   Parâmetros: 'vazio'
+    *   Retorno: 'vazio'
+    **/
+    void drawMoveAxis();
+    /**
+    *   Função drawMoveAxisZero: desenha os eixos de movimento dos objetos na cena na origem, eh usado em na funcao drawMoveAxis
+    *   Parâmetros: 'vazio'
+    *   Retorno: 'vazio'
+    **/
+    void drawMoveAxisZero();
+    /**
+    *   Função drawSetaMove: desenha uma parte
+    *   Parâmetros: 'vazio'
+    *   Retorno: 'vazio'
+    **/
+    void drawSetaMove();
+    /**
+    *   Função resetMBRSelect: inicializa todos os parametros de MBRSelect com os valores maximos e minimos
+    *   Parâmetros: 'vazio'
+    *   Retorno: 'vazio'
+    **/
+    void resetMBRSelect();
+    /**
+    *   Função resetMBRSelect: retorna se o ponto pertence a alguma seta de movimento
+    *   Parâmetros: (x,y,z) ponto em R^3
+    *   Retorno: 'int' -1 -> nao pertence a nenhuma seta
+    *                   0 -> pertence a X positivo
+    *                   1 -> pertence a X negativo
+    *                   2 -> pertence a Y positivo
+    *                   3 -> pertence a Y negativo
+    *                   4 -> pertence a Z positivo
+    *                   5 -> pertence a Z negativo
+    **/
+    int selectMoveSeta(double *ponto);
+    void drawMBRSeta();
 
 }

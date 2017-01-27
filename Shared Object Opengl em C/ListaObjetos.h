@@ -45,10 +45,10 @@ class ListaObjetos
         void clear();
         /**
         *   Função select: seleciona o objeto que contêm o ponto (x,y,z)
-        *   Parâmetros: (x,y,z), ponto que foi clicado na interface
+        *   Parâmetros: (x,y,z), ponto que foi clicado na interface, 'MBRSelect' MBR que engloba todos os objetos selecionados
         *   Retorno: 'bool' se foi selecionado algum objeto
         **/
-        bool select(float x, float y, float z);
+        bool select(float x, float y, float z, Ponto* MBRSelect);
         /**
         *   Função deSelectAll: deseleciona todos os objetos que estavam selecionados
         *   Parâmetros: vazio
@@ -99,16 +99,28 @@ class ListaObjetos
         int refazerSize();
         /**
         *   Função selectAll: seleciona todos os objetos
-        *   Parâmetros: 'vazio'
+        *   Parâmetros: 'MBRSelect' MBR que engloba todos os objetos selecionados
         *   Retorno: 'vazio'
         **/
-        void selectAll();
+        void selectAll(Ponto* MBRSelect);
         /**
         *   Função setFocusToSelect: gera o centro gemometrico de todos os objetos selecionados
         *   Parâmetros: 'vazio'
         *   Retorno: 'Ponto' ponto onde se encontra o centro gemometrico dos objetos
         **/
         Ponto* setFocusToSelect();
+        /**
+        *   Função moveSelect: move todos os objetos selecionados
+        *   Parâmetros: (x,y,z) a quantidade que sera movido por eixo
+        *   Retorno: 'vazio'
+        **/
+        void moveSelect(float x, float y, float z);
+        /**
+        *   Função recalculaMBRSelect: recalcula o MBRSelect
+        *   Parâmetros: 'Ponto*' a MBR que armazena a MBR de todos os objetos selecionados
+        *   Retorno: 'vazio'
+        **/
+        void recalculaMBRSelect(Ponto* MBRSelect);
         ~ListaObjetos();
     private:
 
