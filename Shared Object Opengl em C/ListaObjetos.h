@@ -14,6 +14,12 @@ class ListaObjetos
         **/
         void addCubo(float x, float y, float z);
         /**
+        *   Função addSphere: Adiciona uma esfera de ligacao à lista de objetos na cena
+        *   Parâmetros: 'x','y','z', coordenadas do centro da esfera de ligacao
+        *   Retorno: vazio
+        **/
+        void addSphere(float x, float y, float z);
+        /**
         *   Função get: retorna uma referência para o primeiro no da lista
         *   Parâmetro: vazio
         *   Retorno: vazio

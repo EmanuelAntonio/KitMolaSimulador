@@ -27,10 +27,11 @@ except ImportError:
 
 class Vars(object):
 
-    version = "0.5"  # Variável de controle de versão
-    dateModificacao = "27/01/2017"  # Data da última atualização do programa
+    version = "0.5.1"  # Variável de controle de versão
+    dateModificacao = "30/01/2017"  # Data da última atualização do programa
     tamJanela = (0, 0)  # Tupla respomsável por guardar o tamanho atual da janela
     drawArea = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
+    posLuz = (0.0,0.0,0.0,1.0) # variável que armazena a posição da luz na cena
     toolBar = None # Variável que armazena uma refência para a toolbar
     toolBox = None # Variável que armazena uma referencia ao menu do lado direito da tela
     drawSize = 0.8  # Variável que armazena a porcentagem, normalizada de 0 a 1, do quanto que a drawArea irá pegar do tamanho da janela
@@ -48,6 +49,7 @@ class Vars(object):
     shiftPress = False #Variável que armazena se o shift está sendo pressionado nesse exato momento
     ctrlPress = False #Variável que armazena se o control está sendo pressionado nesse exato momento
     moveObjetos = False #Variável que armazena se a opção de mover objetos está ativa
+    moveObjetosEixo = -1 #Variável que armazena qual eixo a seleção irá se mover, apenas usado quando clica-se em cima da seta de movimento
     ctypes.WinDLL('libs/freeglut.dll') #Importa a dll freeglut.dll, usado apenas no windows, a versão para linux não terá esta linha
     KitLib = ctypes.CDLL('libs/kitmola.dll')  # Variável que armazena uma referência ao núcleo do programa em C
 

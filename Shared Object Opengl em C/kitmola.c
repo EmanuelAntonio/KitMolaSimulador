@@ -408,37 +408,40 @@ extern "C"{
             object_difusa[2] = 0.3;
             if(visionOption == 0){
 
-                glColor3f(0.0,0.0,1.0);
+                glPushMatrix();
+                glLineWidth( 3.0 );
+                    glColor3f(0.0,0.0,1.0);
 
-                glDisable(GL_LIGHTING);
+                    glDisable(GL_LIGHTING);
 
-                glBegin(GL_LINE_STRIP);
+                    glBegin(GL_LINE_STRIP);
 
-                    glVertex3f(0.501,0.501,0.501);
-                    glVertex3f(-0.501,0.501,0.501);
-                    glVertex3f(-0.501,-0.501,0.501);
-                    glVertex3f(0.501,-0.501,0.501);
-                    glVertex3f(0.501,0.501,0.501);
-                    glVertex3f(0.501,0.501,-0.501);
-                    glVertex3f(0.501,-0.501,-0.501);
-                    glVertex3f(-0.501,-0.501,-0.501);
-                    glVertex3f(-0.501,0.501,-0.501);
-                    glVertex3f(0.501,0.501,-0.501);
+                        glVertex3f(0.501,0.501,0.501);
+                        glVertex3f(-0.501,0.501,0.501);
+                        glVertex3f(-0.501,-0.501,0.501);
+                        glVertex3f(0.501,-0.501,0.501);
+                        glVertex3f(0.501,0.501,0.501);
+                        glVertex3f(0.501,0.501,-0.501);
+                        glVertex3f(0.501,-0.501,-0.501);
+                        glVertex3f(-0.501,-0.501,-0.501);
+                        glVertex3f(-0.501,0.501,-0.501);
+                        glVertex3f(0.501,0.501,-0.501);
 
-                glEnd();
-                glBegin(GL_LINES);
+                    glEnd();
+                    glBegin(GL_LINES);
 
-                    glVertex3f(-0.501,-0.501,-0.501);
-                    glVertex3f(-0.501,-0.501,0.501);
+                        glVertex3f(-0.501,-0.501,-0.501);
+                        glVertex3f(-0.501,-0.501,0.501);
 
-                    glVertex3f(0.501,-0.501,0.501);
-                    glVertex3f(0.501,-0.501,-0.501);
+                        glVertex3f(0.501,-0.501,0.501);
+                        glVertex3f(0.501,-0.501,-0.501);
 
-                    glVertex3f(-0.501,0.501,0.501);
-                    glVertex3f(-0.501,0.501,-0.501);
+                        glVertex3f(-0.501,0.501,0.501);
+                        glVertex3f(-0.501,0.501,-0.501);
 
-                glEnd();
-
+                    glEnd();
+                 glLineWidth( 1.0 );
+                glPopMatrix();
                 glEnable(GL_LIGHTING);
 
             }
@@ -521,6 +524,66 @@ extern "C"{
         glPopMatrix();
 
     }
+    void drawSphereZero(bool selected){
+
+        GLfloat object_difusa[] = {1.0,1.0,1.0,0.5};
+        GLfloat object_ambient[] = {0.5,0.5,0.5,1.0};
+        if(selected){
+
+            object_difusa[0] = 0.0;
+            object_difusa[1] = 0.0;
+            object_difusa[2] = 1.0;
+            glPushMatrix();
+                glLineWidth( 3.0 );
+                glPolygonMode(GL_FRONT,GL_LINE);
+                glMaterialfv(GL_FRONT,GL_AMBIENT, object_ambient);
+                glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
+                GLUquadricObj *quadric;
+                quadric = gluNewQuadric();
+                gluSphere( quadric , SPHERE_RADIUS +0.015, 16, 16);
+                gluDeleteQuadric(quadric);
+                glPolygonMode(GL_FRONT, GL_FILL);
+                glLineWidth( 1.0 );
+            glPopMatrix();
+
+            object_difusa[0] = 1.0;
+            object_difusa[1] = 0.3;
+            object_difusa[2] = 0.3;
+
+        }
+        glPushMatrix();
+            glMaterialfv(GL_FRONT,GL_AMBIENT, object_ambient);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
+            GLUquadricObj *quadric;
+            quadric = gluNewQuadric();
+            gluSphere( quadric , SPHERE_RADIUS , 64, 64);
+
+            gluDeleteQuadric(quadric);
+        glPopMatrix();
+
+    }
+    void drawSphere(float x, float y, float z, bool selected){
+
+        glPushMatrix();
+
+            if(visionAxis == 'z'){
+
+                glTranslatef(x,y,z);
+
+            }else if(visionAxis == 'x'){
+
+                glTranslatef(y,z,x);
+
+            }else{
+
+                glTranslatef(x,z,y);
+
+            }
+            drawSphereZero(selected);
+
+        glPopMatrix();
+
+    }
     void drawCena(){
 
         Objeto3D *aux = l->get();
@@ -529,6 +592,10 @@ extern "C"{
             if(aux->getObjeto() == 0){
 
                 drawCube(aux->getCentro()->x, aux->getCentro()->y, aux->getCentro()->z, aux->getSelecionado());
+
+            }else if(aux->getObjeto() == 1){
+
+                drawSphere(aux->getCentro()->x, aux->getCentro()->y, aux->getCentro()->z, aux->getSelecionado());
 
             }
             aux = aux->getProx();
@@ -801,7 +868,6 @@ extern "C"{
         }
         drawMoveAxisZero();
         glPopMatrix();
-        drawMBRSeta();
     }
     void drawMoveAxisZero(){
 
@@ -919,53 +985,54 @@ extern "C"{
     }
     int selectMoveSeta(double *ponto){
 
-        double x = ponto[0];
-        double y = ponto[1];
-        double z = ponto[2];
+        double x,y,z;
+        x = ponto[0];
+        y = ponto[1];
+        z = ponto[2];
 
-        if(x >= MBRMoveX[0].x && y >= MBRMoveX[0].y && z >= MBRMoveX[0].z){
+        if((x >= MBRMoveX[0].x) && (y >= MBRMoveX[0].y) && (z >= MBRMoveX[0].z)){
 
-            if(x <= MBRMoveX[1].x && y <= MBRMoveX[1].y && z <= MBRMoveX[1].z){
+            if((x <= MBRMoveX[1].x) && (y <= MBRMoveX[1].y) && (z <= MBRMoveX[1].z)){
 
                 return 0;
 
             }
 
-        }else if(x >= MBRMoveX[2].x && y >= MBRMoveX[2].y && z >= MBRMoveX[2].z){
+        }else if((x >= MBRMoveX[2].x) && (y >= MBRMoveX[2].y) && (z >= MBRMoveX[2].z)){
 
-            if(x <= MBRMoveX[3].x && y <= MBRMoveX[3].y && z <= MBRMoveX[3].z){
+            if((x <= MBRMoveX[3].x) && (y <= MBRMoveX[3].y) && (z <= MBRMoveX[3].z)){
 
                 return 1;
 
             }
 
-        }else if(x >= MBRMoveY[0].x && y >= MBRMoveY[0].y && z >= MBRMoveY[0].z){
+        }if((x >= MBRMoveY[0].x) && (y >= MBRMoveY[0].y) && (z >= MBRMoveY[0].z)){
 
-            if(x <= MBRMoveY[1].x && y <= MBRMoveY[1].y && z <= MBRMoveY[1].z){
+            if((x <= MBRMoveY[1].x) && (y <= MBRMoveY[1].y) && (z <= MBRMoveY[1].z)){
 
                 return 2;
 
             }
 
-        }else if(x >= MBRMoveY[2].x && y >= MBRMoveY[2].y && z >= MBRMoveY[2].z){
+        }else if((x >= MBRMoveY[2].x) && (y >= MBRMoveY[2].y) && (z >= MBRMoveY[2].z)){
 
-            if(x <= MBRMoveY[3].x && y <= MBRMoveY[3].y && z <= MBRMoveY[3].z){
+            if((x <= MBRMoveY[3].x) && (y <= MBRMoveY[3].y) && (z <= MBRMoveY[3].z)){
 
                 return 3;
 
             }
 
-        }else if(x >= MBRMoveZ[0].x && y >= MBRMoveZ[0].y && z >= MBRMoveZ[0].z){
+        }if((x >= MBRMoveZ[0].x) && (y >= MBRMoveZ[0].y) && (z >= MBRMoveZ[0].z)){
 
-            if(x <= MBRMoveZ[1].x && y <= MBRMoveZ[1].y && z <= MBRMoveZ[1].z){
+            if((x <= MBRMoveZ[1].x) && (y <= MBRMoveZ[1].y) && (z <= MBRMoveZ[1].z)){
 
                 return 4;
 
             }
 
-        }else if(x >= MBRMoveZ[2].x && y >= MBRMoveZ[2].y && z >= MBRMoveZ[2].z){
+        }else if((x >= MBRMoveZ[2].x) && (y >= MBRMoveZ[2].y) && (z >= MBRMoveZ[2].z)){
 
-            if(x <= MBRMoveZ[3].x && y <= MBRMoveZ[3].y && z <= MBRMoveZ[3].z){
+            if((x <= MBRMoveZ[3].x) && (y <= MBRMoveZ[3].y) && (z <= MBRMoveZ[3].z)){
 
                 return 5;
 
@@ -973,26 +1040,28 @@ extern "C"{
 
         }
 
-        printf("%f,%f,%f\n", ponto[0], ponto[1], ponto[2]);
-        printf("MBRY (%f,%f,%f) e (%f,%f,%f)\n", MBRMoveY[0].x,MBRMoveY[0].y,MBRMoveY[0].z,MBRMoveY[1].x,MBRMoveY[1].y,MBRMoveY[1].z);
-        printf("MBRZ (%f,%f,%f) e (%f,%f,%f)\n", MBRMoveZ[0].x,MBRMoveZ[0].y,MBRMoveZ[0].z,MBRMoveZ[1].x,MBRMoveZ[1].y,MBRMoveZ[1].z);
         return -1;
     }
-    void drawMBRSeta(){
+    void addSphere(float x, float y, float z){
 
-        glColor3f(1.0,1.0,1.0);
-        glBegin(GL_LINES);
+        l->addSphere(x,y,z);
 
-            glVertex3f(MBRMoveY[0].x,MBRMoveY[0].y,MBRMoveY[0].z);
-            glVertex3f(MBRMoveY[1].x,MBRMoveY[1].y,MBRMoveY[1].z);
+    }
+    bool MBRSelectPonto(double *ponto){
 
-            glVertex3f(MBRMoveZ[0].x,MBRMoveZ[0].y,MBRMoveZ[0].z);
-            glVertex3f(MBRMoveZ[1].x,MBRMoveZ[1].y,MBRMoveZ[1].z);
+        double x = ponto[0];
+        double y = ponto[1];
+        double z = ponto[2];
 
-            glVertex3f(MBRMoveX[0].x,MBRMoveX[0].y,MBRMoveX[0].z);
-            glVertex3f(MBRMoveX[1].x,MBRMoveX[1].y,MBRMoveX[1].z);
+        if(MBRSelect[0].x <= x && MBRSelect[0].y <= y && MBRSelect[0].z <= z){
 
-        glEnd();
+            if(MBRSelect[1].x >= x && MBRSelect[1].y >= y && MBRSelect[1].z >= z){
 
+                return true;
+
+            }
+
+        }
+        return false;
     }
 }

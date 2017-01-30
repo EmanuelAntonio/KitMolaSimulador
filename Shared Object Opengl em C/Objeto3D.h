@@ -3,6 +3,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define CUBE 0
+#define SPHERE 1
+
+#define SPHERE_RADIUS 0.75 /// em centimetros
+
+
 /**Struct cabecalhoKMP: cabeçalho do arquivo binario do projeto .kmp**/
 struct cabecalhoKMP{
 
@@ -80,6 +86,7 @@ class Objeto3D
     private:
         int objeto;/**Referência a qual objeto este nó da lista se refere
                         0 -> Cubo
+                        1 ->
 
                     **/
         Ponto centro;/**Parâmetro de desenho, para objetos que precisem**/

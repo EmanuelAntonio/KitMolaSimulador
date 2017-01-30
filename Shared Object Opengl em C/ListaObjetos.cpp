@@ -17,6 +17,7 @@ ListaObjetos::ListaObjetos()
 Objeto3D *ListaObjetos::duplicarObj(Objeto3D *obj){
 
     Objeto3D *objOut = new Objeto3D();
+    objOut->setObjeto(obj->getObjeto());
     objOut->setCentro(obj->getCentro()->x,obj->getCentro()->y,obj->getCentro()->z);
     objOut->setExtremidades(obj->getExtremidades()[0],obj->getExtremidades()[1]);
     objOut->setMBR(obj->getMBR()[0].x,obj->getMBR()[0].y,obj->getMBR()[0].z,obj->getMBR()[1].x,obj->getMBR()[1].y,obj->getMBR()[1].z);
@@ -109,6 +110,7 @@ cabecalhoKMP* ListaObjetos::abrir(char* arquivo){
         pri->setCentro(obj.centro.x,obj.centro.y,obj.centro.z);
         pri->setMBR(obj.MBR[0].x,obj.MBR[0].y,obj.MBR[0].z,obj.MBR[1].x,obj.MBR[1].y,obj.MBR[1].z);
         pri->setExtremidades(obj.idExtremidades[0], obj.idExtremidades[1]);
+        pri->setObjeto(obj.obj);
         ant = pri;
         pri->setAnt(NULL);
         pri->setProx(NULL);
@@ -129,6 +131,7 @@ cabecalhoKMP* ListaObjetos::abrir(char* arquivo){
         ant->setCentro(obj.centro.x,obj.centro.y,obj.centro.z);
         ant->setMBR(obj.MBR[0].x,obj.MBR[0].y,obj.MBR[0].z,obj.MBR[1].x,obj.MBR[1].y,obj.MBR[1].z);
         ant->setExtremidades(obj.idExtremidades[0], obj.idExtremidades[1]);
+        ant->setObjeto(obj.obj);
         tam++;
         if(ant->getId() > idMax){
 
@@ -667,9 +670,10 @@ void ListaObjetos::moveSelect(float x, float y, float z){
 
         if(aux->getSelecionado()){
 
-            if(aux->getObjeto() == 0){
+            if(aux->getObjeto() == CUBE || aux->getObjeto() == SPHERE){
 
                 aux->setCentro(aux->getCentro()->x + x,aux->getCentro()->y + y,aux->getCentro()->z + z);
+                aux->setMBR(aux->getMBR()[0].x + x,aux->getMBR()[0].y + y,aux->getMBR()[0].z + z,aux->getMBR()[1].x + x,aux->getMBR()[1].y + y,aux->getMBR()[1].z + z);
 
             }
 
@@ -725,5 +729,34 @@ void ListaObjetos::recalculaMBRSelect(Ponto* MBRSelect){
         }
         aux = aux->getProx();
     }
+
+}
+void ListaObjetos::addSphere(float x, float y, float z){
+
+    float erro = 0.015;
+    if(pri == NULL){
+
+        pri = new Objeto3D();
+        pri->setObjeto(1);
+        pri->setCentro(x,y,z);
+        pri->setMBR(-SPHERE_RADIUS + erro + x,-SPHERE_RADIUS+ erro + y,-SPHERE_RADIUS + erro + z,SPHERE_RADIUS + erro + x,SPHERE_RADIUS + erro + y,SPHERE_RADIUS + erro + z);
+
+    }else{
+
+        Objeto3D *aux = new Objeto3D();
+        aux->setObjeto(1);
+        aux->setCentro(x,y,z);
+        aux->setProx(pri);
+        pri->setAnt(aux);
+        aux->setMBR(-SPHERE_RADIUS + erro + x,-SPHERE_RADIUS+ erro + y,-SPHERE_RADIUS + erro + z,SPHERE_RADIUS + erro + x,SPHERE_RADIUS + erro + y,SPHERE_RADIUS + erro + z);
+        pri = aux;
+
+    }
+    pri->setId(idDis);
+    idDis++;
+    indexId->insere(pri->getId(),pri);
+    desfazer->insere(ADICAO_OBJETOS,duplicarObj(pri));
+    refazer->clear();
+    tam++;
 
 }

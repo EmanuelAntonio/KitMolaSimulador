@@ -17,9 +17,12 @@ class RightMenu(wx.Menu):
         if Vars.KitLib.getVisionOption() != 0:
             addMenu = wx.Menu()
             addCube = wx.MenuItem(self, wx.NewId(), 'Cubo')
+            addSphere = wx.MenuItem(self, wx.NewId(),'Esfera')
             addMenu.Append(addCube)
+            addMenu.Append(addSphere)
             self.AppendSubMenu(addMenu, 'Adicionar')
             self.Bind(wx.EVT_MENU, self.OnAddCube, addCube)
+            self.Bind(wx.EVT_MENU, self.OnAddSphere, addSphere)
 
         #Submenu camera
         camMenu = wx.Menu()
@@ -131,6 +134,43 @@ class RightMenu(wx.Menu):
                     x = ponto[0]
                     y = ponto[2]
                     Vars.KitLib.addCubo(ctypes.c_float(x), 0, ctypes.c_float(y))
+
+        Vars.toolBar.EnableTool(wx.ID_UNDO, True)
+
+    def OnAddSphere(self, e):
+
+        x, y = Vars.rightMouse
+
+        if Vars.KitLib.getVisionOption() != 0:
+
+            ponto = [0, 0, 0]
+            ponto_size = len(ponto)
+            ponto = (ctypes.c_float * ponto_size)(*ponto)
+            Vars.KitLib.getPonto3DFloat(c_int(x), c_int(y), ponto)
+            if Vars.KitLib.getVisionAxis() == 122:  # 122 Codigo ASCII para 'z'
+                x = ponto[0]
+                y = ponto[1]
+                Vars.KitLib.addSphere(ctypes.c_float(x), ctypes.c_float(y), 0)
+            elif Vars.KitLib.getVisionAxis() == 120:  # 120 Codigo ASCII para 'x'
+
+                if Vars.KitLib.getVisionOption() == 1:
+                    x = ponto[1]
+                    y = ponto[2]
+                    Vars.KitLib.addSphere(0, ctypes.c_float(x), ctypes.c_float(y))
+                else:
+                    x = ponto[2]
+                    y = ponto[1]
+                    Vars.KitLib.addSphere(0, ctypes.c_float(y), ctypes.c_float(x))
+            elif Vars.KitLib.getVisionAxis() == 121:  # 121 Codigo ASCII para 'y'
+
+                if Vars.KitLib.getVisionOption() == 3:
+                    x = ponto[0]
+                    y = ponto[2]
+                    Vars.KitLib.addSphere(ctypes.c_float(x), 0, ctypes.c_float(y))
+                else:
+                    x = ponto[0]
+                    y = ponto[2]
+                    Vars.KitLib.addSphere(ctypes.c_float(x), 0, ctypes.c_float(y))
 
         Vars.toolBar.EnableTool(wx.ID_UNDO, True)
 
@@ -259,7 +299,7 @@ class RightMenu(wx.Menu):
 
     """
         -> Função OnSetFocus:
-            Função para altear o foco da câmera para um objeto
+            Função para altera o foco da câmera para um objeto
         -> Parâmetros:
             -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
         -> Retorno: vazio
@@ -276,6 +316,14 @@ class RightMenu(wx.Menu):
             Vars.toolBox.tabConfig.txtFocusZ.SetValue(str(round(centro[2],3)))
         Vars.drawArea.Refresh()
 
+
+    """
+        -> Função OnSetFocusAll:
+            Função para altera o foco da câmera para a seleção de objetos
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
     def OnSetFocusAll(self, e):
 
         centro = [0, 0, 0]

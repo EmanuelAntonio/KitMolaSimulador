@@ -64,6 +64,20 @@ extern "C"{
 	**/
     void drawCubeZero(bool selected);
     /**
+	*   ->Função drawSphere:
+	*		Desenha uma esfera de ligacao em uma posicao do espaco
+	*	->Parâmetros: 'x','y','z' é a posição do centro da esfera e 'selected' se esta selecionada
+	*	->Retorno: vazio
+	**/
+    void drawSphere(float x, float y, float z, bool selected);
+    /**
+	*   ->Função drawCubeZero:
+	*		Desenha uma esfera de ligacao na origem
+	*	->Parâmetros: 'bool', se a esfera está selecionada, se estiver desenha de uma outra cor
+	*	->Retorno: vazio
+	**/
+    void drawSphereZero(bool selected);
+    /**
 	*   ->Função setVisionAxis:
 	*		Altera a variável visionAxis
 	*	->Parâmetros: 'c' é o novo valor da variavel visionAxis
@@ -260,7 +274,7 @@ extern "C"{
     **/
     void resetMBRSelect();
     /**
-    *   Função resetMBRSelect: retorna se o ponto pertence a alguma seta de movimento
+    *   Função selectMoveSeta: retorna se o ponto pertence a alguma seta de movimento
     *   Parâmetros: (x,y,z) ponto em R^3
     *   Retorno: 'int' -1 -> nao pertence a nenhuma seta
     *                   0 -> pertence a X positivo
@@ -271,6 +285,19 @@ extern "C"{
     *                   5 -> pertence a Z negativo
     **/
     int selectMoveSeta(double *ponto);
-    void drawMBRSeta();
+    /**
+	*   ->Função addSphere:
+	*		Adiciona uma esfera de ligação na lista de objetos com o centro em x,y,z
+	*	->Parâmetros: x,y,z, centro da esfera
+	*	->Retorno: 'vazio'
+	**/
+    void addSphere(float x, float y, float z);
+    /**
+	*   ->Função addSphere:
+	*		verifica se o ponto pertence a MBRSelect
+	*	->Parâmetros: 'double*', vetor de 3 posições que representa ponto a ser verificado
+	*	->Retorno: 'bool' se pertence ou não à MBR
+	**/
+    bool MBRSelectPonto(double *ponto);
 
 }

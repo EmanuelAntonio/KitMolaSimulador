@@ -466,14 +466,3 @@ class WindowClass(wx.Frame):
             Vars.toolBar.EnableTool(wx.ID_REDO, False)
 
         Vars.drawArea.Refresh()
-
-    """
-        -> Função OnKeyChar:
-            Função para tratar quando um caracter for pressionado
-            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de key_down
-        -> Retorno: vazio
-    """
-    def OnKeyChar(self, e):
-
-        print("entrou")
-        e.Skip()

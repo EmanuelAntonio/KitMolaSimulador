@@ -59,6 +59,7 @@ class MyCanvasBase(glcanvas.GLCanvas):
         ponto = Vars.KitLib.getPonto3D(c_int(self.x), c_int(self.y))
         if not(Vars.shiftPress):
             Vars.KitLib.deSelectAll()
+            Vars.moveObjetos = False
         Vars.KitLib.select(ponto)
         self.Refresh()
 
@@ -70,7 +71,10 @@ class MyCanvasBase(glcanvas.GLCanvas):
         Vars.centroAux = Vars.centro
         if(Vars.moveObjetos):
             ponto = Vars.KitLib.getPonto3D(c_int(self.x), c_int(self.y))
-            print(Vars.KitLib.selectMoveSeta(ponto))
+            Vars.moveObjetosEixo = Vars.KitLib.selectMoveSeta(ponto)
+            if(Vars.moveObjetosEixo == -1):
+                if(Vars.KitLib.MBRSelectPonto(ponto)):
+                    Vars.moveObjetosEixo = -2
 
 
     def OnMouseUp(self, evt):
@@ -108,17 +112,104 @@ class MyCanvasBase(glcanvas.GLCanvas):
                 self.parent.tabs.tabConfig.txtFocusX.SetValue(str(round(Vars.centro[0],3)))
                 self.parent.tabs.tabConfig.txtFocusY.SetValue(str(round(Vars.centro[1],3)))
                 self.parent.tabs.tabConfig.txtFocusZ.SetValue(str(round(Vars.centro[2],3)))
+
             else:
-               if Vars.KitLib.getVisionOption() == 0:
-                   Vars.theta = Vars.theta + (self.lastx - self.x) / 100
-                   Vars.phi = Vars.phi + (self.lasty - self.y) / 100
-                   if Vars.phi > math.pi / 2:
-                       Vars.phi = math.pi / 2
-                   elif Vars.phi < 0:
-                       Vars.phi = 0.001
-               else:
-                   Vars.orthoCenter = (
-                   (self.lasty - self.y) / 60 + Vars.orthoCenter[0], (self.lastx - self.x) / 60 + Vars.orthoCenter[1])
+
+                if(Vars.moveObjetos):
+                    if Vars.moveObjetosEixo == -1:
+                        if Vars.KitLib.getVisionOption() == 0:
+                            Vars.theta = Vars.theta + (self.lastx - self.x) / 100
+                            Vars.phi = Vars.phi + (self.lasty - self.y) / 100
+                            if Vars.phi > math.pi / 2:
+                               Vars.phi = math.pi / 2
+                            elif Vars.phi < 0:
+                               Vars.phi = 0.001
+                        else:
+                            Vars.orthoCenter = (
+                               (self.lasty - self.y) / 60 + Vars.orthoCenter[0],
+                               (self.lastx - self.x) / 60 + Vars.orthoCenter[1])
+
+                    else:
+                        if Vars.KitLib.getVisionOption() == 0:
+                            dTheta = (-math.sin(Vars.theta),
+                                     math.cos(Vars.theta), 0)
+                            dPhi = (-math.cos(Vars.theta) * math.cos(Vars.phi),
+                                   -math.sin(Vars.theta) * math.cos(Vars.phi),
+                                   math.sin(Vars.phi))
+                            xDes = Vars.centro[0] + (dTheta[0] * (self.lastx - self.x) / 50) + (dPhi[0] * (self.y - self.lasty) / 50)
+                            yDes = Vars.centro[1] + (dTheta[1] * (self.lastx - self.x) / 50) + (dPhi[1] * (self.y - self.lasty) / 50)
+                            zDes = Vars.centro[2] - dPhi[2] * (self.lasty - self.y) / 50
+
+                            if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:
+                               Vars.KitLib.moveSelect(c_float(-xDes), c_float(0.0), c_float(0.0))
+                            elif Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:
+                                Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes), c_float(0.0))
+                            elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
+                                Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(-zDes))
+                            else:
+                                Vars.KitLib.moveSelect(c_float(-xDes), c_float(-yDes), c_float(-zDes))
+
+                        elif Vars.KitLib.getVisionOption() == 5:
+                            xDes = (self.lastx - self.x)/100
+                            yDes = (self.lasty - self.y)/100
+                            if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:
+                               Vars.KitLib.moveSelect(c_float(-xDes), c_float(0.0), c_float(0.0))
+                            elif Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:
+                                Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes), c_float(0.0))
+                            elif Vars.moveObjetosEixo == -2:
+                                Vars.KitLib.moveSelect(c_float(-xDes), c_float(yDes), c_float(0.0))
+
+                        elif Vars.KitLib.getVisionOption() == 1 or Vars.KitLib.getVisionOption() == 2:
+                            yDes = (self.lastx - self.x) / 100
+                            zDes = (self.lasty - self.y) / 100
+                            if Vars.KitLib.getVisionOption() == 1:
+                                if Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes), c_float(0.0))
+                                elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes))
+                                elif Vars.moveObjetosEixo == -2:
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes), c_float(zDes))
+                            else:
+                                if Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes), c_float(0.0))
+                                elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes))
+                                elif Vars.moveObjetosEixo == -2:
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes), c_float(zDes))
+
+
+                        elif Vars.KitLib.getVisionOption() == 3 or Vars.KitLib.getVisionOption() == 4:
+                            xDes = (self.lastx - self.x) / 100
+                            zDes = (self.lasty - self.y) / 100
+
+                            if Vars.KitLib.getVisionOption() == 3:
+                                if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:
+                                    Vars.KitLib.moveSelect(c_float(xDes), c_float(0.0), c_float(0.0))
+                                elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes))
+                                elif Vars.moveObjetosEixo == -2:
+                                    Vars.KitLib.moveSelect(c_float(xDes), c_float(0.0), c_float(zDes))
+                            else:
+                                if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:
+                                    Vars.KitLib.moveSelect(c_float(-xDes), c_float(0.0), c_float(0.0))
+                                elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes))
+                                elif Vars.moveObjetosEixo == -2:
+                                    Vars.KitLib.moveSelect(c_float(-xDes), c_float(0.0), c_float(zDes))
+
+                else:
+                    if Vars.KitLib.getVisionOption() == 0:
+                        Vars.theta = Vars.theta + (self.lastx - self.x) / 100
+                        Vars.phi = Vars.phi + (self.lasty - self.y) / 100
+                        if Vars.phi > math.pi / 2:
+                           Vars.phi = math.pi / 2
+                        elif Vars.phi < 0:
+                           Vars.phi = 0.001
+                    else:
+                        Vars.orthoCenter = (
+                           (self.lasty - self.y) / 60 + Vars.orthoCenter[0],
+                           (self.lastx - self.x) / 60 + Vars.orthoCenter[1])
+
             self.Refresh(False)
 
     """
@@ -185,13 +276,22 @@ class CubeCanvas(MyCanvasBase):
 
     def InitGL(self):
 
+        luzAmbiente = (0.2, 0.2, 0.2, 1.0)
+        luzDifusa = (0.7, 0.7, 0.7, 1.0)
         glClearColor(0.5, 0.5, 0.5, 0.0)
+
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_CULL_FACE)
         glEnable(GL_NORMALIZE)
         glEnable(GL_LIGHTING)
+
+        glLightfv(GL_LIGHT0, GL_AMBIENT, luzAmbiente)
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa)
+        glLightfv(GL_LIGHT0, GL_POSITION, Vars.posLuz)
+
         glEnable(GL_LIGHT0)
-        glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST)
+        #glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST)
+
 
     def OnDraw(self):
 
@@ -202,7 +302,12 @@ class CubeCanvas(MyCanvasBase):
             up = (-Vars.camZoom * math.cos(Vars.theta) * math.cos(Vars.phi),
                   -Vars.camZoom * math.sin(Vars.theta) * math.cos(Vars.phi), Vars.camZoom * math.sin(Vars.phi))
 
+
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+            Vars.posLuz = (eye[0], eye[1], eye[2], 1.0)
+            glLightfv(GL_LIGHT0, GL_POSITION, Vars.posLuz)
+
             glViewport(0, 0, self.GetClientSize()[0], self.GetClientSize()[1])
             glMatrixMode(GL_PROJECTION)
             glLoadIdentity()
@@ -214,6 +319,8 @@ class CubeCanvas(MyCanvasBase):
         #Definições de câmera ortho positiva
         elif Vars.KitLib.getVisionOption() == 5 or Vars.KitLib.getVisionOption() == 1 or Vars.KitLib.getVisionOption() == 4:
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            Vars.posLuz = (0,0,500000, 1.0)
+            glLightfv(GL_LIGHT0, GL_POSITION, Vars.posLuz)
             glViewport(0, 0, self.GetClientSize()[0], self.GetClientSize()[1])
             glMatrixMode(GL_PROJECTION)
             glLoadIdentity()
@@ -225,6 +332,8 @@ class CubeCanvas(MyCanvasBase):
         #Definições de câmera ortho negativa
         elif Vars.KitLib.getVisionOption() == 2 or Vars.KitLib.getVisionOption() == 3:
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            Vars.posLuz = (0, 0, -500000, 1.0)
+            glLightfv(GL_LIGHT0, GL_POSITION, Vars.posLuz)
             glViewport(0, 0, self.GetClientSize()[0], self.GetClientSize()[1])
             glMatrixMode(GL_PROJECTION)
             glLoadIdentity()
