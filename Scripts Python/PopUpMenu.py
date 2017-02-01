@@ -16,13 +16,13 @@ class RightMenu(wx.Menu):
         #Submenu adicionar
         if Vars.KitLib.getVisionOption() != 0:
             addMenu = wx.Menu()
-            addCube = wx.MenuItem(self, wx.NewId(), 'Cubo')
             addSphere = wx.MenuItem(self, wx.NewId(),'Esfera')
-            addMenu.Append(addCube)
+            addBar = wx.MenuItem(self, wx.NewId(), 'Barra')
             addMenu.Append(addSphere)
+            addMenu.Append(addBar)
             self.AppendSubMenu(addMenu, 'Adicionar')
-            self.Bind(wx.EVT_MENU, self.OnAddCube, addCube)
             self.Bind(wx.EVT_MENU, self.OnAddSphere, addSphere)
+            self.Bind(wx.EVT_MENU, self.OnAddBar, addBar)
 
         #Submenu camera
         camMenu = wx.Menu()
@@ -335,3 +335,9 @@ class RightMenu(wx.Menu):
             Vars.toolBox.tabConfig.txtFocusY.SetValue(str(round(centro[1], 3)))
             Vars.toolBox.tabConfig.txtFocusZ.SetValue(str(round(centro[2], 3)))
         Vars.drawArea.Refresh()
+
+    def OnAddBar(self,e):
+
+        BAR_SMALL = 2
+        BAR_LARGE = 3
+        print(Vars.KitLib.addBar(2))

@@ -284,6 +284,7 @@ class CubeCanvas(MyCanvasBase):
         glEnable(GL_CULL_FACE)
         glEnable(GL_NORMALIZE)
         glEnable(GL_LIGHTING)
+        glShadeModel(GL_SMOOTH)
 
         glLightfv(GL_LIGHT0, GL_AMBIENT, luzAmbiente)
         glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa)

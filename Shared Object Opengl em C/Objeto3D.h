@@ -5,8 +5,13 @@
 
 #define CUBE 0
 #define SPHERE 1
+#define BAR_SMALL 2
+#define BAR_LARGE 3
 
 #define SPHERE_RADIUS 0.75 /// em centimetros
+#define BAR_RADIUS 0.3 /// em centimetros
+#define BAR_LENGTH_SMALL 7.5 /// em Centrimetros
+#define BAR_LENGTH_LARGE 16.3 /// em centrimetros
 
 
 /**Struct cabecalhoKMP: cabeçalho do arquivo binario do projeto .kmp**/
@@ -86,8 +91,9 @@ class Objeto3D
     private:
         int objeto;/**Referência a qual objeto este nó da lista se refere
                         0 -> Cubo
-                        1 ->
-
+                        1 -> Esfera
+                        3 -> Barra Pequena
+                        4 -> Barra Grande
                     **/
         Ponto centro;/**Parâmetro de desenho, para objetos que precisem**/
         int idExtremidades[2];/**Parâmetro de desenho, para objetos que precisem**/

@@ -589,13 +589,13 @@ extern "C"{
         Objeto3D *aux = l->get();
         while(aux != NULL){
 
-            if(aux->getObjeto() == 0){
-
-                drawCube(aux->getCentro()->x, aux->getCentro()->y, aux->getCentro()->z, aux->getSelecionado());
-
-            }else if(aux->getObjeto() == 1){
+            if(aux->getObjeto() == SPHERE){
 
                 drawSphere(aux->getCentro()->x, aux->getCentro()->y, aux->getCentro()->z, aux->getSelecionado());
+
+            }else if(aux->getObjeto() == BAR_SMALL || aux->getObjeto() == BAR_LARGE){
+
+                drawBar(aux->getExtremidades()[0],aux->getExtremidades()[1]);
 
             }
             aux = aux->getProx();
@@ -1063,5 +1063,79 @@ extern "C"{
 
         }
         return false;
+    }
+    bool addBar(int tipoBar){
+
+        return l->addBar(tipoBar);
+
+    }
+    void drawBar(int id1, int id2){
+
+        Objeto3D *objId1 = l->getbyId(id1);
+        Objeto3D *objId2 = l->getbyId(id2);
+        float vetDir[3];
+        vetDir[0] = objId2->getCentro()->x - objId1->getCentro()->x;
+        vetDir[1] = objId2->getCentro()->y - objId1->getCentro()->y;
+        vetDir[2] = objId2->getCentro()->z - objId1->getCentro()->z;
+
+        float normaVetDir = sqrt(pow(vetDir[0],2) + pow(vetDir[1],2) + pow(vetDir[2],2));
+        vetDir[0] /= normaVetDir;
+        vetDir[1] /= normaVetDir;
+        vetDir[2] /= normaVetDir;
+        float angX = asin(vetDir[0]);
+        float angY = asin(vetDir[1]);
+        float angZ = asin(vetDir[2]);
+        angX *= 180/M_PI;
+        angY *= 180/M_PI;
+        angZ *= 180/M_PI;
+        float centro[3];
+        centro[0] = (objId1->getCentro()->x + objId2->getCentro()->x)/2.0;
+        centro[1] = (objId1->getCentro()->y + objId2->getCentro()->y)/2.0;
+        centro[2] = (objId1->getCentro()->z + objId2->getCentro()->z)/2.0;
+        glPushMatrix();
+
+            glTranslatef(centro[0],centro[1],centro[2]);
+            glRotatef(angX,1.0,0.0,0.0);
+            glRotatef(angY,0.0,1.0,0.0);
+            glRotatef(angZ,0.0,0.0,1.0);
+            drawBarZero(normaVetDir);
+
+        glPopMatrix();
+
+
+    }
+    void drawBarZero(float tamBar){
+
+        float divTheta = 32;
+        float divTam = 16;
+        float dTheta = 2*M_PI/divTheta;
+        float dTam = tamBar/divTam;
+
+        GLfloat object_difusa[] = {1.0,1.0,1.0};
+
+        glBegin(GL_QUADS);
+
+            for(float i = -tamBar/2.0; i < tamBar/2.0; i = i + dTam){
+
+                for(int j = 0; j < divTheta; j++){
+
+                    glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
+
+                    glNormal3f(0,cos(j*dTheta),sin(j*dTheta));
+                    glVertex3f(i,BAR_RADIUS*cos(j*dTheta),BAR_RADIUS*sin(j*dTheta));
+                    glNormal3f(0,cos((j + 1)*dTheta),sin((j + 1)*dTheta));
+                    glVertex3f(i,BAR_RADIUS*cos((j + 1)*dTheta),BAR_RADIUS*sin((j + 1)*dTheta));
+                    glNormal3f(0,cos((j + 1)*dTheta),sin((j + 1)*dTheta));
+                    glVertex3f(i + dTam,BAR_RADIUS*cos((j + 1)*dTheta),BAR_RADIUS*sin((j + 1)*dTheta));
+                    glNormal3f(0,cos(j*dTheta),sin(j*dTheta));
+                    glVertex3f(i + dTam,BAR_RADIUS*cos(j*dTheta),BAR_RADIUS*sin(j*dTheta));
+
+
+                }
+
+            }
+
+        glEnd();
+
     }
 }

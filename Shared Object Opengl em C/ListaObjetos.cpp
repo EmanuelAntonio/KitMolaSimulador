@@ -13,6 +13,7 @@ ListaObjetos::ListaObjetos()
     indexId = new AVL();
     desfazer = new ListaAcao();
     refazer = new ListaAcao();
+    tamSelect = 0;
 }
 Objeto3D *ListaObjetos::duplicarObj(Objeto3D *obj){
 
@@ -179,6 +180,7 @@ bool ListaObjetos::select(float x, float y, float z, Ponto* MBRSelect){
                 aux->setSelecionado(!aux->getSelecionado());
                 if(aux->getSelecionado()){
 
+                    tamSelect++;
                     if(MBRSelect[0].x > aux->getMBR()[0].x){
 
                         MBRSelect[0].x = aux->getMBR()[0].x;
@@ -212,6 +214,7 @@ bool ListaObjetos::select(float x, float y, float z, Ponto* MBRSelect){
 
                 }else{
 
+                    tamSelect--;
                     recalculaMBRSelect(MBRSelect);
 
                 }
@@ -233,6 +236,7 @@ void ListaObjetos::deSelectAll(){
         aux = aux->getProx();
 
     }
+    tamSelect = 0;
 
 }
 void ListaObjetos::selectAll(Ponto* MBRSelect){
@@ -274,6 +278,7 @@ void ListaObjetos::selectAll(Ponto* MBRSelect){
         aux = aux->getProx();
 
     }
+    tamSelect = tam;
 
 }
 bool ListaObjetos::remover(float x, float y, float z){
@@ -306,6 +311,11 @@ bool ListaObjetos::remover(float x, float y, float z){
 
                 }
                 desfazer->insere(REMOCAO_OBJETOS,duplicarObj(aux));
+                if(aux->getSelecionado()){
+
+                    tamSelect--;
+
+                }
                 delete aux;
                 tam--;
                 return true;
@@ -425,6 +435,7 @@ void ListaObjetos::removeAll(){
         }
     }
     desfazer->insere(REMOCAO_OBJETOS,refOut);
+    tamSelect = 0;
 
 }
 bool ListaObjetos::getCenter(float x, float y, float z, float *center){
@@ -691,6 +702,11 @@ void ListaObjetos::recalculaMBRSelect(Ponto* MBRSelect){
     MBRSelect[1].y = -FLT_MAX;
     MBRSelect[1].z = -FLT_MAX;
 
+    if(tamSelect <= 0){
+
+        return;
+
+    }
     Objeto3D *aux = pri;
     while(aux != NULL){
 
@@ -758,5 +774,114 @@ void ListaObjetos::addSphere(float x, float y, float z){
     desfazer->insere(ADICAO_OBJETOS,duplicarObj(pri));
     refazer->clear();
     tam++;
+
+}
+bool ListaObjetos::addBar(int tipoBar){
+
+    int id1,id2;
+    Objeto3D *objId1;
+    Objeto3D *objId2;
+    if(tamSelect != 2){
+
+        return false;
+
+    }else{
+
+        Objeto3D *aux = pri;
+        int cont = 0;
+        while(cont < 2){
+
+            if(aux->getSelecionado()){
+
+                if(aux->getObjeto() != SPHERE){
+
+                    return false;
+
+                }else{
+                    if(cont == 0){
+
+                        id1 = aux->getId();
+                        objId1 = aux;
+
+                    }else{
+
+                        id2 = aux->getId();
+                        objId2 = aux;
+
+                    }
+                    cont++;
+
+                }
+
+            }
+            aux = aux->getProx();
+
+        }
+
+    }
+    float xMBR, yMBR, zMBR, XMBR, YMBR, ZMBR;
+    if(pri == NULL){
+
+        pri = new Objeto3D();
+        pri->setObjeto(tipoBar);
+        pri->setExtremidades(id1,id2);
+
+
+    }else{
+
+        Objeto3D *aux = new Objeto3D();
+        aux->setObjeto(tipoBar);
+        aux->setProx(pri);
+        aux->setExtremidades(id1,id2);
+        pri->setAnt(aux);
+        pri = aux;
+
+    }
+    if(objId1->getCentro()->x < objId2->getCentro()->x){
+
+        xMBR = objId1->getCentro()->x - BAR_RADIUS;
+        XMBR = objId2->getCentro()->x + BAR_RADIUS;
+
+    }else{
+
+        XMBR = objId1->getCentro()->x - BAR_RADIUS;
+        xMBR = objId2->getCentro()->x + BAR_RADIUS;
+
+    }
+    if(objId1->getCentro()->y < objId2->getCentro()->y){
+
+        yMBR = objId1->getCentro()->y - BAR_RADIUS;
+        YMBR = objId2->getCentro()->y + BAR_RADIUS;
+
+    }else{
+
+        YMBR = objId1->getCentro()->y - BAR_RADIUS;
+        yMBR = objId2->getCentro()->y + BAR_RADIUS;
+
+    }
+        if(objId1->getCentro()->z < objId2->getCentro()->z){
+
+        zMBR = objId1->getCentro()->z - BAR_RADIUS;
+        ZMBR = objId2->getCentro()->z + BAR_RADIUS;
+
+    }else{
+
+        ZMBR = objId1->getCentro()->z - BAR_RADIUS;
+        zMBR = objId2->getCentro()->z + BAR_RADIUS;
+
+    }
+    pri->setMBR(xMBR, yMBR, zMBR, XMBR, YMBR, ZMBR);
+    pri->setId(idDis);
+    idDis++;
+    indexId->insere(pri->getId(),pri);
+    desfazer->insere(ADICAO_OBJETOS,duplicarObj(pri));
+    refazer->clear();
+    tam++;
+    return true;
+
+}
+Objeto3D* ListaObjetos::getbyId(int id){
+
+    return indexId->busca(id);
 
 }

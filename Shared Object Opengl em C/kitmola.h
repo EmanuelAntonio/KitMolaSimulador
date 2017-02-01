@@ -78,6 +78,20 @@ extern "C"{
 	**/
     void drawSphereZero(bool selected);
     /**
+	*   ->Função drawBar:
+	*		Desenha uma barra entre duas esferas de id1 e id2
+	*	->Parâmetros: 'id1' 'id2', ids das esferas que ligam as  duas pontas da barra
+	*	->Retorno: 'vazio'
+	**/
+    void drawBar(int id1, int id2);
+    /**
+	*   ->Função drawBarZero:
+	*		Desenha uma barra na origem
+	*	->Parâmetros: 'tamBar' tamanho da barra a ser desenhada
+    *	->Retorno: 'vazio'
+	**/
+    void drawBarZero(float tamBar);
+    /**
 	*   ->Função setVisionAxis:
 	*		Altera a variável visionAxis
 	*	->Parâmetros: 'c' é o novo valor da variavel visionAxis
@@ -299,5 +313,12 @@ extern "C"{
 	*	->Retorno: 'bool' se pertence ou não à MBR
 	**/
     bool MBRSelectPonto(double *ponto);
+    /**
+	*   ->Função addBar:
+	*		Adiciona uma barra na lista de objetos ligando duas eferas com ids 'id1' e 'id2'
+	*	->Parâmetros: 'id1', 'id2' ids das esferas
+	*	->Retorno: 'bool' se a adição foi realizada
+	**/
+    bool addBar(int tipoBar);
 
 }

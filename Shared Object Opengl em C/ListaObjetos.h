@@ -2,6 +2,7 @@
 #define LISTAOBJETOS_H
 #include "ListaAcao.cpp"
 #include "AVL.cpp"
+#include <math.h>
 
 class ListaObjetos
 {
@@ -19,6 +20,12 @@ class ListaObjetos
         *   Retorno: vazio
         **/
         void addSphere(float x, float y, float z);
+        /**
+        *   Função addBar: Adiciona uma barra na lista de objetos da cena
+        *   Parâmetros: 'tipoBar' constante referente ao tipo da barra que irá ser inserida, BAR_SMALL ou BAR_LARGE
+        *   Retorno: vazio
+        **/
+        bool addBar(int tipoBar);
         /**
         *   Função get: retorna uma referência para o primeiro no da lista
         *   Parâmetro: vazio
@@ -127,16 +134,23 @@ class ListaObjetos
         *   Retorno: 'vazio'
         **/
         void recalculaMBRSelect(Ponto* MBRSelect);
+        /**
+        *   Função getById: retorna o objeto que tem id
+        *   Parâmetros: 'id' ID do objeto a ser buscado
+        *   Retorno: 'Objeto3D*' o objeto que contem o 'id'
+        **/
+        Objeto3D* getbyId(int id);
         ~ListaObjetos();
     private:
 
         Objeto3D *duplicarObj(Objeto3D *obj);
         Objeto3D *pri;
-        int idDis;
+        int idDis; ///ID disponivel para a proxima inserção
         ListaAcao *desfazer;
         ListaAcao *refazer;
         AVL *indexId;
         int tam;
+        int tamSelect;
 
 };
 

@@ -34,7 +34,7 @@ class Vars(object):
     posLuz = (0.0,0.0,0.0,1.0) # variável que armazena a posição da luz na cena
     toolBar = None # Variável que armazena uma refência para a toolbar
     toolBox = None # Variável que armazena uma referencia ao menu do lado direito da tela
-    drawSize = 0.8  # Variável que armazena a porcentagem, normalizada de 0 a 1, do quanto que a drawArea irá pegar do tamanho da janela
+    drawSize = 0.2  # Variável que armazena a porcentagem, normalizada de 0 a 1, do quanto que a drawArea irá pegar do tamanho da janela
     status = None # Varável que armazena uma referência ao 'status bar', pode ser utilizado em usos futuros
     visionModes = ("Perspectiva", "Frente Ortho", "Atrás Ortho", "Direita Ortho", "Esquerda Ortho", "Cima Ortho")  # Variável que armazena os modos de visão(Perspectiva, direita, esquerda, frente, atrás, cima, baixo)
     visionItem = None  # Variável que armazena o label que mostra na janela qual o tipo de visão que estamos utilizando
