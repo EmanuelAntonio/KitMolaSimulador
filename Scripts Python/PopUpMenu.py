@@ -14,15 +14,18 @@ class RightMenu(wx.Menu):
         self.parent = parent
 
         #Submenu adicionar
-        if Vars.KitLib.getVisionOption() != 0:
+        if self.parent.visionOption != 0:
             addMenu = wx.Menu()
             addSphere = wx.MenuItem(self, wx.NewId(),'Esfera')
-            addBar = wx.MenuItem(self, wx.NewId(), 'Barra')
+            addSBar = wx.MenuItem(self, wx.NewId(), 'Barra Pequena')
+            addLBar = wx.MenuItem(self, wx.NewId(), 'Barra Grande')
             addMenu.Append(addSphere)
-            addMenu.Append(addBar)
+            addMenu.Append(addSBar)
+            addMenu.Append(addLBar)
             self.AppendSubMenu(addMenu, 'Adicionar')
             self.Bind(wx.EVT_MENU, self.OnAddSphere, addSphere)
-            self.Bind(wx.EVT_MENU, self.OnAddBar, addBar)
+            self.Bind(wx.EVT_MENU, self.OnAddSmallBar, addSBar)
+            self.Bind(wx.EVT_MENU, self.OnAddLargeBar, addLBar)
 
         #Submenu camera
         camMenu = wx.Menu()
@@ -93,86 +96,79 @@ class RightMenu(wx.Menu):
     """
     def OnClose(self, e):
         self.parent.Close()
-    """
-        -> Função OnAddCube:
-            Função para adicionar a lista de objetos com o botão direito do mouse
-        -> Parâmetros:
-            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
-        -> Retorno: vazio
-    """
-    def OnAddCube(self,e):
-
-        x,y = Vars.rightMouse
-
-        if Vars.KitLib.getVisionOption() != 0:
-
-            ponto = [0, 0, 0]
-            ponto_size = len(ponto)
-            ponto = (ctypes.c_float * ponto_size)(*ponto)
-            Vars.KitLib.getPonto3DFloat(c_int(x), c_int(y), ponto)
-            if Vars.KitLib.getVisionAxis() == 122: #122 Codigo ASCII para 'z'
-                x = ponto[0]
-                y = ponto[1]
-                Vars.KitLib.addCubo(ctypes.c_float(x),ctypes.c_float(y),0)
-            elif Vars.KitLib.getVisionAxis() == 120:#120 Codigo ASCII para 'x'
-
-                if Vars.KitLib.getVisionOption() == 1:
-                    x = ponto[1]
-                    y = ponto[2]
-                    Vars.KitLib.addCubo(0, ctypes.c_float(x),ctypes.c_float(y))
-                else:
-                    x = ponto[2]
-                    y = ponto[1]
-                    Vars.KitLib.addCubo(0, ctypes.c_float(y), ctypes.c_float(x))
-            elif Vars.KitLib.getVisionAxis() == 121:#121 Codigo ASCII para 'y'
-
-                if Vars.KitLib.getVisionOption() == 3:
-                    x = ponto[0]
-                    y = ponto[2]
-                    Vars.KitLib.addCubo(ctypes.c_float(x), 0, ctypes.c_float(y))
-                else:
-                    x = ponto[0]
-                    y = ponto[2]
-                    Vars.KitLib.addCubo(ctypes.c_float(x), 0, ctypes.c_float(y))
-
-        Vars.toolBar.EnableTool(wx.ID_UNDO, True)
 
     def OnAddSphere(self, e):
 
         x, y = Vars.rightMouse
-
-        if Vars.KitLib.getVisionOption() != 0:
+        if self.parent.visionOption != Vars.VISION_Z_PERSP:
 
             ponto = [0, 0, 0]
             ponto_size = len(ponto)
             ponto = (ctypes.c_float * ponto_size)(*ponto)
-            Vars.KitLib.getPonto3DFloat(c_int(x), c_int(y), ponto)
-            if Vars.KitLib.getVisionAxis() == 122:  # 122 Codigo ASCII para 'z'
+            Vars.KitLib.getPonto3DFloat(c_int(x), c_int(y), ponto, self.parent.visionAxis)
+            if self.parent.visionAxis == Vars.ASCII_Z:  # 122 Codigo ASCII para 'z'
                 x = ponto[0]
                 y = ponto[1]
-                Vars.KitLib.addSphere(ctypes.c_float(x), ctypes.c_float(y), 0)
-            elif Vars.KitLib.getVisionAxis() == 120:  # 120 Codigo ASCII para 'x'
+                space = c_float(Vars.KitLib.getEspacoGrid()).value
+                x = x / space
+                dx = x - int(x)
+                if dx < 0.5:
+                    x = int(x) * space
+                else:
+                    x = (int(x) + 1) * space
+                y = y / space
+                dy = y - int(y)
+                if dy < 0.5:
+                    y = int(y) * space
+                else:
+                    y = (int(y) + 1) * space
+                Vars.KitLib.addSphere(c_float(x), c_float(y), 0)
+            elif self.parent.visionAxis == Vars.ASCII_X:  # 120 Codigo ASCII para 'x'
 
-                if Vars.KitLib.getVisionOption() == 1:
-                    x = ponto[1]
-                    y = ponto[2]
+                x = ponto[1]
+                y = ponto[2]
+                space = c_float(Vars.KitLib.getEspacoGrid()).value
+                x = x / space
+                dx = x - int(x)
+                if dx < 0.5:
+                    x = int(x) * space
+                else:
+                    x = (int(x) + 1) * space
+                y = y / space
+                dy = y - int(y)
+                if dy < 0.5:
+                    y = int(y) * space
+                else:
+                    y = (int(y) + 1) * space
+                if self.parent.visionOption == Vars.VISION_X_POS:
                     Vars.KitLib.addSphere(0, ctypes.c_float(x), ctypes.c_float(y))
                 else:
-                    x = ponto[2]
-                    y = ponto[1]
                     Vars.KitLib.addSphere(0, ctypes.c_float(y), ctypes.c_float(x))
-            elif Vars.KitLib.getVisionAxis() == 121:  # 121 Codigo ASCII para 'y'
-
-                if Vars.KitLib.getVisionOption() == 3:
-                    x = ponto[0]
-                    y = ponto[2]
-                    Vars.KitLib.addSphere(ctypes.c_float(x), 0, ctypes.c_float(y))
+            elif self.parent.visionAxis == Vars.ASCII_Y:  # 121 Codigo ASCII para 'y'
+                x = ponto[0]
+                y = ponto[2]
+                space = c_float(Vars.KitLib.getEspacoGrid()).value
+                x = x / space
+                dx = x - int(x)
+                if dx < 0.5:
+                    x = int(x) * space
                 else:
-                    x = ponto[0]
-                    y = ponto[2]
-                    Vars.KitLib.addSphere(ctypes.c_float(x), 0, ctypes.c_float(y))
+                    x = (int(x) + 1) * space
+                y = y / space
+                if y - int(y) < 0.5:
+                    y = int(y) * space
+                else:
+                    y = (int(y) + 1) * space
+
+                Vars.KitLib.addSphere(ctypes.c_float(x), 0, ctypes.c_float(y))
+
+
 
         Vars.toolBar.EnableTool(wx.ID_UNDO, True)
+        Vars.drawArea0.Refresh(False)
+        Vars.drawArea1.Refresh(False)
+        Vars.drawArea2.Refresh(False)
+        Vars.drawArea3.Refresh(False)
 
     """
         -> Função OnPerspectiva:
@@ -182,10 +178,10 @@ class RightMenu(wx.Menu):
         -> Retorno: vazio
     """
     def OnPerspectiva(self, evt):
-        Vars.KitLib.setVisionOption(0)
+        self.parent.visionOption = 0
         Vars.visionItem.SetLabelText(Vars.visionModes[0])
-        Vars.KitLib.setVisionAxis(122)  # 122 Codigo ASCII para 'z'
-        Vars.drawArea.Refresh()
+        self.parent.visionAxis = Vars.ASCII_Z  # 122 Codigo ASCII para 'z'
+        self.parent.Refresh()
 
     """
         -> Função OnTop:
@@ -195,10 +191,10 @@ class RightMenu(wx.Menu):
         -> Retorno: vazio
     """
     def OnTop(self, evt):
-        Vars.KitLib.setVisionOption(5)
+        self.parent.visionOption = 5
         Vars.visionItem.SetLabelText(Vars.visionModes[5])
-        Vars.KitLib.setVisionAxis(122)  # 122 Codigo ASCII para 'z'
-        Vars.drawArea.Refresh()
+        Vars.KitLib.setVisionAxis = Vars.ASCII_Z  # 122 Codigo ASCII para 'z'
+        self.parent.Refresh()
 
     """
         -> Função OnFront:
@@ -208,10 +204,10 @@ class RightMenu(wx.Menu):
         -> Retorno: vazio
     """
     def OnFront(self, evt):
-        Vars.KitLib.setVisionOption(1)
+        self.parent.visionOption = 1
         Vars.visionItem.SetLabelText(Vars.visionModes[1])
-        Vars.KitLib.setVisionAxis(120)  # 120 Codigo ASCII para 'x'
-        Vars.drawArea.Refresh()
+        self.parent.visionAxis = Vars.ASCII_X  # 120 Codigo ASCII para 'x'
+        self.parent.Refresh()
 
     """
         -> Função OnBack:
@@ -221,10 +217,10 @@ class RightMenu(wx.Menu):
         -> Retorno: vazio
     """
     def OnBack(self, evt):
-        Vars.KitLib.setVisionOption(2)
+        self.parent.visionOption = 2
         Vars.visionItem.SetLabelText(Vars.visionModes[2])
-        Vars.KitLib.setVisionAxis(120)  # 120 Codigo ASCII para 'x'
-        Vars.drawArea.Refresh()
+        Vars.KitLib.setVisionAxis = Vars.ASCII_X  # 120 Codigo ASCII para 'x'
+        self.parent.Refresh()
 
     """
         -> Função OnRight:
@@ -234,10 +230,10 @@ class RightMenu(wx.Menu):
         -> Retorno: vazio
     """
     def OnRight(self, evt):
-        Vars.KitLib.setVisionOption(3)
+        self.parent.visionOption = 3
         Vars.visionItem.SetLabelText(Vars.visionModes[3])
-        Vars.KitLib.setVisionAxis(121)  # 121 Codigo ASCII para 'y'
-        Vars.drawArea.Refresh()
+        Vars.KitLib.setVisionAxis = Vars.ASCII_Y  # 121 Codigo ASCII para 'y'
+        self.parent.Refresh()
 
     """
         -> Função OnLeft:
@@ -247,10 +243,10 @@ class RightMenu(wx.Menu):
         -> Retorno: vazio
     """
     def OnLeft(self, evt):
-        Vars.KitLib.setVisionOption(4)
+        self.parent.visionOption = 4
         Vars.visionItem.SetLabelText(Vars.visionModes[4])
-        Vars.KitLib.setVisionAxis(121)  # 121 Codigo ASCII para 'y'
-        Vars.drawArea.Refresh()
+        Vars.KitLib.setVisionAxis = Vars.ASCII_Y  # 121 Codigo ASCII para 'y'
+        self.parent.Refresh()
 
     """
         -> Função OnSelectAll:
@@ -330,14 +326,53 @@ class RightMenu(wx.Menu):
         centro_size = len(centro)
         centro = (ctypes.c_float * centro_size)(*centro)
         if Vars.KitLib.setFocusToSelect(centro):
-            Vars.centro = (centro[0], centro[1], centro[2])
-            Vars.toolBox.tabConfig.txtFocusX.SetValue(str(round(centro[0], 3)))
+            if self.parent.visionOption == Vars.VISION_Z_PERSP:
+                self.parent.centro = (centro[0], centro[1], centro[2])
+                Vars.toolBox.tabConfig.txtFocusX.SetValue(str(round(centro[0], 3)))
+            elif self.parent.visionOption == Vars.VISION_Z_ORTHO:
+                self.parent.orthoCenter = (-centro[0], centro[1], centro[2])
+                Vars.toolBox.tabConfig.txtFocusX.SetValue(str(round(-centro[0], 3)))
             Vars.toolBox.tabConfig.txtFocusY.SetValue(str(round(centro[1], 3)))
             Vars.toolBox.tabConfig.txtFocusZ.SetValue(str(round(centro[2], 3)))
-        Vars.drawArea.Refresh()
+        Vars.drawArea0.Refresh()
+        Vars.drawArea1.Refresh()
+        Vars.drawArea2.Refresh()
+        Vars.drawArea3.Refresh()
 
-    def OnAddBar(self,e):
+    """
+        -> Função OnAddBar:
+            Função para adicionar uma barra na lista de objetos
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
+    def OnAddSmallBar(self,e):
 
         BAR_SMALL = 2
+        add = Vars.KitLib.addBar(BAR_SMALL)
+        if not(add):
+            msg = "Para adicionar uma barra pequena certifique-se que tenha duas esferas selecionadas e que a distância entre elas seja de 7.5 cm."
+            msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
+            msgCx.ShowModal()
+            msgCx.Destroy()
+        Vars.drawArea0.Refresh()
+        Vars.drawArea1.Refresh()
+        Vars.drawArea2.Refresh()
+        Vars.drawArea3.Refresh()
+        self.parent.Refresh()
+
+    def OnAddLargeBar(self,e):
+
         BAR_LARGE = 3
-        print(Vars.KitLib.addBar(2))
+        add = Vars.KitLib.addBar(BAR_LARGE)
+        if not(add):
+            msg = "Para adicionar uma barra grande certifique-se que tenha duas esferas selecionadas e que a distância entre elas seja de 16.3 cm."
+            msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
+            msgCx.ShowModal()
+            msgCx.Destroy()
+
+        Vars.drawArea0.Refresh()
+        Vars.drawArea1.Refresh()
+        Vars.drawArea2.Refresh()
+        Vars.drawArea3.Refresh()
+        self.parent.Refresh()

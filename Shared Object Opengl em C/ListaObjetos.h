@@ -61,7 +61,7 @@ class ListaObjetos
         *   Parâmetros: (x,y,z), ponto que foi clicado na interface, 'MBRSelect' MBR que engloba todos os objetos selecionados
         *   Retorno: 'bool' se foi selecionado algum objeto
         **/
-        bool select(float x, float y, float z, Ponto* MBRSelect);
+        int select(float x, float y, float z, Ponto* MBRSelect);
         /**
         *   Função deSelectAll: deseleciona todos os objetos que estavam selecionados
         *   Parâmetros: vazio
@@ -140,6 +140,33 @@ class ListaObjetos
         *   Retorno: 'Objeto3D*' o objeto que contem o 'id'
         **/
         Objeto3D* getbyId(int id);
+        /**
+        *   ->Função distObjsSelect:
+        *		retorna o valor da distância entre dois objetos selecionados
+        *	->Parâmetros: 'vazio'
+        *	->Retorno: 'float' valor da distâcia
+        **/
+        float distObjsSelect();
+        /**
+        *   ->Função getObj:
+        *		Retorna o objeto cujo "*ponto" pertence
+        *	->Parâmetros: '*ponto' vetor de 3 posições correspondente a XYZ
+        *	->Retorno: 'Objeto3D' objeto que "*ponto" pertence
+        **/
+        Objeto3D* getObj(double *ponto);
+        /**
+        *   Função moveObj: move todos os objetos selecionados
+        *   Parâmetros: (x,y,z) a quantidade que sera movido por eixo e 'id' é o ID do objeto a ser movido
+        *   Retorno: 'vazio'
+        **/
+        void moveObj(int id, float x, float y, float z);
+        /**
+        *   Função moveObjSelect: move todos os objetos selecionados
+        *   Parâmetros: (x,y,z) a quantidade que sera movido por eixo
+        *   Retorno: 'vazio'
+        **/
+        void moveObjSelect(float x, float y, float z);
+        int getNumSelect(){return tamSelect;}
         ~ListaObjetos();
     private:
 

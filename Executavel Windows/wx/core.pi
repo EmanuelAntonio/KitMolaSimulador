@@ -10,7 +10,7 @@
 #
 # See: https://wingware.com/doc/edit/helping-wing-analyze-code
 #
-# Copyright: (c) 2011-2016 by Total Control Software
+# Copyright: (c) 2017 by Total Control Software
 # License:   wxWindows License
 #---------------------------------------------------------------------------
 
@@ -8106,7 +8106,7 @@ class Image(Object):
 # end of class Image
 
 
-class ImageHistogram(Object):
+class ImageHistogram(object):
     """
     ImageHistogram()
     """
@@ -8238,6 +8238,13 @@ class ImageHandler(Object):
         SetName(name)
         
         Sets the handler name.
+        """
+
+    def SetType(self, type):
+        """
+        SetType(type)
+        
+        Sets the bitmap type for the handler.
         """
     AltExtensions = property(None, None)
     Extension = property(None, None)
@@ -12009,7 +12016,7 @@ class BufferedPaintDC(BufferedDC):
 # end of class BufferedPaintDC
 
 
-class AutoBufferedPaintDC(BufferedPaintDC):
+class AutoBufferedPaintDC(DC):
     """
     AutoBufferedPaintDC(window)
     
@@ -19941,6 +19948,9 @@ class PyEvent(Event):
     def _getAttrDict(self):
         """
         _getAttrDict() -> PyObject
+        
+        Gives access to the internal object that is tracking the event's
+        python attributes.
         """
 
     def Clone(self):
@@ -20010,6 +20020,9 @@ class PyCommandEvent(CommandEvent):
     def _getAttrDict(self):
         """
         _getAttrDict() -> PyObject
+        
+        Gives access to the internal object that is tracking the event's
+        python attributes.
         """
 
     def Clone(self):
@@ -26741,14 +26754,6 @@ class Scrolled(object):
         """
 # end of class Scrolled
 
-class ScrolledWindow(Panel, Scrolled):
-    """
-    The :ref:`ScrolledWindow` class is a combination of the :ref:`Panel` and
-    :ref:`Scrolled` classes, and manages scrolling for its client area,
-    transforming the coordinates according to the scrollbar positions,
-    and setting the scroll positions, thumb sizes and ranges according to
-    the area in view.
-    """
 class ScrolledCanvas(Window, Scrolled):
     """
     The :ref:`ScrolledCanvas` class is a combination of the :ref:`Window` and
@@ -26757,6 +26762,32 @@ class ScrolledCanvas(Window, Scrolled):
     and setting the scroll positions, thumb sizes and ranges according to
     the area in view.
     """
+
+class ScrolledWindow(Window, Scrolled):
+    """
+    ScrolledWindow()
+    ScrolledWindow(parent, winid=ID_ANY, pos=DefaultPosition, size=DefaultSize, style=ScrolledWindowStyle, name=PanelNameStr)
+    
+    Scrolled window derived from wxPanel.
+    """
+
+    def __init__(self, *args, **kw):
+        """
+        ScrolledWindow()
+        ScrolledWindow(parent, winid=ID_ANY, pos=DefaultPosition, size=DefaultSize, style=ScrolledWindowStyle, name=PanelNameStr)
+        
+        Scrolled window derived from wxPanel.
+        """
+
+    def SetFocusIgnoringChildren(self):
+        """
+        SetFocusIgnoringChildren()
+        
+        In contrast to SetFocus() this will set the focus to the panel even if
+        there are child windows in the panel. This is only rarely needed.
+        """
+# end of class ScrolledWindow
+
 
 PyScrolledWindow = wx.deprecated(ScrolledWindow, 'Use ScrolledWindow instead.')
 #-- end-scrolwin --#
@@ -41778,6 +41809,15 @@ def GetPasswordFromUser(message, caption=GetPasswordFromUserPromptStr, default_v
     not shown on screen but replaced with stars.
     """
 #-- end-textdlg --#
+#-- begin-numdlg --#
+
+def GetNumberFromUser(message, prompt, caption, value, min=0, max=100, parent=None, pos=DefaultPosition):
+    """
+    GetNumberFromUser(message, prompt, caption, value, min=0, max=100, parent=None, pos=DefaultPosition) -> long
+    
+    Shows a dialog asking the user for numeric input.
+    """
+#-- end-numdlg --#
 #-- begin-power --#
 POWER_SOCKET = 0
 POWER_BATTERY = 0
@@ -42199,6 +42239,16 @@ class WindowDisabler(object):
         This class disables all windows of the application (may be with the
         exception of one of them) in its constructor and enables them back in
         its destructor.
+        """
+
+    def __enter__(self):
+        """
+        
+        """
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        
         """
 # end of class WindowDisabler
 
@@ -43033,7 +43083,7 @@ SYS_SCREEN_PDA = 0
 SYS_SCREEN_SMALL = 0
 SYS_SCREEN_DESKTOP = 0
 
-class SystemSettings(Object):
+class SystemSettings(object):
     """
     SystemSettings()
     

@@ -10,7 +10,7 @@
 #
 # See: https://www.jetbrains.com/help/pycharm/2016.1/type-hinting-in-pycharm.html
 #
-# Copyright: (c) 2011-2016 by Total Control Software
+# Copyright: (c) 2017 by Total Control Software
 # License:   wxWindows License
 #---------------------------------------------------------------------------
 

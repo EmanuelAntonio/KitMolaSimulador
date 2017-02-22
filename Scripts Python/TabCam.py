@@ -55,7 +55,7 @@ class CamPanel(wx.Panel):
         Vars.visionItem.SetLabelText(Vars.visionModes[0])
         Vars.KitLib.setVisionAxis(122)#122 Codigo ASCII para 'z'
         self.Parent.SetFocus()
-        Vars.drawArea.Refresh()
+        Vars.drawArea0.Refresh()
     """
         -> Função OnTop:
             Função para alternar o modo de visão para ortogonal de cima com o botao direito do mouse
@@ -68,7 +68,7 @@ class CamPanel(wx.Panel):
         Vars.visionItem.SetLabelText(Vars.visionModes[5])
         Vars.KitLib.setVisionAxis(122)#122 Codigo ASCII para 'z'
         self.Parent.SetFocus()
-        Vars.drawArea.Refresh()
+        Vars.drawArea0.Refresh()
 
     """
         -> Função OnFront:
@@ -82,7 +82,7 @@ class CamPanel(wx.Panel):
         Vars.visionItem.SetLabelText(Vars.visionModes[1])
         Vars.KitLib.setVisionAxis(120)#120 Codigo ASCII para 'x'
         self.Parent.SetFocus()
-        Vars.drawArea.Refresh()
+        Vars.drawArea0.Refresh()
 
     """
         -> Função OnBack:
@@ -96,7 +96,7 @@ class CamPanel(wx.Panel):
         Vars.visionItem.SetLabelText(Vars.visionModes[2])
         Vars.KitLib.setVisionAxis(120)#120 Codigo ASCII para 'x'
         self.Parent.SetFocus()
-        Vars.drawArea.Refresh()
+        Vars.drawArea0.Refresh()
     """
         -> Função OnRight:
             Função para alternar o modo de visão para ortogonal em y positivo com o botao direito do mouse
@@ -109,7 +109,7 @@ class CamPanel(wx.Panel):
         Vars.visionItem.SetLabelText(Vars.visionModes[3])
         Vars.KitLib.setVisionAxis(121)#121 Codigo ASCII para 'y'
         self.Parent.SetFocus()
-        Vars.drawArea.Refresh()
+        Vars.drawArea0.Refresh()
 
     """
         -> Função OnLeft:
@@ -123,4 +123,4 @@ class CamPanel(wx.Panel):
         Vars.visionItem.SetLabelText(Vars.visionModes[4])
         Vars.KitLib.setVisionAxis(121)#121 Codigo ASCII para 'y'
         self.Parent.SetFocus()
-        Vars.drawArea.Refresh()
+        Vars.drawArea0.Refresh()

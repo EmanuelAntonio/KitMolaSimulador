@@ -3,391 +3,254 @@
 extern "C"{
     void init(){
 
-        visionAxis = 'z';
-        visionOption = 0;
         tamGrid = 16;
         resetMBRSelect();
         l = new ListaObjetos();
+        espacoGrid = 1.0;
+        meshQual = 1.0;
+        wireframe = false;
 
     }
-	void drawAxis(){
+    void drawAxisZero(){
 
-		if(visionAxis == 'z'){
+        glDisable(GL_LIGHTING);
+        glLineWidth(0.5);
+        float tamSeta = espacoGrid * 0.2;
+        float dxyz = espacoGrid * 0.05;
+        // X-axis
+        glColor3f(1.0, 0.0, 0.0);
+        glBegin(GL_LINES);
 
-			glDisable(GL_LIGHTING);
+        glVertex3f(0.0, 0.0, 0.0);
+        glVertex3f(espacoGrid, 0.0, 0.0);
 
-			// X-axis
-			glColor3f(1.0, 0.0, 0.0);
-			glBegin(GL_LINES);
+        glEnd();
 
-			glVertex3f(0.0, 0.0, 0.0);
-			glVertex3f(1.0, 0.0, 0.0);
+        glBegin(GL_QUADS);
 
-			glEnd();
+        glNormal3f(-1.0, 0.0, 0.0);
+        glVertex3f(espacoGrid, -dxyz, -dxyz);
+        glVertex3f(espacoGrid, -dxyz, dxyz);
+        glVertex3f(espacoGrid, dxyz, dxyz);
+        glVertex3f(espacoGrid, dxyz, -dxyz);
 
-			glBegin(GL_QUADS);
+        glEnd();
 
-			glNormal3f(-1.0, 0.0, 0.0);
-			glVertex3f(1.0, -0.05, -0.05);
-			glVertex3f(1.0, -0.05, 0.05);
-			glVertex3f(1.0, 0.05, 0.05);
-			glVertex3f(1.0, 0.05, -0.05);
+        glBegin(GL_TRIANGLE_FAN);
 
-			glEnd();
+        glVertex3f(espacoGrid + tamSeta, 0.0, 0.0);
+        glVertex3f(espacoGrid, dxyz, dxyz);
+        glVertex3f(espacoGrid, -dxyz, dxyz);
+        glVertex3f(espacoGrid, -dxyz, -dxyz);
+        glVertex3f(espacoGrid, dxyz, -dxyz);
+        glVertex3f(espacoGrid, dxyz, dxyz);
 
-			glBegin(GL_TRIANGLE_FAN);
+        glEnd();
 
-			glVertex3f(1.2, 0.0, 0.0);
-			glVertex3f(1.0, 0.05, 0.05);
-			glVertex3f(1.0, -0.05, 0.05);
-			glVertex3f(1.0, -0.05, -0.05);
-			glVertex3f(1.0, 0.05, -0.05);
-			glVertex3f(1.0, 0.05, 0.05);
+        // Y-axis
+        glColor3f(0.0, 1.0, 0.0);
+        glBegin(GL_LINES);
 
-			glEnd();
+        glVertex3f(0.0, 0.0, 0.0);
+        glVertex3f(0.0, espacoGrid, 0.0);
 
-			// Y-axis
-			glColor3f(0.0, 1.0, 0.0);
-			glBegin(GL_LINES);
+        glEnd();
 
-			glVertex3f(0.0, 0.0, 0.0);
-			glVertex3f(0.0, 1.0, 0.0);
+        glBegin(GL_QUADS);
 
-			glEnd();
+        glNormal3f(0.0, -1.0, 0.0);
+        glVertex3f(dxyz, espacoGrid, dxyz);
+        glVertex3f(-dxyz, espacoGrid, dxyz);
+        glVertex3f(-dxyz, espacoGrid, -dxyz);
+        glVertex3f(dxyz, espacoGrid, -dxyz);
 
-			glBegin(GL_QUADS);
+        glEnd();
 
-			glNormal3f(0.0, -1.0, 0.0);
-			glVertex3f(0.05, 1.0, 0.05);
-			glVertex3f(-0.05, 1.0, 0.05);
-			glVertex3f(-0.05, 1.0, -0.05);
-			glVertex3f(0.05, 1.0, -0.05);
+        glBegin(GL_TRIANGLE_FAN);
 
-			glEnd();
+        glVertex3f(0.0, espacoGrid + tamSeta, 0.0);
+        glVertex3f(-dxyz, espacoGrid, -dxyz);
+        glVertex3f(-dxyz, espacoGrid, dxyz);
+        glVertex3f(dxyz, espacoGrid, dxyz);
+        glVertex3f(dxyz, espacoGrid, -dxyz);
+        glVertex3f(-dxyz, espacoGrid, -dxyz);
 
-			glBegin(GL_TRIANGLE_FAN);
+        glEnd();
 
-			glVertex3f(0.0, 1.2, 0.0);
-			glVertex3f(-0.05, 1.0, -0.05);
-			glVertex3f(-0.05, 1.0, 0.05);
-			glVertex3f(0.05, 1.0, 0.05);
-			glVertex3f(0.05, 1.0, -0.05);
-			glVertex3f(-0.05, 1.0, -0.05);
+        // Z-axis
+        glColor3f(0.0, 0.0, 1.0);
+        glBegin(GL_LINES);
 
-			glEnd();
+        glVertex3f(0.0, 0.0, 0.0);
+        glVertex3f(0.0, 0.0, espacoGrid);
 
-			// Z-axis
-			glColor3f(0.0, 0.0, 1.0);
-			glBegin(GL_LINES);
+        glEnd();
 
-			glVertex3f(0.0, 0.0, 0.0);
-			glVertex3f(0.0, 0.0, 1.0);
+        glBegin(GL_QUADS);
 
-			glEnd();
+        glNormal3f(0.0, 0.0, 1.0);
+        glVertex3f(-dxyz, -dxyz, espacoGrid);
+        glVertex3f(-dxyz, dxyz, espacoGrid);
+        glVertex3f(dxyz, dxyz, espacoGrid);
+        glVertex3f(dxyz, -dxyz, espacoGrid);
 
-			glBegin(GL_QUADS);
+        glEnd();
 
-			glNormal3f(0.0, 0.0, 1.0);
-			glVertex3f(-0.05, -0.05, 1.0);
-			glVertex3f(-0.05, 0.05, 1.0);
-			glVertex3f(0.05, 0.05, 1.0);
-			glVertex3f(0.05, -0.05, 1.0);
+        glBegin(GL_TRIANGLE_FAN);
 
-			glEnd();
+        glVertex3f(0.0, 0.0, espacoGrid + tamSeta);
+        glVertex3f(dxyz, dxyz, espacoGrid);
+        glVertex3f(-dxyz, dxyz, espacoGrid);
+        glVertex3f(-dxyz, -dxyz, espacoGrid);
+        glVertex3f(dxyz, -dxyz, espacoGrid);
+        glVertex3f(dxyz, dxyz, espacoGrid);
 
-			glBegin(GL_TRIANGLE_FAN);
+        glEnd();
 
-			glVertex3f(0.0, 0.0, 1.2);
-			glVertex3f(0.05, 0.05, 1.0);
-			glVertex3f(-0.05, 0.05, 1.0);
-			glVertex3f(-0.05, -0.05, 1.0);
-			glVertex3f(0.05, -0.05, 1.0);
-			glVertex3f(0.05, 0.05, 1.0);
+        glEnable(GL_LIGHTING);
 
-			glEnd();
+    }
+	void drawAxis(char visionAxis){
 
-			glEnable(GL_LIGHTING);
+        glPushMatrix();
+            if(visionAxis == 'x'){
 
-		}else if(visionAxis == 'x'){
+                glRotatef(-90.0,1.0,0.0,0.0);
+                glRotatef(-90.0,0.0,0.0,1.0);
 
-			drawAxisX();
 
-		}else{
+            }else if(visionAxis == 'y'){
 
-			drawAxisY();
+                glRotatef(180.0,0.0,1.0,0.0);
+                glRotatef(-90.0,1.0,0.0,0.0);
+                glRotatef(180.0,0.0,0.0,1.0);
 
-		}
+            }
+            drawAxisZero();
+        glPopMatrix();
 
 	}
 
-	void drawAxisY(){
+	void drawGrid(char visionAxis){
 
-		glDisable(GL_LIGHTING);
-
-		// X-axis
-		glColor3f(1.0, 0.0, 0.0);
-		glBegin(GL_LINES);
-
-		glVertex3f(0.0, 0.0, 0.0);
-		glVertex3f(1.0, 0.0, 0.0);
-
-		glEnd();
-
-		glBegin(GL_QUADS);
-
-		glNormal3f(-1.0, 0.0, 0.0);
-		glVertex3f(1.0, -0.05, -0.05);
-		glVertex3f(1.0, -0.05, 0.05);
-		glVertex3f(1.0, 0.05, 0.05);
-		glVertex3f(1.0, 0.05, -0.05);
-
-		glEnd();
-
-		glBegin(GL_TRIANGLE_FAN);
-
-		glVertex3f(1.2, 0.0, 0.0);
-		glVertex3f(1.0, 0.05, 0.05);
-		glVertex3f(1.0, -0.05, 0.05);
-		glVertex3f(1.0, -0.05, -0.05);
-		glVertex3f(1.0, 0.05, -0.05);
-		glVertex3f(1.0, 0.05, 0.05);
-
-		glEnd();
-
-		// Y-axis
-		glColor3f(0.0, 0.0, 1.0);
-		glBegin(GL_LINES);
-
-		glVertex3f(0.0, 0.0, 0.0);
-		glVertex3f(0.0, 1.0, 0.0);
-
-		glEnd();
-
-		glBegin(GL_QUADS);
-
-		glNormal3f(0.0, -1.0, 0.0);
-		glVertex3f(0.05, 1.0, 0.05);
-		glVertex3f(-0.05, 1.0, 0.05);
-		glVertex3f(-0.05, 1.0, -0.05);
-		glVertex3f(0.05, 1.0, -0.05);
-
-		glEnd();
-
-		glBegin(GL_TRIANGLE_FAN);
-
-		glVertex3f(0.0, 1.2, 0.0);
-		glVertex3f(-0.05, 1.0, -0.05);
-		glVertex3f(-0.05, 1.0, 0.05);
-		glVertex3f(0.05, 1.0, 0.05);
-		glVertex3f(0.05, 1.0, -0.05);
-		glVertex3f(-0.05, 1.0, -0.05);
-
-		glEnd();
-
-		// Z-axis
-		glColor3f(0.0, 1.0, 0.0);
-		glBegin(GL_LINES);
-
-		glVertex3f(0.0, 0.0, 0.0);
-		glVertex3f(0.0, 0.0, 1.0);
-
-		glEnd();
-
-		glBegin(GL_QUADS);
-
-		glNormal3f(0.0, 0.0, 1.0);
-		glVertex3f(-0.05, -0.05, 1.0);
-		glVertex3f(-0.05, 0.05, 1.0);
-		glVertex3f(0.05, 0.05, 1.0);
-		glVertex3f(0.05, -0.05, 1.0);
-
-		glEnd();
-
-		glBegin(GL_TRIANGLE_FAN);
-
-		glVertex3f(0.0, 0.0, 1.2);
-		glVertex3f(0.05, 0.05, 1.0);
-		glVertex3f(-0.05, 0.05, 1.0);
-		glVertex3f(-0.05, -0.05, 1.0);
-		glVertex3f(0.05, -0.05, 1.0);
-		glVertex3f(0.05, 0.05, 1.0);
-
-		glEnd();
-
-		glEnable(GL_LIGHTING);
-
-
-	}
-
-	void drawAxisX(){
-
-		glDisable(GL_LIGHTING);
-
-		// X-axis
-		glColor3f(0.0, 1.0, 0.0);
-		glBegin(GL_LINES);
-
-		glVertex3f(0.0, 0.0, 0.0);
-		glVertex3f(1.0, 0.0, 0.0);
-
-		glEnd();
-
-		glBegin(GL_QUADS);
-
-		glNormal3f(-1.0, 0.0, 0.0);
-		glVertex3f(1.0, -0.05, -0.05);
-		glVertex3f(1.0, -0.05, 0.05);
-		glVertex3f(1.0, 0.05, 0.05);
-		glVertex3f(1.0, 0.05, -0.05);
-
-		glEnd();
-
-		glBegin(GL_TRIANGLE_FAN);
-
-		glVertex3f(1.2, 0.0, 0.0);
-		glVertex3f(1.0, 0.05, 0.05);
-		glVertex3f(1.0, -0.05, 0.05);
-		glVertex3f(1.0, -0.05, -0.05);
-		glVertex3f(1.0, 0.05, -0.05);
-		glVertex3f(1.0, 0.05, 0.05);
-
-		glEnd();
-
-		// Y-axis
-		glColor3f(0.0, 0.0, 1.0);
-		glBegin(GL_LINES);
-
-		glVertex3f(0.0, 0.0, 0.0);
-		glVertex3f(0.0, 1.0, 0.0);
-
-		glEnd();
-
-		glBegin(GL_QUADS);
-
-		glNormal3f(0.0, -1.0, 0.0);
-		glVertex3f(0.05, 1.0, 0.05);
-		glVertex3f(-0.05, 1.0, 0.05);
-		glVertex3f(-0.05, 1.0, -0.05);
-		glVertex3f(0.05, 1.0, -0.05);
-
-		glEnd();
-
-		glBegin(GL_TRIANGLE_FAN);
-
-		glVertex3f(0.0, 1.2, 0.0);
-		glVertex3f(-0.05, 1.0, -0.05);
-		glVertex3f(-0.05, 1.0, 0.05);
-		glVertex3f(0.05, 1.0, 0.05);
-		glVertex3f(0.05, 1.0, -0.05);
-		glVertex3f(-0.05, 1.0, -0.05);
-
-		glEnd();
-
-		// Z-axis
-		glColor3f(1.0, 0.0, 0.0);
-		glBegin(GL_LINES);
-
-		glVertex3f(0.0, 0.0, 0.0);
-		glVertex3f(0.0, 0.0, 1.0);
-
-		glEnd();
-
-		glBegin(GL_QUADS);
-
-		glNormal3f(0.0, 0.0, 1.0);
-		glVertex3f(-0.05, -0.05, 1.0);
-		glVertex3f(-0.05, 0.05, 1.0);
-		glVertex3f(0.05, 0.05, 1.0);
-		glVertex3f(0.05, -0.05, 1.0);
-
-		glEnd();
-
-		glBegin(GL_TRIANGLE_FAN);
-
-		glVertex3f(0.0, 0.0, 1.2);
-		glVertex3f(0.05, 0.05, 1.0);
-		glVertex3f(-0.05, 0.05, 1.0);
-		glVertex3f(-0.05, -0.05, 1.0);
-		glVertex3f(0.05, -0.05, 1.0);
-		glVertex3f(0.05, 0.05, 1.0);
-
-		glEnd();
-
-		glEnable(GL_LIGHTING);
-
-	}
-
-	void drawGrid(){
-
-        float espacoGrid = 1;
         float iniGrid = -tamGrid/(2/espacoGrid);
 
         glDisable(GL_LIGHTING);
-        glColor3f(0.65,0.65,0.65);
-        for(int i = 0; i <= tamGrid; i++){
 
-            if (i == tamGrid/2){
-                if (visionAxis == 'z'){
-                    glColor3f(0.0, 1.0, 0.0);
-                }else if (visionAxis == 'y'){
-                    glColor3f(0.0, 0.0, 1.0);
+        if(espacoGrid != 1.0){
+
+            glPushMatrix();
+
+                glColor3f(0.65,0.65,0.65);
+                glBegin(GL_LINES);
+                for(int i = 0; i <= tamGrid; i++){
+
+                    if(i != tamGrid/2){
+
+                        glVertex3f(iniGrid + (i * espacoGrid), iniGrid, 0.0);
+                        glVertex3f(iniGrid + (i * espacoGrid), iniGrid + (tamGrid * espacoGrid), 0.0);
+
+                        glVertex3f(iniGrid, iniGrid + (i * espacoGrid), 0.0);
+                        glVertex3f(iniGrid + (tamGrid * espacoGrid), iniGrid + (i * espacoGrid), 0.0);
+
+                    }
+
                 }
-                else{
-                    glColor3f(0.0, 0.0, 1.0);
-                }
-
-                glBegin(GL_LINES);
-
-                glVertex3f(iniGrid + (i * espacoGrid), iniGrid, 0.0);
-                glVertex3f(iniGrid + (i * espacoGrid), iniGrid + (tamGrid * espacoGrid), 0.0);
-
                 glEnd();
 
-                if (visionAxis == 'z'){
-                    glColor3f(1.0, 0.0, 0.0);
-                }else if (visionAxis == 'y'){
-                    glColor3f(1.0, 0.0, 0.0);
-                }else{
-                    glColor3d(0.0, 1.0, 0.0);
-                }
-                glBegin(GL_LINES);
+            glPopMatrix();
+            if(espacoGrid == 18.0){
 
-                glVertex3f(iniGrid, iniGrid + (i * espacoGrid), 0.0);
-                glVertex3f(iniGrid + (tamGrid * espacoGrid), iniGrid + (i * espacoGrid), 0.0);
+                glPushMatrix();
 
-                glEnd();
-                glColor3f(0.65, 0.65, 0.65);
+                    glColor3f(0.55,0.55,0.55);
+                    glBegin(GL_LINES);
+                    for(int i = 0; i <= tamGrid*2; i++){
 
-            }else{
-                glBegin(GL_LINES);
+                        if(i != tamGrid){
 
-                glVertex3f(iniGrid + (i * espacoGrid), iniGrid, 0.0);
-                glVertex3f(iniGrid + (i * espacoGrid), iniGrid + (tamGrid * espacoGrid), 0.0);
+                            glVertex3f(iniGrid + (i * espacoGrid/2.0), iniGrid, 0.0);
+                            glVertex3f(iniGrid + (i * espacoGrid/2.0), iniGrid + (tamGrid * espacoGrid), 0.0);
 
-                glEnd();
+                            glVertex3f(iniGrid, iniGrid + (i * espacoGrid/2.0), 0.0);
+                            glVertex3f(iniGrid + (tamGrid * espacoGrid), iniGrid + (i * espacoGrid/2.0), 0.0);
 
-                glBegin(GL_LINES);
+                        }
 
-                glVertex3f(iniGrid, iniGrid + (i * espacoGrid), 0.0);
-                glVertex3f(iniGrid + (tamGrid * espacoGrid), iniGrid + (i * espacoGrid), 0.0);
+                    }
+                    glEnd();
 
-                glEnd();
+                glPopMatrix();
+
             }
 
         }
+
+        int tGrid = tamGrid*espacoGrid;
+        iniGrid = -tGrid/(2.0);
+
+        glBegin(GL_LINES);
+            if(espacoGrid > 1.0){
+
+                glColor3f(0.45,0.45,0.45);
+
+            }else{
+
+                glColor3f(0.65,0.65,0.65);
+
+            }
+            for(int i = 0; i <= tGrid; i++){
+
+                if (i == tGrid/2){
+                    if (visionAxis == 'z'){
+                        glColor3f(0.0, 1.0, 0.0);
+                    }else if (visionAxis == 'y'){
+                        glColor3f(0.0, 0.0, 1.0);
+                    }
+                    else{
+                        glColor3f(0.0, 0.0, 1.0);
+                    }
+
+                    glVertex3f(iniGrid + (i), iniGrid, 0.0);
+                    glVertex3f(iniGrid + (i), iniGrid + (tGrid), 0.0);
+
+                    if (visionAxis == 'z'){
+                        glColor3f(1.0, 0.0, 0.0);
+                    }else if (visionAxis == 'y'){
+                        glColor3f(1.0, 0.0, 0.0);
+                    }else{
+                        glColor3d(0.0, 1.0, 0.0);
+                    }
+
+                    glVertex3f(iniGrid, iniGrid + (i), 0.0);
+                    glVertex3f(iniGrid + (tGrid), iniGrid + (i), 0.0);
+
+                    if(espacoGrid > 1.0){
+
+                        glColor3f(0.45,0.45,0.45);
+
+                    }else{
+
+                        glColor3f(0.65,0.65,0.65);
+
+                    }
+
+                }else{
+
+
+                    glVertex3f(iniGrid + (i), iniGrid, 0.0);
+                    glVertex3f(iniGrid + (i), iniGrid + (tGrid), 0.0);
+
+                    glVertex3f(iniGrid, iniGrid + (i), 0.0);
+                    glVertex3f(iniGrid + (tGrid), iniGrid + (i), 0.0);
+
+                }
+
+        }
+        glEnd();
+        glLineWidth(0.5);
         glEnable(GL_LIGHTING);
-
 	}
-    void setVisionAxis(char c){
-
-        visionAxis = c;
-
-    }
-    char getVisionAxis(){
-
-        return visionAxis;
-
-    }
     void addCubo(float x, float y, float z){
 
         l->addCubo(x,y,z);
@@ -398,152 +261,37 @@ extern "C"{
         return l->size();
 
     }
-    void drawCubeZero(bool selected){
+    void drawSphereZero(bool selected){
 
-        GLfloat object_difusa[] = {0.0,1.0,0.0};
+        GLfloat object_difusa[] = {1.0,1.0,1.0,0.5};
+        float resolucao = meshQual * 32;
         if(selected){
 
             object_difusa[0] = 1.0;
             object_difusa[1] = 0.3;
             object_difusa[2] = 0.3;
-            if(visionOption == 0){
-
-                glPushMatrix();
-                glLineWidth( 3.0 );
-                    glColor3f(0.0,0.0,1.0);
-
-                    glDisable(GL_LIGHTING);
-
-                    glBegin(GL_LINE_STRIP);
-
-                        glVertex3f(0.501,0.501,0.501);
-                        glVertex3f(-0.501,0.501,0.501);
-                        glVertex3f(-0.501,-0.501,0.501);
-                        glVertex3f(0.501,-0.501,0.501);
-                        glVertex3f(0.501,0.501,0.501);
-                        glVertex3f(0.501,0.501,-0.501);
-                        glVertex3f(0.501,-0.501,-0.501);
-                        glVertex3f(-0.501,-0.501,-0.501);
-                        glVertex3f(-0.501,0.501,-0.501);
-                        glVertex3f(0.501,0.501,-0.501);
-
-                    glEnd();
-                    glBegin(GL_LINES);
-
-                        glVertex3f(-0.501,-0.501,-0.501);
-                        glVertex3f(-0.501,-0.501,0.501);
-
-                        glVertex3f(0.501,-0.501,0.501);
-                        glVertex3f(0.501,-0.501,-0.501);
-
-                        glVertex3f(-0.501,0.501,0.501);
-                        glVertex3f(-0.501,0.501,-0.501);
-
-                    glEnd();
-                 glLineWidth( 1.0 );
-                glPopMatrix();
-                glEnable(GL_LIGHTING);
-
-            }
-
-
-        }else{
-
-            object_difusa[0] = 1.0;
-            object_difusa[1] = 1.0;
-            object_difusa[2] = 1.0;
 
         }
-        glBegin(GL_QUADS);
+        if(wireframe){
 
-            glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
-            //z+
-            glNormal3f(0.0,0.0,1.0);
-            glVertex3f(0.5,0.5,0.5);
-            glVertex3f(-0.5,0.5,0.5);
-            glVertex3f(-0.5,-0.5,0.5);
-            glVertex3f(0.5,-0.5,0.5);
+            if(!selected){
 
-            //z-
-            glNormal3f(0.0,0.0,1.0);
-            glVertex3f(0.5,0.5,-0.5);
-            glVertex3f(0.5,-0.5,-0.5);
-            glVertex3f(-0.5,-0.5,-0.5);
-            glVertex3f(-0.5,0.5,-0.5);
-
-            //x+
-            glNormal3f(1.0,0.0,0.0);
-            glVertex3f(0.5,0.5,0.5);
-            glVertex3f(0.5,-0.5,0.5);
-            glVertex3f(0.5,-0.5,-0.5);
-            glVertex3f(0.5,0.5,-0.5);
-
-            //x-
-            glNormal3f(-1.0,0.0,0.0);
-            glVertex3f(-0.5,0.5,0.5);
-            glVertex3f(-0.5,0.5,-0.5);
-            glVertex3f(-0.5,-0.5,-0.5);
-            glVertex3f(-0.5,-0.5,0.5);
-
-            //y+
-            glNormal3f(0.0,1.0,0.0);
-            glVertex3f(0.5,0.5,0.5);
-            glVertex3f(0.5,0.5,-0.5);
-            glVertex3f(-0.5,0.5,-0.5);
-            glVertex3f(-0.5,0.5,0.5);
-
-            //y-
-            glNormal3f(0.0,-1.0,0.0);
-            glVertex3f(0.5,-0.5,0.5);
-            glVertex3f(-0.5,-0.5,0.5);
-            glVertex3f(-0.5,-0.5,-0.5);
-            glVertex3f(0.5,-0.5,-0.5);
-
-        glEnd();
-
-    }
-    void drawCube(float x, float y, float z, bool selected){
-
-        glPushMatrix();
-
-            if(visionAxis == 'z'){
-
-                glTranslatef(x,y,z);
-
-            }else if(visionAxis == 'x'){
-
-                glTranslatef(y,z,x);
-
-            }else{
-
-                glTranslatef(x,z,y);
+                object_difusa[0] = 0.0;
+                object_difusa[1] = 0.0;
+                object_difusa[2] = 1.0;
 
             }
-            drawCubeZero(selected);
-
-        glPopMatrix();
-
-    }
-    void drawSphereZero(bool selected){
-
-        GLfloat object_difusa[] = {1.0,1.0,1.0,0.5};
-        GLfloat object_ambient[] = {0.5,0.5,0.5,1.0};
-        if(selected){
-
-            object_difusa[0] = 0.0;
-            object_difusa[1] = 0.0;
-            object_difusa[2] = 1.0;
             glPushMatrix();
-                glLineWidth( 3.0 );
                 glPolygonMode(GL_FRONT,GL_LINE);
-                glMaterialfv(GL_FRONT,GL_AMBIENT, object_ambient);
                 glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
+                glMaterialfv(GL_FRONT,GL_AMBIENT, object_ambient);
+                glMaterialfv(GL_FRONT, GL_SHININESS, object_brilho);
+                glMaterialfv(GL_FRONT, GL_SPECULAR, object_especular);
                 GLUquadricObj *quadric;
                 quadric = gluNewQuadric();
-                gluSphere( quadric , SPHERE_RADIUS +0.015, 16, 16);
+                gluSphere( quadric , SPHERE_RADIUS + 0.015, 16, 16);
                 gluDeleteQuadric(quadric);
                 glPolygonMode(GL_FRONT, GL_FILL);
-                glLineWidth( 1.0 );
             glPopMatrix();
 
             object_difusa[0] = 1.0;
@@ -551,18 +299,23 @@ extern "C"{
             object_difusa[2] = 0.3;
 
         }
-        glPushMatrix();
-            glMaterialfv(GL_FRONT,GL_AMBIENT, object_ambient);
+        if(!wireframe){
+
+            glPushMatrix();
             glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
+            glMaterialfv(GL_FRONT,GL_AMBIENT, object_ambient);
+            glMaterialfv(GL_FRONT, GL_SHININESS, object_brilho);
+            glMaterialfv(GL_FRONT, GL_SPECULAR, object_especular);
             GLUquadricObj *quadric;
             quadric = gluNewQuadric();
-            gluSphere( quadric , SPHERE_RADIUS , 64, 64);
-
+            gluSphere( quadric , SPHERE_RADIUS , resolucao, resolucao);
             gluDeleteQuadric(quadric);
-        glPopMatrix();
+            glPopMatrix();
+
+        }
 
     }
-    void drawSphere(float x, float y, float z, bool selected){
+    void drawSphere(float x, float y, float z, bool selected,char visionAxis){
 
         glPushMatrix();
 
@@ -584,18 +337,22 @@ extern "C"{
         glPopMatrix();
 
     }
-    void drawCena(){
+    void drawCena(char visionAxis,int visionOption){
 
         Objeto3D *aux = l->get();
         while(aux != NULL){
 
             if(aux->getObjeto() == SPHERE){
 
-                drawSphere(aux->getCentro()->x, aux->getCentro()->y, aux->getCentro()->z, aux->getSelecionado());
+                drawSphere(aux->getCentro()->x, aux->getCentro()->y, aux->getCentro()->z, aux->getSelecionado(),visionAxis);
 
             }else if(aux->getObjeto() == BAR_SMALL || aux->getObjeto() == BAR_LARGE){
 
-                drawBar(aux->getExtremidades()[0],aux->getExtremidades()[1]);
+                drawBar(aux->getExtremidades()[0],aux->getExtremidades()[1], aux->getSelecionado(),visionAxis);
+                glBegin(GL_LINES);
+                    glVertex3f(aux->getMBR()[0].x,aux->getMBR()[0].y,aux->getMBR()[0].z);
+                    glVertex3f(aux->getMBR()[1].x,aux->getMBR()[1].y,aux->getMBR()[1].z);
+                glEnd();
 
             }
             aux = aux->getProx();
@@ -603,7 +360,7 @@ extern "C"{
         }
 
     }
-    void save(char* arquivo){
+    void save(char* arquivo,char visionAxis,int visionOption){
 
         l->salvar(arquivo, visionAxis,visionOption);
 
@@ -611,17 +368,7 @@ extern "C"{
     void open(char* arquivo){
 
         cabecalhoKMP *c = l->abrir(arquivo);
-        visionAxis = c->visionAxis;
-
-    }
-    int getVisionOption(){
-
-        return visionOption;
-
-    }
-    void setVisionOption(int p){
-
-        visionOption = p;
+        delete c;
 
     }
     void setTamGrid(int p){
@@ -634,7 +381,7 @@ extern "C"{
         return tamGrid;
 
     }
-    double* getPonto3D(int x, int y){
+    double* getPonto3D(int x, int y,char visionAxis){
 
         double modelview[16], projection[16];
         int viewport[4];
@@ -672,15 +419,15 @@ extern "C"{
         return ponto;
 
     }
-    void getPonto3DFloat(int x, int y, float *ponto){
+    void getPonto3DFloat(int x, int y, float *ponto,char visionAxis){
 
-        double *p = getPonto3D(x,y);
+        double *p = getPonto3D(x,y,visionAxis);
         ponto[0] = p[0];
         ponto[1] = p[1];
         ponto[2] = p[2];
 
     }
-    bool select(double *ponto){
+    int select(double *ponto){
 
         return l->select(ponto[0], ponto[1], ponto[2], MBRSelect);
 
@@ -778,27 +525,27 @@ extern "C"{
         MBRSelect[1].z = -FLT_MAX;
 
     }
-    void drawMoveAxis(){
+    void drawMoveAxis(char visionAxis){
 
         Ponto centro;
         centro.x = (MBRSelect[1].x + MBRSelect[0].x)/2.0;
         centro.y = (MBRSelect[1].y + MBRSelect[0].y)/2.0;
         centro.z = (MBRSelect[1].z + MBRSelect[0].z)/2.0;
 
-        float dx = 0.3;
-        float dy = 0.1;
-        float dz = 0.1;
+        float dx = 1.25;
+        float dy = 0.5;
+        float dz = 0.5;
 
         ///MBR para X
         MBRMoveX[0].x = MBRSelect[1].x + dx;
         MBRMoveX[0].y = centro.y - dy ;
         MBRMoveX[0].z = centro.z - dz;
 
-        MBRMoveX[1].x = MBRSelect[1].x + 1.2;
+        MBRMoveX[1].x = MBRSelect[1].x + 5.0;
         MBRMoveX[1].y = centro.y + dy;
         MBRMoveX[1].z = centro.z + dz;
 
-        MBRMoveX[2].x = MBRSelect[0].x - 1.2;
+        MBRMoveX[2].x = MBRSelect[0].x - 5.0;
         MBRMoveX[2].y = centro.y - dy;
         MBRMoveX[2].z = centro.z - dz;
 
@@ -807,19 +554,19 @@ extern "C"{
         MBRMoveX[3].z = centro.z + dz;
 
         ///MBR para Y
-        dx = 0.1;
-        dy = 0.3;
+        dx = 0.5;
+        dy = 1.25;
 
         MBRMoveY[0].x = centro.x - dx;
         MBRMoveY[0].y = MBRSelect[1].y + dy ;
         MBRMoveY[0].z = centro.z - dz;
 
         MBRMoveY[1].x = centro.x + dx;
-        MBRMoveY[1].y = MBRSelect[1].y + 1.2;
+        MBRMoveY[1].y = MBRSelect[1].y + 5.0;
         MBRMoveY[1].z = centro.z + dz;
 
         MBRMoveY[2].x = centro.x - dx;
-        MBRMoveY[2].y = MBRSelect[0].y - 1.2;
+        MBRMoveY[2].y = MBRSelect[0].y - 5.0;
         MBRMoveY[2].z = centro.z - dz;
 
         MBRMoveY[3].x = centro.x + dx;
@@ -827,8 +574,8 @@ extern "C"{
         MBRMoveY[3].z = centro.z + dz;
 
         ///MBR para Z
-        dy = 0.1;
-        dz = 0.3;
+        dy = 0.5;
+        dz = 1.25;
 
         MBRMoveZ[0].x = centro.x - dx;
         MBRMoveZ[0].y = centro.y - dy ;
@@ -836,12 +583,12 @@ extern "C"{
 
         MBRMoveZ[1].x = centro.x + dx;
         MBRMoveZ[1].y = centro.y + dy;
-        MBRMoveZ[1].z = MBRSelect[1].z + 1.2;
+        MBRMoveZ[1].z = MBRSelect[1].z + 5.0;
 
 
         MBRMoveZ[2].x = centro.x - dx;
         MBRMoveZ[2].y = centro.y - dy;
-        MBRMoveZ[2].z = MBRSelect[0].z - 1.2;
+        MBRMoveZ[2].z = MBRSelect[0].z - 5.0;
 
         MBRMoveZ[3].x = centro.x + dx;
         MBRMoveZ[3].y = centro.y + dy;
@@ -929,14 +676,14 @@ extern "C"{
     }
     void drawSetaMove(){
 
-        float dx = 0.3;
-        float dy = 0.1;
-        float dz = 0.1;
+        float dx = 1.25;
+        float dy = 0.5;
+        float dz = 0.5;
         ///X
         glColor3f(0.69,0.933333,0.933333);
         glBegin(GL_TRIANGLE_FAN);
 
-            glVertex3f(1.2, 0, 0);
+            glVertex3f(5.0, 0, 0);
             glVertex3f(dx, dy, dz);
             glVertex3f(dx,-dy, dz);
             glVertex3f(dx,-dy,-dz);
@@ -957,15 +704,15 @@ extern "C"{
         glColor3f(1.0,0.0,0.0);
         glBegin(GL_LINES);
 
-            glVertex3f(1.2, 0, 0);
+            glVertex3f(5, 0, 0);
             glVertex3f(dx, dy, dz);
-            glVertex3f(1.2, 0, 0);
+            glVertex3f(5, 0, 0);
             glVertex3f(dx,-dy, dz);
-            glVertex3f(1.2, 0, 0);
+            glVertex3f(5, 0, 0);
             glVertex3f(dx,-dy,-dz);
-            glVertex3f(1.2, 0, 0);
+            glVertex3f(5, 0, 0);
             glVertex3f(dx, dy,-dz);
-            glVertex3f(1.2, 0, 0);
+            glVertex3f(5, 0, 0);
             glVertex3f(dx, dy, dz);
 
             glVertex3f(dx, dy, dz);
@@ -1069,73 +816,193 @@ extern "C"{
         return l->addBar(tipoBar);
 
     }
-    void drawBar(int id1, int id2){
+    void drawBar(int id1, int id2, bool selecionado,char visionAxis){
+
+        float resolucao = meshQual * 32;
 
         Objeto3D *objId1 = l->getbyId(id1);
         Objeto3D *objId2 = l->getbyId(id2);
-        float vetDir[3];
-        vetDir[0] = objId2->getCentro()->x - objId1->getCentro()->x;
-        vetDir[1] = objId2->getCentro()->y - objId1->getCentro()->y;
-        vetDir[2] = objId2->getCentro()->z - objId1->getCentro()->z;
+        Ponto p1,p2;
+        if(visionAxis == 'z'){
 
-        float normaVetDir = sqrt(pow(vetDir[0],2) + pow(vetDir[1],2) + pow(vetDir[2],2));
-        vetDir[0] /= normaVetDir;
-        vetDir[1] /= normaVetDir;
-        vetDir[2] /= normaVetDir;
-        float angX = asin(vetDir[0]);
-        float angY = asin(vetDir[1]);
-        float angZ = asin(vetDir[2]);
-        angX *= 180/M_PI;
-        angY *= 180/M_PI;
-        angZ *= 180/M_PI;
-        float centro[3];
-        centro[0] = (objId1->getCentro()->x + objId2->getCentro()->x)/2.0;
-        centro[1] = (objId1->getCentro()->y + objId2->getCentro()->y)/2.0;
-        centro[2] = (objId1->getCentro()->z + objId2->getCentro()->z)/2.0;
-        glPushMatrix();
+            p1.x = objId1->getCentro()->x;
+            p1.y = objId1->getCentro()->y;
+            p1.z = objId1->getCentro()->z;
+            p2.x = objId2->getCentro()->x;
+            p2.y = objId2->getCentro()->y;
+            p2.z = objId2->getCentro()->z;
 
-            glTranslatef(centro[0],centro[1],centro[2]);
-            glRotatef(angX,1.0,0.0,0.0);
-            glRotatef(angY,0.0,1.0,0.0);
-            glRotatef(angZ,0.0,0.0,1.0);
-            drawBarZero(normaVetDir);
+        }else if(visionAxis == 'x'){
 
-        glPopMatrix();
+            p1.x = objId1->getCentro()->y;
+            p1.y = objId1->getCentro()->z;
+            p1.z = objId1->getCentro()->x;
+            p2.x = objId2->getCentro()->y;
+            p2.y = objId2->getCentro()->z;
+            p2.z = objId2->getCentro()->x;
+
+
+        }else{
+
+            p1.x = objId1->getCentro()->x;
+            p1.y = objId1->getCentro()->z;
+            p1.z = objId1->getCentro()->y;
+            p2.x = objId2->getCentro()->x;
+            p2.y = objId2->getCentro()->z;
+            p2.z = objId2->getCentro()->y;
+
+        }
+        GLUquadricObj *quadric=gluNewQuadric();
+        gluQuadricNormals(quadric, GLU_SMOOTH);
+        drawBarZero(&p1,&p2, BAR_RADIUS, resolucao, quadric, selecionado);
+        gluDeleteQuadric(quadric);
+
+    }
+    void drawBarZero(Ponto *p1, Ponto *p2,float radius,int subdivisions,GLUquadricObj *quadric,bool selecionado){
+
+        GLfloat object_difusa[] = {1.0,1.0,1.0,0.5};
+        float vx = p2->x - p1->x;
+        float vy = p2->y - p1->y;
+        float vz = p2->z - p1->z;
+
+        //handle the degenerate case of z1 == z2 with an approximation
+        if(vz == 0)
+            vz = .0001;
+
+        float v = sqrt( vx*vx + vy*vy + vz*vz );
+        float ax = 57.2957795*acos( vz/v );
+        if ( vz < 0.0 )
+            ax = -ax;
+        float rx = -vy*vz;
+        float ry = vx*vz;
+        if(selecionado){
+
+            object_difusa[0] = 1.0;
+            object_difusa[1] = 0.3;
+            object_difusa[2] = 0.3;
+
+        }
+        if(wireframe){
+            if(!selecionado){
+
+                object_difusa[0] = 0.0;
+                object_difusa[1] = 0.0;
+                object_difusa[2] = 1.0;
+
+            }
+            glPushMatrix();
+
+                glPolygonMode(GL_FRONT,GL_LINE);
+                glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
+                glMaterialfv(GL_FRONT,GL_AMBIENT, object_ambient);
+                glMaterialfv(GL_FRONT, GL_SHININESS, object_brilho);
+                glMaterialfv(GL_FRONT, GL_SPECULAR, object_especular);
+                //draw the cylinder body
+                glTranslatef( p1->x,p1->y,p1->z );
+                glRotatef(ax, rx, ry, 0.0);
+                gluQuadricOrientation(quadric,GLU_OUTSIDE);
+                gluCylinder(quadric, radius, radius, v, 16, 1);
+
+                glPolygonMode(GL_FRONT,GL_FILL);
+
+            glPopMatrix();
+            object_difusa[0] = 1.0;
+            object_difusa[1] = 0.3;
+            object_difusa[2] = 0.3;
+
+        }
+        if(!wireframe){
+            glPushMatrix();
+
+                glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
+                glMaterialfv(GL_FRONT,GL_AMBIENT, object_ambient);
+                glMaterialfv(GL_FRONT, GL_SHININESS, object_brilho);
+                glMaterialfv(GL_FRONT, GL_SPECULAR, object_especular);
+                //draw the cylinder body
+                glTranslatef( p1->x,p1->y,p1->z );
+                glRotatef(ax, rx, ry, 0.0);
+                gluQuadricOrientation(quadric,GLU_OUTSIDE);
+                gluCylinder(quadric, radius, radius, v, subdivisions, 1);
+
+                //draw the first cap
+                gluQuadricOrientation(quadric,GLU_INSIDE);
+                gluDisk( quadric, 0.0, radius, subdivisions, 1);
+                glTranslatef( 0,0,v );
+
+                //draw the second cap
+                gluQuadricOrientation(quadric,GLU_OUTSIDE);
+                gluDisk( quadric, 0.0, radius, subdivisions, 1);
+
+            glPopMatrix();
+        }
 
 
     }
-    void drawBarZero(float tamBar){
+    void setEspacoGrid(float tam){
 
-        float divTheta = 32;
-        float divTam = 16;
-        float dTheta = 2*M_PI/divTheta;
-        float dTam = tamBar/divTam;
+        espacoGrid = tam;
 
-        GLfloat object_difusa[] = {1.0,1.0,1.0};
+    }
+    float getEspacoGrid(){
 
-        glBegin(GL_QUADS);
+        return espacoGrid;
 
-            for(float i = -tamBar/2.0; i < tamBar/2.0; i = i + dTam){
+    }
+    float distObjsSelect(){
 
-                for(int j = 0; j < divTheta; j++){
+        return l->distObjsSelect();
 
-                    glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
+    }
+    void setWireframe(bool w){
 
-                    glNormal3f(0,cos(j*dTheta),sin(j*dTheta));
-                    glVertex3f(i,BAR_RADIUS*cos(j*dTheta),BAR_RADIUS*sin(j*dTheta));
-                    glNormal3f(0,cos((j + 1)*dTheta),sin((j + 1)*dTheta));
-                    glVertex3f(i,BAR_RADIUS*cos((j + 1)*dTheta),BAR_RADIUS*sin((j + 1)*dTheta));
-                    glNormal3f(0,cos((j + 1)*dTheta),sin((j + 1)*dTheta));
-                    glVertex3f(i + dTam,BAR_RADIUS*cos((j + 1)*dTheta),BAR_RADIUS*sin((j + 1)*dTheta));
-                    glNormal3f(0,cos(j*dTheta),sin(j*dTheta));
-                    glVertex3f(i + dTam,BAR_RADIUS*cos(j*dTheta),BAR_RADIUS*sin(j*dTheta));
+        wireframe = w;
 
+    }
+    bool getWireframe(){
 
-                }
+        return wireframe;
 
-            }
+    }
+    void setMeshQual(float p){
 
-        glEnd();
+        meshQual = p;
+
+    }
+    float getMeshQual(){
+
+        return meshQual;
+
+    }
+    Objeto *getObjById(int id){
+
+        Objeto3D *aux = l->getbyId(id);
+        Objeto *obj = new Objeto;
+        obj->obj = aux->getObjeto();
+        obj->id = aux->getId();
+        obj->centro = *aux->getCentro();
+        obj->MBR[0] = aux->getMBR()[0];
+        obj->MBR[1] = aux->getMBR()[1];
+        obj->idExtremidades[0] = aux->getExtremidades()[0];
+        obj->idExtremidades[1] = aux->getExtremidades()[1];
+        return obj;
+
+    }
+    void moveObj(int id, float x, float y, float z){
+
+        l->moveObj(id,x,y,z);
+
+    }
+    void moveObjSelect(float x, float y, float z){
+
+        if(l->getNumSelect() > 0){
+
+            Ponto vetDeslocamento;
+            vetDeslocamento.x = x - (MBRSelect[1].x + MBRSelect[0].x)/2.0;
+            vetDeslocamento.y = y - (MBRSelect[1].y + MBRSelect[0].y)/2.0;
+            vetDeslocamento.z = z - (MBRSelect[1].z + MBRSelect[0].z)/2.0;
+            l->moveSelect(vetDeslocamento.x, vetDeslocamento.y, vetDeslocamento.z);
+
+        }
 
     }
 }

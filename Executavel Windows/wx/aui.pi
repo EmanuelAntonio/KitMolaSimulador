@@ -10,7 +10,7 @@
 #
 # See: https://wingware.com/doc/edit/helping-wing-analyze-code
 #
-# Copyright: (c) 2011-2016 by Total Control Software
+# Copyright: (c) 2017 by Total Control Software
 # License:   wxWindows License
 #---------------------------------------------------------------------------
 
@@ -2460,7 +2460,7 @@ class AuiNotebook(wx.BookCtrlBase):
 
     def SetSelection(self, new_page):
         """
-        SetSelection(new_page) -> size_t
+        SetSelection(new_page) -> int
         
         Sets the page selection.
         """

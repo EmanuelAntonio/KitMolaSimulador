@@ -10,7 +10,7 @@
 #
 # See: https://wingware.com/doc/edit/helping-wing-analyze-code
 #
-# Copyright: (c) 2011-2016 by Total Control Software
+# Copyright: (c) 2017 by Total Control Software
 # License:   wxWindows License
 #---------------------------------------------------------------------------
 
@@ -2243,6 +2243,13 @@ class Grid(wx.ScrolledWindow):
         Returns true if the in-place edit control is currently enabled.
         """
 
+    def IsCellEditControlShown(self):
+        """
+        IsCellEditControlShown() -> bool
+        
+        Returns true if the in-place edit control is currently shown.
+        """
+
     def IsCurrentCellReadOnly(self):
         """
         IsCurrentCellReadOnly() -> bool
@@ -2933,6 +2940,27 @@ class Grid(wx.ScrolledWindow):
         Deselects all cells that are currently selected.
         """
 
+    def DeselectRow(self, row):
+        """
+        DeselectRow(row)
+        
+        Deselects a row of cells.
+        """
+
+    def DeselectCol(self, col):
+        """
+        DeselectCol(col)
+        
+        Deselects a column of cells.
+        """
+
+    def DeselectCell(self, row, col):
+        """
+        DeselectCell(row, col)
+        
+        Deselects a cell.
+        """
+
     def GetSelectedCells(self):
         """
         GetSelectedCells() -> GridCellCoordsArray
@@ -3317,6 +3345,13 @@ class Grid(wx.ScrolledWindow):
         Render(dc, pos=wx.DefaultPosition, size=wx.DefaultSize, topLeft=GridCellCoords(-1,-1), bottomRight=GridCellCoords(-1,-1), style=GRID_DRAW_DEFAULT)
         
         Draws part or all of a wxGrid on a wxDC for printing or display.
+        """
+
+    def SetAttr(self, row, col, attr):
+        """
+        SetAttr(row, col, attr)
+        
+        Sets the cell attributes for the specified cell.
         """
 
     def SetColAttr(self, col, attr):

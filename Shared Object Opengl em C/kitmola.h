@@ -4,14 +4,18 @@
 
 extern "C"{
 
-    char visionAxis; ///Eixo principal para visao, usado na visao ortogonal
-    int visionOption; ///Define qual visão estpa ativa no momento
     int tamGrid; ///Define o tamanho do grid a ser exibido na tela
     Ponto MBRSelect[2]; ///MBR que engloba todos os objetos que estao selecionados
     ListaObjetos *l;
     Ponto MBRMoveX[4]; ///MBR que engloba as setas de movimento no eixo X(posicoes 0 e 1 para positivo, 2 e 3 para negativo)
     Ponto MBRMoveY[4]; ///MBR que engloba as setas de movimento no eixo Y(posicoes 0 e 1 para positivo, 2 e 3 para negativo)
     Ponto MBRMoveZ[4]; ///MBR que engloba as setas de movimento no eixo Z(posicoes 0 e 1 para positivo, 2 e 3 para negativo)
+    float espacoGrid; /// Espaçamento das marcações do grid
+    GLfloat object_ambient[] = {0.5,0.5,0.5,1.0};
+    GLfloat object_brilho[]    = { 128.0 };
+    GLfloat object_especular[] = { 1.0, 1.0, 1.0, 1.0 };
+    float meshQual; /// Qualidade da malha
+    bool wireframe; /// Variavel que armazena se será exibido em modo wireframe
 
 
     /**
@@ -27,49 +31,28 @@ extern "C"{
 	*	->Parâmetros: vazio
 	*	->Retorno: vazio
 	**/
-	void drawAxis();
+	void drawAxis(char visionAxis);
+    /**
+	*	->Função drawAxisZero:
+	*		Desenha os eixos cartesianos no centro do espaco R^3 na posicão original
+	*	->Parâmetros: vazio
+	*	->Retorno: vazio
+	**/
+	void drawAxisZero();
 	/**
 	*	->Função drawAxisX:
 	*		Desenha os eixos cartesianos no centro do espaco R^3 quando o eixo 'pra cima' selecionado é o X
 	*	->Parâmetros: vazio
 	*	->Retorno: vazio
 	**/
-	void drawAxisX();
-	/**
-	*   ->Função drawAxisY:
-	*		Desenha os eixos cartesianos no centro do espaco R^3 quando o eixo 'pra cima' selecionado é o Y
-	*	->Parâmetros: vazio
-	*	->Retorno: vazio
-	**/
-    void drawAxisY();
-    /**
-	*   ->Função drawGrid:
-	*		Desenha o grid no plano XY
-	*	->Parâmetros: vazio
-	*	->Retorno: vazio
-	**/
-    void drawGrid();
-    /**
-	*   ->Função drawCube:
-	*		Desenha um cubo em uma posição do espaço
-	*	->Parâmetros: 'x','y','z' é a posição do centro do cubo e 'selected' se o cubo está selecionado
-	*	->Retorno: vazio
-	**/
-    void drawCube(float x, float y, float z, bool selected);
-    /**
-	*   ->Função drawCubeZero:
-	*		Desenha um cubo na origem
-	*	->Parâmetros: 'bool', se o cubo está selecionado, se estiver desenha de uma outra cor
-	*	->Retorno: vazio
-	**/
-    void drawCubeZero(bool selected);
+    void drawGrid(char visionAxis);
     /**
 	*   ->Função drawSphere:
 	*		Desenha uma esfera de ligacao em uma posicao do espaco
 	*	->Parâmetros: 'x','y','z' é a posição do centro da esfera e 'selected' se esta selecionada
 	*	->Retorno: vazio
 	**/
-    void drawSphere(float x, float y, float z, bool selected);
+    void drawSphere(float x, float y, float z, bool selected,char visionAxis);
     /**
 	*   ->Função drawCubeZero:
 	*		Desenha uma esfera de ligacao na origem
@@ -83,46 +66,18 @@ extern "C"{
 	*	->Parâmetros: 'id1' 'id2', ids das esferas que ligam as  duas pontas da barra
 	*	->Retorno: 'vazio'
 	**/
-    void drawBar(int id1, int id2);
+    void drawBar(int id1, int id2, bool selecionado,char visionAxis);
     /**
 	*   ->Função drawBarZero:
 	*		Desenha uma barra na origem
 	*	->Parâmetros: 'tamBar' tamanho da barra a ser desenhada
     *	->Retorno: 'vazio'
 	**/
-    void drawBarZero(float tamBar);
+    void drawBarZero(Ponto *p1, Ponto *p2,float radius,int subdivisions,GLUquadricObj *quadric, bool selecionado);
     /**
 	*   ->Função setVisionAxis:
 	*		Altera a variável visionAxis
 	*	->Parâmetros: 'c' é o novo valor da variavel visionAxis
-	*	->Retorno: vazio
-	**/
-    void setVisionAxis(char c);
-    /**
-	*   ->Função getVisionAxis:
-	*		Retorna a variável visionAxis
-	*	->Parâmetros: vazio
-	*	->Retorno: 'char', retorna o caracter armazenado em visionAxis
-	**/
-    char getVisionAxis();
-    /**
-	*   ->Função setVisionOption:
-	*		Altera a variável visionOption
-	*	->Parâmetros: 'p' é o novo valor da variavel visionOption
-	*	->Retorno: vazio
-	**/
-    void setVisionOption(int p);
-    /**
-	*   ->Função getVisionOption:
-	*		Retorna a variável visionOption
-	*	->Parâmetros: vazio
-	*	->Retorno: 'int', retorna o modo de visao armazenado em visionAxis
-	**/
-    int getVisionOption();
-    /**
-	*   ->Função setTamGrid:
-	*		Altera a variável tamGrid
-	*	->Parâmetros: 'p' é o novo valor da variavel tamGrid
 	*	->Retorno: vazio
 	**/
     void setTamGrid(int p);
@@ -153,14 +108,14 @@ extern "C"{
 	*	->Parâmetros: vazio
 	*	->Retorno: 'int'
 	**/
-    void drawCena();
+    void drawCena(char visionAxis,int visionOption);
     /**
 	*   ->Função save:
 	*		Salva a lista de objetos em um arquivo .kmp
 	*	->Parâmetros: "char* arquivo" é o arquivo de destino
 	*	->Retorno: 'vazio'
 	**/
-    void save(char* arquivo);
+    void save(char* arquivo,char visionAxis,int visionOption);
     /**
 	*   ->Função open:
 	*		Abre um projeto em um arquivo .kmp
@@ -174,21 +129,21 @@ extern "C"{
 	*	->Parâmetros: (x,y) ponto da janela
 	*	->Retorno: (float[3])(x,y,z) ponto em 3d da cena
 	**/
-    double* getPonto3D(int x, int y);
+    double* getPonto3D(int x, int y,char visionAxis);
     /**
 	*   ->Função getPonto3DFloat:
 	*		Converte um ponto da janela em seu respectivo ponto 3d da cena
 	*	->Parâmetros: (x,y) ponto da janela, 'ponto' ponto em 3d da cena
 	*	->Retorno: 'vazio'
 	**/
-    void getPonto3DFloat(int x, int y, float *ponto);
+    void getPonto3DFloat(int x, int y, float *ponto,char visionAxis);
     /**
 	*   ->Função select:
 	*       Seleciona um objeto da cena de acordo com o ponto passado cmo parametro
 	*	->Parâmetros: 'double*' um ponto em R^3
 	*	->Retorno: 'bool' se o select encontrou algum objeto que corresponde ao ponto passado
 	**/
-    bool select(double *ponto);
+    int select(double *ponto);
     /**
 	*   ->Função deSelectAll:
 	*       Desseleciona todos os objetos da cena
@@ -268,7 +223,7 @@ extern "C"{
     *   Parâmetros: 'vazio'
     *   Retorno: 'vazio'
     **/
-    void drawMoveAxis();
+    void drawMoveAxis(char visionAxis);
     /**
     *   Função drawMoveAxisZero: desenha os eixos de movimento dos objetos na cena na origem, eh usado em na funcao drawMoveAxis
     *   Parâmetros: 'vazio'
@@ -320,5 +275,73 @@ extern "C"{
 	*	->Retorno: 'bool' se a adição foi realizada
 	**/
     bool addBar(int tipoBar);
+    /**
+	*   ->Função setEspacoGrid:
+	*		Altera o espaçamento entre o grid
+	*	->Parâmetros: 'tam' novo valor da variavel
+	*	->Retorno: 'vazio'
+	**/
+    void setEspacoGrid(float tam);
+    /**
+	*   ->Função getEspacoGrid:
+	*		Retorna o valor da variéavel espacoGrid
+	*	->Parâmetros: 'vazio'
+	*	->Retorno: 'float' valor da variável
+	**/
+    float getEspacoGrid();
+    /**
+	*   ->Função distObjsSelect:
+	*		Retorna o valor da distância entre dois objetos selecionados
+	*	->Parâmetros: 'vazio'
+	*	->Retorno: 'float' valor da distâcia
+	**/
+    float distObjsSelect();
+    /**
+	*   ->Função setWireframe:
+	*		Altera o valor da variavel wireframe
+	*	->Parâmetros: 'vazio'
+	*	->Retorno: 'vazio'
+	**/
+    void setWireframe(bool w);
+    /**
+	*   ->Função getWireframe:
+	*		Retorna o valor da variavel wireframe
+	*	->Parâmetros: 'vazio'
+	*	->Retorno: 'bool' o valor da variável
+	**/
+    bool getWireframe();
+    /**
+	*   ->Função setMeshQual:
+	*		Altera o valor da variavel meshQual
+	*	->Parâmetros: 'vazio'
+	*	->Retorno: 'vazio'
+	**/
+    void setMeshQual(float p);
+    /**
+	*   ->Função getMeshQual:
+	*		Retorna o valor da variável meshQual
+	*	->Parâmetros: 'vazio'
+	*	->Retorno: 'float' valor da variável
+	**/
+    float getMeshQual();
+    /**
+	*   ->Função getObjById:
+	*		Retorna um struct do tipo objeto com o 'id' passado como parâmetro
+	*	->Parâmetros: 'id' parâmetro do objeto a ser retornado
+	*	->Retorno: 'Objeto' struct que representa um objeto da classe Objeto3D
+	**/
+    Objeto *getObjById(int id);
+    /**
+    *   Função moveObj: move todos os objetos selecionados
+    *   Parâmetros: (x,y,z) a quantidade que sera movido por eixo e 'id' é o ID do objeto a ser movido
+    *   Retorno: 'vazio'
+    **/
+    void moveObj(int id, float x, float y, float z);
+    /**
+    *   Função moveObjSelect: move todos os objetos selecionados
+    *   Parâmetros: (x,y,z) a quantidade que sera movido por eixo
+    *   Retorno: 'vazio'
+    **/
+    void moveObjSelect(float x, float y, float z);
 
 }

@@ -8,7 +8,7 @@ using namespace std;
 ListaObjetos::ListaObjetos()
 {
     pri = NULL;
-    idDis = 0;
+    idDis = 1;
     tam = 0;
     indexId = new AVL();
     desfazer = new ListaAcao();
@@ -71,7 +71,7 @@ void ListaObjetos::salvar(char* arquivo, char visionAxis, int visionOption){
     FILE *arq;
     arq = fopen(arquivo,"ab");
     cabecalhoKMP c;
-    objeto obj;
+    Objeto obj;
     Objeto3D *aux = pri;
     c.numObj = size();
     c.visionAxis = visionAxis;
@@ -80,12 +80,13 @@ void ListaObjetos::salvar(char* arquivo, char visionAxis, int visionOption){
     while(aux != NULL){
 
         obj.obj = aux->getObjeto();
+        obj.id = aux->getId();
         obj.centro = *aux->getCentro();
         obj.MBR[0] = aux->getMBR()[0];
         obj.MBR[1] = aux->getMBR()[1];
         obj.idExtremidades[0] = aux->getExtremidades()[0];
         obj.idExtremidades[1] = aux->getExtremidades()[1];
-        fwrite(&obj,sizeof(objeto),1,arq);
+        fwrite(&obj,sizeof(Objeto),1,arq);
         aux = aux->getProx();
     }
     fclose(arq);
@@ -97,7 +98,7 @@ cabecalhoKMP* ListaObjetos::abrir(char* arquivo){
     arq = fopen(arquivo,"rb");
     cabecalhoKMP *c = new cabecalhoKMP;
     fread(c,sizeof(cabecalhoKMP),1,arq);
-    objeto obj;
+    Objeto obj;
     Objeto3D *ant;
     int idMax = 0;
     clear();
@@ -106,12 +107,13 @@ cabecalhoKMP* ListaObjetos::abrir(char* arquivo){
     indexId = new AVL();
     if(c->numObj != 0){
 
-        fread(&obj,sizeof(objeto),1,arq);
+        fread(&obj,sizeof(Objeto),1,arq);
         pri = new Objeto3D();
         pri->setCentro(obj.centro.x,obj.centro.y,obj.centro.z);
         pri->setMBR(obj.MBR[0].x,obj.MBR[0].y,obj.MBR[0].z,obj.MBR[1].x,obj.MBR[1].y,obj.MBR[1].z);
         pri->setExtremidades(obj.idExtremidades[0], obj.idExtremidades[1]);
         pri->setObjeto(obj.obj);
+        pri->setId(obj.id);
         ant = pri;
         pri->setAnt(NULL);
         pri->setProx(NULL);
@@ -125,7 +127,7 @@ cabecalhoKMP* ListaObjetos::abrir(char* arquivo){
 
     }for(int i = 1; i < c->numObj; i++){
 
-        fread(&obj,sizeof(objeto),1,arq);
+        fread(&obj,sizeof(Objeto),1,arq);
         ant->setProx(new Objeto3D());
         ant->getProx()->setAnt(ant);
         ant = ant->getProx();
@@ -133,6 +135,7 @@ cabecalhoKMP* ListaObjetos::abrir(char* arquivo){
         ant->setMBR(obj.MBR[0].x,obj.MBR[0].y,obj.MBR[0].z,obj.MBR[1].x,obj.MBR[1].y,obj.MBR[1].z);
         ant->setExtremidades(obj.idExtremidades[0], obj.idExtremidades[1]);
         ant->setObjeto(obj.obj);
+        ant->setId(obj.id);
         tam++;
         if(ant->getId() > idMax){
 
@@ -168,7 +171,7 @@ void ListaObjetos::clear(){
     }
 
 }
-bool ListaObjetos::select(float x, float y, float z, Ponto* MBRSelect){
+int ListaObjetos::select(float x, float y, float z, Ponto* MBRSelect){
 
     Objeto3D *aux = pri;
     while(aux != NULL){
@@ -218,14 +221,14 @@ bool ListaObjetos::select(float x, float y, float z, Ponto* MBRSelect){
                     recalculaMBRSelect(MBRSelect);
 
                 }
-                return true;
+                return aux->getId();
 
             }
 
         }
         aux = aux->getProx();
     }
-    return false;
+    return 0;
 }
 void ListaObjetos::deSelectAll(){
 
@@ -485,6 +488,7 @@ void ListaObjetos::desfazerAcao(){
     if(aux->getAcao() == ADICAO_OBJETOS){
 
         /**Trata para desfazer a acao de adicionar objetos, ou seja, os remove**/
+
         Objeto3D *refObj = aux->getObjs();
         Objeto3D *obj = NULL;
         while(refObj != NULL){
@@ -493,8 +497,8 @@ void ListaObjetos::desfazerAcao(){
             indexId->remover(refObj->getId());
             if(obj->getAnt() == NULL && obj->getProx() != NULL){
 
-                delete obj;
                 pri = pri->getProx();
+                delete obj;
                 if(pri != NULL){
 
                     pri->setAnt(NULL);
@@ -749,18 +753,20 @@ void ListaObjetos::recalculaMBRSelect(Ponto* MBRSelect){
 }
 void ListaObjetos::addSphere(float x, float y, float z){
 
-    float erro = 0.015;
+    float erro = 0.0;
     if(pri == NULL){
 
         pri = new Objeto3D();
-        pri->setObjeto(1);
+        pri->setObjeto(SPHERE);
         pri->setCentro(x,y,z);
         pri->setMBR(-SPHERE_RADIUS + erro + x,-SPHERE_RADIUS+ erro + y,-SPHERE_RADIUS + erro + z,SPHERE_RADIUS + erro + x,SPHERE_RADIUS + erro + y,SPHERE_RADIUS + erro + z);
+        pri->setAnt(NULL);
+        pri->setProx(NULL);
 
     }else{
 
         Objeto3D *aux = new Objeto3D();
-        aux->setObjeto(1);
+        aux->setObjeto(SPHERE);
         aux->setCentro(x,y,z);
         aux->setProx(pri);
         pri->setAnt(aux);
@@ -819,6 +825,30 @@ bool ListaObjetos::addBar(int tipoBar){
         }
 
     }
+    if(tipoBar == BAR_SMALL){
+
+        float dist = sqrt(pow(objId1->getCentro()->x - objId2->getCentro()->x,2)
+                          + pow(objId1->getCentro()->y - objId2->getCentro()->y,2)
+                          + pow(objId1->getCentro()->z - objId2->getCentro()->z,2)) - 2*SPHERE_RADIUS;
+        if(dist < BAR_LENGTH_SMALL - 0.01 || dist > BAR_LENGTH_SMALL + 0.01){
+
+            return false;
+
+        }
+
+    }else if(tipoBar == BAR_LARGE){
+
+        float dist = sqrt(pow(objId1->getCentro()->x - objId2->getCentro()->x,2)
+                          + pow(objId1->getCentro()->y - objId2->getCentro()->y,2)
+                          + pow(objId1->getCentro()->z - objId2->getCentro()->z,2)) - 2*SPHERE_RADIUS;
+
+        if(dist < BAR_LENGTH_LARGE - 0.01 || dist > BAR_LENGTH_LARGE + 0.01){
+
+            return false;
+
+        }
+
+    }
     float xMBR, yMBR, zMBR, XMBR, YMBR, ZMBR;
     if(pri == NULL){
 
@@ -859,7 +889,7 @@ bool ListaObjetos::addBar(int tipoBar){
         yMBR = objId2->getCentro()->y + BAR_RADIUS;
 
     }
-        if(objId1->getCentro()->z < objId2->getCentro()->z){
+    if(objId1->getCentro()->z < objId2->getCentro()->z){
 
         zMBR = objId1->getCentro()->z - BAR_RADIUS;
         ZMBR = objId2->getCentro()->z + BAR_RADIUS;
@@ -872,6 +902,7 @@ bool ListaObjetos::addBar(int tipoBar){
     }
     pri->setMBR(xMBR, yMBR, zMBR, XMBR, YMBR, ZMBR);
     pri->setId(idDis);
+    pri->setSelecionado(true);
     idDis++;
     indexId->insere(pri->getId(),pri);
     desfazer->insere(ADICAO_OBJETOS,duplicarObj(pri));
@@ -883,5 +914,71 @@ bool ListaObjetos::addBar(int tipoBar){
 Objeto3D* ListaObjetos::getbyId(int id){
 
     return indexId->busca(id);
+
+}
+float ListaObjetos::distObjsSelect(){
+
+    if(tamSelect != 2){
+
+        return -1;
+
+    }else{
+
+        Objeto3D *aux = pri;
+        Objeto3D *obj1 = NULL;
+        while(aux != NULL){
+
+            if(aux->getSelecionado()){
+
+                if(obj1 == NULL){
+
+                   obj1 = aux;
+
+                }else{
+
+                    return sqrt((pow(obj1->getCentro()->x - aux->getCentro()->x, 2))+
+                                (pow(obj1->getCentro()->y - aux->getCentro()->y, 2))+
+                                (pow(obj1->getCentro()->z - aux->getCentro()->z, 2))) - 2*SPHERE_RADIUS;
+
+                }
+
+            }
+
+            aux = aux->getProx();
+
+        }
+        return -1;
+    }
+
+}
+Objeto3D* ListaObjetos::getObj(double *ponto){
+
+        Objeto3D *aux = pri;
+        while(aux != NULL){
+
+
+            if((aux->getMBR()[0].x - 0.05 <= ponto[0]) && (aux->getMBR()[0].y - 0.05 <= ponto[1]) && (aux->getMBR()[0].z - 0.05 <= ponto[2])){
+
+                if((aux->getMBR()[1].x + 0.05>= ponto[0]) && (aux->getMBR()[1].y + 0.05 >= ponto[1]) && (aux->getMBR()[1].z + 0.05 >= ponto[2])){
+
+                        return aux;
+
+                }
+
+            }
+
+        }
+        return NULL;
+
+}
+void ListaObjetos::moveObj(int id, float x, float y, float z){
+
+    Objeto3D *aux = indexId->busca(id);
+    if(aux->getObjeto() == SPHERE){
+
+        aux->setCentro(x,y,z);
+        aux->setMBR(-SPHERE_RADIUS + x,-SPHERE_RADIUS + y,-SPHERE_RADIUS + z,SPHERE_RADIUS + x,SPHERE_RADIUS + y,SPHERE_RADIUS + z);
+
+    }
 
 }

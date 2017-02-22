@@ -10,7 +10,7 @@
 #
 # See: https://wingware.com/doc/edit/helping-wing-analyze-code
 #
-# Copyright: (c) 2011-2016 by Total Control Software
+# Copyright: (c) 2017 by Total Control Software
 # License:   wxWindows License
 #---------------------------------------------------------------------------
 
@@ -3237,7 +3237,7 @@ class PropertyGridIterator(PropertyGridIteratorBase):
 # end of class PropertyGridIterator
 
 
-class PGVIterator(ObjectRefData):
+class PGVIterator(object):
     """
     PGVIterator()
     PGVIterator(it)

@@ -33,13 +33,15 @@ class WindowClass(wx.Frame):
         boxMain = wx.BoxSizer(wx.HORIZONTAL)
         box = wx.BoxSizer(wx.VERTICAL)
         boxBtn = wx.BoxSizer(wx.VERTICAL)
+        Vars.boxUp = wx.BoxSizer(wx.HORIZONTAL)
+        Vars.boxDown = wx.BoxSizer(wx.HORIZONTAL)
 
         #Criação da area das tabs
         self.tabs = Tabs(self)
 
-        self.cam = CamOp(self)
+        #self.cam = CamOp(self)
         boxBtn.Add(self.tabs, 1, wx.ALIGN_TOP | wx.EXPAND, 1)
-        boxBtn.Add(self.cam,0,wx.ALIGN_BOTTOM | wx.EXPAND, 1)
+        #boxBtn.Add(self.cam,0,wx.ALIGN_BOTTOM | wx.EXPAND, 1)
 
         #Definição dos menus
         menuBar = wx.MenuBar()
@@ -53,10 +55,6 @@ class WindowClass(wx.Frame):
         saveAsItem = fileMenu.Append(wx.ID_SAVEAS, 'Salvar como...', 'Salvar como...')
         exitItem = fileMenu.Append(wx.ID_EXIT, 'Sair', 'Fechar Programa')
 
-        editItem = editMenu.Append(wx.ID_EDIT, 'Editar', 'Editar')
-        copyItem = editMenu.Append(wx.ID_COPY, 'Copiar', 'Copiar')
-        pasteItem = editMenu.Append(wx.ID_PASTE, 'Colar', 'Colar')
-
         helpItem = aboutMenu.Append(wx.ID_ABOUT, 'Ajuda', 'Ajuda')
 
         #Criação do label de visao(ao lado esquerdo)
@@ -69,13 +67,36 @@ class WindowClass(wx.Frame):
 
         #Adição dos menus à barra de menus
         menuBar.Append(fileMenu, '&Arquivo')
-        menuBar.Append(editMenu, '&Editar')
         menuBar.Append(aboutMenu, '&Sobre')
 
         #Criação da area de desenho
-        c = CubeCanvas(self)
-        Vars.drawArea = c
-        box.Add(c,0, wx.ALIGN_RIGHT | wx.EXPAND, 15)
+        Vars.drawArea0 = CanvasBase(self,0)
+        Vars.drawArea1 = CanvasBase(self,1)
+        Vars.drawArea2 = CanvasBase(self,2)
+        Vars.drawArea3 = CanvasBase(self,3)
+
+        Vars.drawArea0.visionAxis = Vars.ASCII_Z
+        Vars.drawArea0.visionOption = Vars.VISION_Z_ORTHO
+        Vars.drawArea1.visionAxis = Vars.ASCII_X
+        Vars.drawArea1.visionOption = Vars.VISION_X_POS
+        Vars.drawArea3.visionAxis = Vars.ASCII_Y
+        Vars.drawArea3.visionOption = Vars.VISION_Y_POS
+
+        Vars.lineUp = wx.StaticLine(self, wx.ID_ANY, style=wx.LI_VERTICAL)
+        Vars.lineDown = wx.StaticLine(self, wx.ID_ANY, style=wx.LI_VERTICAL)
+        Vars.lineBox = wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL)
+        Vars.boxUp.Add(Vars.drawArea0,1,wx.ALIGN_LEFT | wx.EXPAND, 15)
+        Vars.boxUp.Add(Vars.lineUp, 0, wx.ALIGN_CENTRE | wx.EXPAND, 5)
+        Vars.boxUp.Add(Vars.drawArea1, 1, wx.ALIGN_RIGHT | wx.EXPAND, 15)
+        Vars.boxDown.Add(Vars.drawArea2, 1, wx.ALIGN_LEFT | wx.EXPAND, 15)
+        Vars.boxDown.Add(Vars.lineDown, 0, wx.ALIGN_CENTRE | wx.EXPAND, 5)
+        Vars.boxDown.Add(Vars.drawArea3, 1, wx.ALIGN_RIGHT | wx.EXPAND, 15)
+        box.Add(Vars.boxUp,1, wx.ALIGN_RIGHT | wx.EXPAND, 15)
+        box.Add(Vars.lineBox, 0, wx.ALIGN_CENTRE | wx.EXPAND, 5)
+        box.Add(Vars.boxDown, 1, wx.ALIGN_RIGHT | wx.EXPAND, 15)
+
+        Vars.boxDraw = box
+
 
         #Junção dos sizers das tabs com o sizer principal
         boxMain.Add(box, 1, wx.ALIGN_RIGHT | wx.EXPAND,0)
@@ -119,11 +140,10 @@ class WindowClass(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onOpen, openItem)
         self.Bind(wx.EVT_MENU, self.onSave, saveItem)
         self.Bind(wx.EVT_MENU, self.onSaveAs, saveAsItem)
-        self.Bind(wx.EVT_MENU, self.onEdit, editItem)
         self.Bind(wx.EVT_MENU, self.onHelp, helpItem)
         self.Bind(wx.EVT_MENU, self.version, versionItem)
-        self.cam.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
-        self.cam.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
+        #self.cam.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
+        #self.cam.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
         self.tabs.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
         self.tabs.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
 
@@ -133,8 +153,6 @@ class WindowClass(wx.Frame):
         #Configurações finais
         self.Maximize(True)
         self.SetSizer(boxMain)
-        #self.SetAutoLayout(True)
-        #self.Layout()
         self.Show()
 
     def createToolbar(self):
@@ -182,7 +200,10 @@ class WindowClass(wx.Frame):
     """
     def OnSelectAll(self,e):
         Vars.KitLib.selectAll()
-        Vars.drawArea.Refresh()
+        Vars.drawArea0.Refresh()
+        Vars.drawArea1.Refresh()
+        Vars.drawArea2.Refresh()
+        Vars.drawArea3.Refresh()
 
     """
         ->Função onSize:
@@ -195,9 +216,9 @@ class WindowClass(wx.Frame):
     def onSize(self,e):
 
         tamJanela = self.GetSize()
-        resize = tamJanela
-        resize[0] = resize[0]*Vars.drawSize
-        Vars.drawArea.SetMinSize(resize)
+        #resize = tamJanela
+        #resize[0] = resize[0]*Vars.drawSize
+        #Vars.drawArea.SetMinSize(resize)
         self.Layout()
 
 
@@ -287,7 +308,11 @@ class WindowClass(wx.Frame):
                 msg = wx.MessageDialog(None, "Arquivo Corrompido!", "Erro!", wx.OK)
                 msg.ShowModal()
                 msg.Destroy()
-            Vars.drawArea.Refresh()
+            Vars.drawArea0.Refresh()
+            Vars.drawArea1.Refresh()
+            Vars.drawArea2.Refresh()
+            Vars.drawArea3.Refresh()
+
 
         Vars.ctrlPress = False
 
@@ -344,12 +369,6 @@ class WindowClass(wx.Frame):
     """
     def OnKeyDown(self, e):
 
-        W_PRESS = 87
-        S_PRESS = 83
-        G_PRESS = 71
-        A_PRESS = 65
-        D_PRESS = 68
-
         if(e.GetKeyCode() == wx.WXK_SHIFT):
             Vars.shiftPress = True
 
@@ -359,28 +378,30 @@ class WindowClass(wx.Frame):
                 self.toolbar.EnableTool(wx.ID_UNDO, True)
             if Vars.KitLib.refazerSize() > 0:
                 self.toolbar.EnableTool(wx.ID_REDO, True)
-            Vars.drawArea.Refresh()
+            Vars.drawArea0.Refresh()
+            Vars.drawArea1.Refresh()
+            Vars.drawArea2.Refresh()
+            Vars.drawArea3.Refresh()
 
         elif(e.GetKeyCode() == wx.WXK_CONTROL):
-            if Vars.KitLib.getVisionOption() == 0:
-                Vars.ctrlPress = True
-                Vars.centroAux = Vars.centro
 
-        elif(e.GetKeyCode() == W_PRESS and Vars.moveObjetos):
+            Vars.ctrlPress = True
+
+        elif(e.GetKeyCode() == Vars.W_PRESS and Vars.moveObjetos):
 
             if(Vars.KitLib.getVisionOption() == 5):
                 Vars.KitLib.moveSelect(c_float(0.0), c_float(0.1), c_float(0.0))
             elif(Vars.KitLib.getVisionOption() != 0):
                 Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(0.1))
 
-        elif (e.GetKeyCode() == S_PRESS and Vars.moveObjetos):
+        elif (e.GetKeyCode() == Vars.S_PRESS and Vars.moveObjetos):
 
             if (Vars.KitLib.getVisionOption() == 5):
                 Vars.KitLib.moveSelect(c_float(0.0), c_float(-0.1), c_float(0.0))
             elif(Vars.KitLib.getVisionOption() != 0):
                 Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(-0.1))
 
-        elif (e.GetKeyCode() == A_PRESS and Vars.moveObjetos):
+        elif (e.GetKeyCode() == Vars.A_PRESS and Vars.moveObjetos):
             if (Vars.KitLib.getVisionOption() == 5):
                 Vars.KitLib.moveSelect(c_float(-0.1), c_float(0.0), c_float(0.0))
             elif(Vars.KitLib.getVisionOption() == 1):
@@ -392,7 +413,7 @@ class WindowClass(wx.Frame):
             elif(Vars.KitLib.getVisionOption() == 4):
                 Vars.KitLib.moveSelect(c_float(-0.1), c_float(0.0), c_float(0.0))
 
-        elif (e.GetKeyCode() == D_PRESS and Vars.moveObjetos):
+        elif (e.GetKeyCode() == Vars.D_PRESS and Vars.moveObjetos):
             if (Vars.KitLib.getVisionOption() == 5):
                 Vars.KitLib.moveSelect(c_float(0.1), c_float(0.0), c_float(0.0))
             elif(Vars.KitLib.getVisionOption() == 1):
@@ -404,12 +425,56 @@ class WindowClass(wx.Frame):
             elif(Vars.KitLib.getVisionOption() == 4):
                 Vars.KitLib.moveSelect(c_float(0.1), c_float(0.0), c_float(0.0))
 
-        elif (e.GetKeyCode() == G_PRESS ):
+        elif (e.GetKeyCode() == Vars.G_PRESS ):
             Vars.moveObjetos = not(Vars.moveObjetos)
+
+        elif (e.GetKeyCode() == Vars.Z_PRESS ):
+            Vars.KitLib.setWireframe(not(Vars.KitLib.getWireframe()))
+        elif (e.GetKeyCode() == Vars.NUM_0_PRESS or e.GetKeyCode() == Vars.N_0_PRESS):
+            if Vars.ultimoDrawSelected != None:
+                Vars.ultimoDrawSelected.visionOption = Vars.VISION_Z_PERSP
+                Vars.ultimoDrawSelected.visionAxis = Vars.ASCII_Z  # 122 Codigo ASCII para 'z'
+                Vars.visionItem.SetLabelText(Vars.visionModes[0])
+                Vars.ultimoDrawSelected.Refresh()
+        elif (e.GetKeyCode() == Vars.NUM_1_PRESS or e.GetKeyCode() == Vars.N_1_PRESS):
+            if Vars.ultimoDrawSelected != None:
+                Vars.ultimoDrawSelected.visionOption = Vars.VISION_Z_ORTHO
+                Vars.ultimoDrawSelected.visionAxis = Vars.ASCII_Z  # 122 Codigo ASCII para 'z'
+                Vars.visionItem.SetLabelText(Vars.visionModes[5])
+                Vars.ultimoDrawSelected.Refresh()
+        elif (e.GetKeyCode() == Vars.NUM_2_PRESS or e.GetKeyCode() == Vars.N_2_PRESS):
+            if Vars.ultimoDrawSelected != None:
+                Vars.ultimoDrawSelected.visionOption = Vars.VISION_X_POS
+                Vars.ultimoDrawSelected.visionAxis = Vars.ASCII_X  # 122 Codigo ASCII para 'z'
+                Vars.visionItem.SetLabelText(Vars.visionModes[1])
+                Vars.ultimoDrawSelected.Refresh()
+        elif (e.GetKeyCode() == Vars.NUM_3_PRESS or e.GetKeyCode() == Vars.N_3_PRESS):
+            if Vars.ultimoDrawSelected != None:
+                Vars.ultimoDrawSelected.visionOption = Vars.VISION_X_NEG
+                Vars.ultimoDrawSelected.visionAxis = Vars.ASCII_X  # 122 Codigo ASCII para 'z'
+                Vars.visionItem.SetLabelText(Vars.visionModes[2])
+                Vars.ultimoDrawSelected.Refresh()
+        elif (e.GetKeyCode() == Vars.NUM_4_PRESS or e.GetKeyCode() == Vars.N_4_PRESS):
+            if Vars.ultimoDrawSelected != None:
+                Vars.ultimoDrawSelected.visionOption = Vars.VISION_Y_POS
+                Vars.ultimoDrawSelected.visionAxis = Vars.ASCII_Y  # 122 Codigo ASCII para 'z'
+                Vars.visionItem.SetLabelText(Vars.visionModes[3])
+                Vars.ultimoDrawSelected.Refresh()
+        elif (e.GetKeyCode() == Vars.NUM_5_PRESS or e.GetKeyCode() == Vars.N_5_PRESS):
+            if Vars.ultimoDrawSelected != None:
+                Vars.ultimoDrawSelected.visionOption = Vars.VISION_Y_NEG
+                Vars.ultimoDrawSelected.visionAxis = Vars.ASCII_Y  # 122 Codigo ASCII para 'z'
+                Vars.visionItem.SetLabelText(Vars.visionModes[4])
+                Vars.ultimoDrawSelected.Refresh()
+        elif (e.GetKeyCode() == Vars.ESC_PRESS):
+            self.Close()
         else:
             print(e.GetKeyCode())
 
-        e.Skip()
+        Vars.drawArea0.Refresh()
+        Vars.drawArea1.Refresh()
+        Vars.drawArea2.Refresh()
+        Vars.drawArea3.Refresh()
 
     """
         -> Função OnKeyUp:
@@ -443,7 +508,10 @@ class WindowClass(wx.Frame):
                 Vars.toolBar.EnableTool(wx.ID_UNDO, False)
         else:
             Vars.toolBar.EnableTool(wx.ID_UNDO, False)
-        Vars.drawArea.Refresh()
+        Vars.drawArea0.Refresh()
+        Vars.drawArea1.Refresh()
+        Vars.drawArea2.Refresh()
+        Vars.drawArea3.Refresh()
 
     """
         -> Função OnRedo:
@@ -465,4 +533,7 @@ class WindowClass(wx.Frame):
         else:
             Vars.toolBar.EnableTool(wx.ID_REDO, False)
 
-        Vars.drawArea.Refresh()
+        Vars.drawArea0.Refresh()
+        Vars.drawArea1.Refresh()
+        Vars.drawArea2.Refresh()
+        Vars.drawArea3.Refresh()

@@ -11,7 +11,7 @@
 #define SPHERE_RADIUS 0.75 /// em centimetros
 #define BAR_RADIUS 0.3 /// em centimetros
 #define BAR_LENGTH_SMALL 7.5 /// em Centrimetros
-#define BAR_LENGTH_LARGE 16.3 /// em centrimetros
+#define BAR_LENGTH_LARGE 16.5 /// em centrimetros
 
 
 /**Struct cabecalhoKMP: cabeçalho do arquivo binario do projeto .kmp**/
@@ -31,9 +31,10 @@ struct Ponto{
 
 };
 /**Struct objeto: armazena um objeto3d para armazenamento no arquivo binario do projeto .kmp**/
-struct objeto{
+struct Objeto{
 
     int obj;
+    int id;
     Ponto centro;
     Ponto MBR[2];
     int idExtremidades[2];

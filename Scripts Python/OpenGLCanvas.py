@@ -2,16 +2,39 @@
 from PopUpMenu import *
 
 """
-    ->Classe MyCanvasBase:
-        Classe para manipulação geral da área de canvas do wxPython, como eventos de mouse e teclado
+    ->Classe CanvasBase:
+        Classe para manipulação do GLcanvas, responsável pela definição inicial do draw do OpenGL e da captura de eventos de mouse
 
 """
-class MyCanvasBase(glcanvas.GLCanvas):
-    def __init__(self, parent):
+class CanvasBase(glcanvas.GLCanvas):
+    def __init__(self, parent, ref):
         glcanvas.GLCanvas.__init__(self, parent, -1)
         self.parent = parent
         self.init = False
         self.context = glcanvas.GLContext(self)
+        self.numJanela = ref # Variável para armazenar o id da janela
+        self.dClickEvent = False #Variável referênte a se o usuário está durante o evento de duplo click do mouse, usado para não disparar o evento mouse_motion
+
+
+        if ref == 0:
+            self.visionAxis = Vars.ASCII_Z
+            self.visionOption = Vars.VISION_Z_PERSP
+        elif ref == 1:
+            self.visionAxis = Vars.ASCII_Z
+            self.visionOption = Vars.VISION_Z_PERSP
+        elif ref == 2:
+            self.visionAxis = Vars.ASCII_Z
+            self.visionOption = Vars.VISION_Z_PERSP
+        else:
+            self.visionAxis = Vars.ASCII_Z
+            self.visionOption = Vars.VISION_Z_PERSP
+
+        self.camZoom = 16  # Variável que armazena o raio da coordenada esférica correspondente ao zoom da câmera
+        self.theta = math.pi / 4  # Variável que armazena em radianos o ângulo XY da câmera
+        self.phi = math.pi / 3  # Variável que armazena em radianos o ângulo do eixo Z com o plano XY
+        self.centro = (0,0,0) #Variável que armazena a posição do foco da cãmera
+        self.orthoCenter = (0,0) #Tupla que armazena o ponto central da visão ortho
+        self.orthoZoom = 5 #Variável que armazena a distancia do centro para visao ortho
 
         # initial mouse position
         self.lastx = self.x = 30
@@ -25,11 +48,85 @@ class MyCanvasBase(glcanvas.GLCanvas):
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnMouseScroll)
         self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
         self.Bind(wx.EVT_MIDDLE_DOWN, self.OnScrollClick)
-        self.Bind(wx.EVT_IDLE, self.OnIdle)
+        self.Bind(wx.EVT_LEFT_DCLICK, self.OnDClick)
 
-    def OnIdle(self, e):
+    def OnDClick(self, e):
+
+        self.dClickEvent = True
+        if Vars.drawPrincipal == -1:
+            Vars.drawPrincipal = self.numJanela
+            if self.numJanela == 0:
+                Vars.drawArea1.Hide()
+                Vars.drawArea2.Hide()
+                Vars.drawArea3.Hide()
+                Vars.lineDown.Hide()
+                Vars.lineUp.Hide()
+                Vars.lineBox.Hide()
+                Vars.boxDown.Hide(True)
+                Vars.boxUp.Layout()
+                Vars.boxDraw.Layout()
+
+            elif self.numJanela == 1:
+                Vars.drawArea0.Hide()
+                Vars.drawArea2.Hide()
+                Vars.drawArea3.Hide()
+                Vars.lineDown.Hide()
+                Vars.lineUp.Hide()
+                Vars.lineBox.Hide()
+                Vars.boxDown.Hide(True)
+                Vars.boxUp.Layout()
+                Vars.boxDraw.Layout()
+
+            elif self.numJanela == 2:
+
+                Vars.drawArea0.Hide()
+                Vars.drawArea1.Hide()
+                Vars.drawArea3.Hide()
+                Vars.lineDown.Hide()
+                Vars.lineUp.Hide()
+                Vars.lineBox.Hide()
+                Vars.boxUp.Hide(True)
+                Vars.boxDown.Layout()
+                Vars.boxDraw.Layout()
+
+            else:
+
+                Vars.drawArea0.Hide()
+                Vars.drawArea1.Hide()
+                Vars.drawArea2.Hide()
+                Vars.lineDown.Hide()
+                Vars.lineUp.Hide()
+                Vars.lineBox.Hide()
+                Vars.boxUp.Hide(True)
+                Vars.boxDown.Layout()
+                Vars.boxDraw.Layout()
+
+        else:
+            Vars.drawPrincipal = -1
+            Vars.drawArea0.Show()
+            Vars.drawArea1.Show()
+            Vars.drawArea2.Show()
+            Vars.drawArea3.Show()
+            Vars.lineDown.Show()
+            Vars.lineUp.Show()
+            Vars.lineBox.Show()
+            Vars.boxUp.Show(True)
+            Vars.boxDown.Show(True)
+            Vars.boxDown.Layout()
+            Vars.boxUp.Layout()
+            Vars.boxDraw.Layout()
+
+        Vars.drawArea0.Refresh()
+        Vars.drawArea1.Refresh()
+        Vars.drawArea2.Refresh()
+        Vars.drawArea3.Refresh()
         self.Refresh(True)
-        e.Skip()
+        """if self.parent.IsFullScreen():
+            self.parent.ShowFullScreen(False)
+            self.parent.Maximize(True)
+        else:
+            self.parent.ShowFullScreen(True)"""
+
     """
         -> Função OnSize:
             Função para reoganizar a viewport da drawArea assim que sofrer um resize na janela
@@ -39,12 +136,11 @@ class MyCanvasBase(glcanvas.GLCanvas):
     def OnSize(self, event):
         wx.CallAfter(self.DoSetViewport)
         self.DoSetViewport()
-        event.Skip()
 
     def DoSetViewport(self):
-        size = self.size = self.GetClientSize()
+        self.size = self.GetClientSize()
         self.SetCurrent(self.context)
-        glViewport(0, 0, size.width, size.height)
+        glViewport(0, 0, self.size.width, self.size.height)
 
     def OnPaint(self, event):
         dc = wx.PaintDC(self)
@@ -55,20 +151,63 @@ class MyCanvasBase(glcanvas.GLCanvas):
         self.OnDraw()
 
     def OnScrollClick(self,e):
-        self.x, self.y = self.lastx, self.lasty = e.GetPosition()
+        Vars.ultimoDrawSelected = self
+        self.atualizaCentroFocus()
+        self.x, self.y = e.GetPosition()
+        self.Refresh(True)
         ponto = Vars.KitLib.getPonto3D(c_int(self.x), c_int(self.y))
         if not(Vars.shiftPress):
             Vars.KitLib.deSelectAll()
             Vars.moveObjetos = False
-        Vars.KitLib.select(ponto)
-        self.Refresh()
+        idObj = Vars.KitLib.select(ponto)
+        if idObj != 0:
+            obj = Vars.KitLib.getObjById(idObj)
+            centro = (obj.contents.centro.x, obj.contents.centro.y, obj.contents.centro.z)
+            self.parent.tabs.tabInfo.AlteraLayoutInfo(obj.contents.id, obj.contents.obj,centro)
+        else:
+            self.parent.tabs.tabInfo.AlteraLayoutInfo(0, 0, None)
+
+        Vars.drawArea0.Refresh()
+        Vars.drawArea1.Refresh()
+        Vars.drawArea2.Refresh()
+        Vars.drawArea3.Refresh()
+
+    def atualizaCentroFocus(self):
+
+        if self.visionOption == Vars.VISION_Z_PERSP:
+            self.parent.tabs.tabConfig.txtFocusX.SetValue(str(round(self.centro[0],3)))
+            self.parent.tabs.tabConfig.txtFocusY.SetValue(str(round(self.centro[1],3)))
+            self.parent.tabs.tabConfig.txtFocusZ.SetValue(str(round(self.centro[2],3)))
+        elif self.visionOption == Vars.VISION_X_POS:
+            self.parent.tabs.tabConfig.txtFocusX.SetValue("0")
+            self.parent.tabs.tabConfig.txtFocusY.SetValue(str(round(self.orthoCenter[1],3)))
+            self.parent.tabs.tabConfig.txtFocusZ.SetValue(str(round(-self.orthoCenter[0],3)))
+        elif self.visionOption == Vars.VISION_X_NEG:
+            self.parent.tabs.tabConfig.txtFocusX.SetValue("0")
+            self.parent.tabs.tabConfig.txtFocusY.SetValue(str(round(-self.orthoCenter[1],3)))
+            self.parent.tabs.tabConfig.txtFocusZ.SetValue(str(round(-self.orthoCenter[0],3)))
+        elif self.visionOption == Vars.VISION_Y_POS:
+            self.parent.tabs.tabConfig.txtFocusX.SetValue(str(round(-self.orthoCenter[1],3)))
+            self.parent.tabs.tabConfig.txtFocusY.SetValue("0")
+            self.parent.tabs.tabConfig.txtFocusZ.SetValue(str(round(-self.orthoCenter[0],3)))
+        elif self.visionOption == Vars.VISION_Y_NEG:
+            self.parent.tabs.tabConfig.txtFocusX.SetValue(str(round(self.orthoCenter[1],3)))
+            self.parent.tabs.tabConfig.txtFocusY.SetValue("0")
+            self.parent.tabs.tabConfig.txtFocusZ.SetValue(str(round(-self.orthoCenter[1],3)))
+        else:
+            self.parent.tabs.tabConfig.txtFocusX.SetValue(str(round(self.orthoCenter[1],3)))
+            self.parent.tabs.tabConfig.txtFocusY.SetValue(str(round(-self.orthoCenter[0],3)))
+            self.parent.tabs.tabConfig.txtFocusZ.SetValue("0")
 
 
     def OnMouseDown(self, evt):
+        Vars.ultimoDrawSelected = self
+        self.atualizaCentroFocus()
+
         Vars.toolBox.SetFocus()
         self.CaptureMouse()
         self.x, self.y = self.lastx, self.lasty = evt.GetPosition()
-        Vars.centroAux = Vars.centro
+        Vars.centroAux = self.centro
         if(Vars.moveObjetos):
             ponto = Vars.KitLib.getPonto3D(c_int(self.x), c_int(self.y))
             Vars.moveObjetosEixo = Vars.KitLib.selectMoveSeta(ponto)
@@ -78,8 +217,10 @@ class MyCanvasBase(glcanvas.GLCanvas):
 
 
     def OnMouseUp(self, evt):
+
         try:
             self.ReleaseMouse()
+
         except:
             pass
 
@@ -91,126 +232,163 @@ class MyCanvasBase(glcanvas.GLCanvas):
     """
     def OnMouseMotion(self, evt):
 
-        if evt.Dragging() and evt.LeftIsDown():
+        if evt.Dragging() and evt.LeftIsDown() and not(self.dClickEvent):
+
             self.lastx, self.lasty = self.x, self.y
             self.x, self.y = evt.GetPosition()
 
-            if Vars.ctrlPress and Vars.KitLib.getVisionOption() == 0:
+            if Vars.ctrlPress and self.visionOption == 0: #Se o Control estiver pressionado e estiver na visão perspectiva então fará o deslocamento da câmera livre
 
-                dTheta = (-math.sin(Vars.theta),
-                         math.cos(Vars.theta), 0)
+                dTheta = (-math.sin(self.theta),
+                         math.cos(self.theta), 0)
 
-                dPhi = (-math.cos(Vars.theta) * math.cos(Vars.phi),
-                        -math.sin(Vars.theta) * math.cos(Vars.phi),
-                        math.sin(Vars.phi))
+                dPhi = (-math.cos(self.theta) * math.cos(self.phi),
+                        -math.sin(self.theta) * math.cos(self.phi),
+                        math.sin(self.phi))
 
-                xCentro = Vars.centro[0] + (dTheta[0] * (self.lastx - self.x)/50) + (dPhi[0] * (self.y - self.lasty)/50)
-                yCentro = Vars.centro[1] + (dTheta[1] * (self.lastx - self.x)/50) + (dPhi[1] * (self.y - self.lasty)/50)
-                zCentro = Vars.centro[2] - dPhi[2] * (self.lasty - self.y)/50
+                xCentro = self.centro[0] + (dTheta[0] * ((self.lastx - self.x)/50) * c_float(Vars.KitLib.getEspacoGrid()).value) + (dPhi[0] * (((self.y - self.lasty)/50) * c_float(Vars.KitLib.getEspacoGrid()).value))
+                yCentro = self.centro[1] + (dTheta[1] * ((self.lastx - self.x)/50) * c_float(Vars.KitLib.getEspacoGrid()).value) + (dPhi[1] * (((self.y - self.lasty)/50) * c_float(Vars.KitLib.getEspacoGrid()).value))
+                zCentro = self.centro[2] - dPhi[2] * (((self.lasty - self.y)/50) * c_float(Vars.KitLib.getEspacoGrid()).value)
 
-                Vars.centro = (xCentro, yCentro, zCentro)
-                self.parent.tabs.tabConfig.txtFocusX.SetValue(str(round(Vars.centro[0],3)))
-                self.parent.tabs.tabConfig.txtFocusY.SetValue(str(round(Vars.centro[1],3)))
-                self.parent.tabs.tabConfig.txtFocusZ.SetValue(str(round(Vars.centro[2],3)))
+                self.centro = (xCentro, yCentro, zCentro)
+                if Vars.drawPrincipal != -1:
+                    self.parent.tabs.tabConfig.txtFocusX.SetValue(str(round(self.centro[0], 3)))
+                    self.parent.tabs.tabConfig.txtFocusY.SetValue(str(round(self.centro[1], 3)))
+                    self.parent.tabs.tabConfig.txtFocusZ.SetValue(str(round(self.centro[2], 3)))
 
-            else:
+            else: #já que o control nao está pressionado, fará uma das opções de movimento abaixo
 
-                if(Vars.moveObjetos):
-                    if Vars.moveObjetosEixo == -1:
-                        if Vars.KitLib.getVisionOption() == 0:
-                            Vars.theta = Vars.theta + (self.lastx - self.x) / 100
-                            Vars.phi = Vars.phi + (self.lasty - self.y) / 100
-                            if Vars.phi > math.pi / 2:
-                               Vars.phi = math.pi / 2
-                            elif Vars.phi < 0:
-                               Vars.phi = 0.001
-                        else:
-                            Vars.orthoCenter = (
-                               (self.lasty - self.y) / 60 + Vars.orthoCenter[0],
-                               (self.lastx - self.x) / 60 + Vars.orthoCenter[1])
+                if(Vars.moveObjetos):#Se o usuário selecionou a opção de movimentar objetos..
 
-                    else:
-                        if Vars.KitLib.getVisionOption() == 0:
-                            dTheta = (-math.sin(Vars.theta),
-                                     math.cos(Vars.theta), 0)
-                            dPhi = (-math.cos(Vars.theta) * math.cos(Vars.phi),
-                                   -math.sin(Vars.theta) * math.cos(Vars.phi),
-                                   math.sin(Vars.phi))
-                            xDes = Vars.centro[0] + (dTheta[0] * (self.lastx - self.x) / 50) + (dPhi[0] * (self.y - self.lasty) / 50)
-                            yDes = Vars.centro[1] + (dTheta[1] * (self.lastx - self.x) / 50) + (dPhi[1] * (self.y - self.lasty) / 50)
-                            zDes = Vars.centro[2] - dPhi[2] * (self.lasty - self.y) / 50
+                    if Vars.moveObjetosEixo == -1: #Porém nenhum eixo de movimento foi clicado anteriormente e nem em um objeto selecionado
+                        if self.visionOption == 0: #Logo se está no modo perspectiva, apenas altera os parâmetros das coordenadas esféricas
+                            self.theta = self.theta + (self.lastx - self.x) / 100
+                            self.phi = self.phi + (self.lasty - self.y) / 100
+                            if self.phi > math.pi / 2:
+                               self.phi = math.pi / 2
+                            elif self.phi < 0:
+                               self.phi = 0.001
+                        else: #Se não altera os parâmetros para visao ortogonal
+                            self.orthoCenter = (
+                                ((self.lasty - self.y) / 60) * c_float(Vars.KitLib.getEspacoGrid()).value + self.orthoCenter[0],
+                                ((self.lastx - self.x) / 60) * c_float(Vars.KitLib.getEspacoGrid()).value + self.orthoCenter[1])
 
-                            if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:
-                               Vars.KitLib.moveSelect(c_float(-xDes), c_float(0.0), c_float(0.0))
-                            elif Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:
-                                Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes), c_float(0.0))
-                            elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
-                                Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(-zDes))
-                            else:
-                                Vars.KitLib.moveSelect(c_float(-xDes), c_float(-yDes), c_float(-zDes))
+                    else:#Porém se o usuário selecionou algum modo de movimentar objetos
+                        if self.visionOption == 0:# e está em modo perspectiva
+                            dTheta = (-math.sin(self.theta),
+                                     math.cos(self.theta), 0)
+                            dPhi = (-math.cos(self.theta) * math.cos(self.phi),
+                                   -math.sin(self.theta) * math.cos(self.phi),
+                                   math.sin(self.phi))
+                            xDes =  (dTheta[0] * (self.lastx - self.x) / 50) + (dPhi[0] * (self.y - self.lasty) / 50)
+                            yDes =  (dTheta[1] * (self.lastx - self.x) / 50) + (dPhi[1] * (self.y - self.lasty) / 50)
+                            zDes = - dPhi[2] * (self.lasty - self.y) / 50
 
-                        elif Vars.KitLib.getVisionOption() == 5:
+                            spaceGrid = c_float(Vars.KitLib.getEspacoGrid()).value
+
+                            if spaceGrid == 9.0:
+                                spaceGrid *= 0.6
+                            elif spaceGrid == 18.0:
+                                spaceGrid *= 0.4
+
+                            if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:#se o eixo dos X está selecionado
+                               Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(0.0), c_float(0.0))
+                            elif Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:#se o eixo dos y está selecionado
+                                Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes*spaceGrid), c_float(0.0))
+                            elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:#se o eixo dos Z está selecionado
+                                Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(-zDes*spaceGrid))
+                            else:#Porém se nenhuma seta foi selecionada, caiu na opção de ter clicado em um objeto selecionado, logo a movimentação desses objetos é livre em XYZ
+                                Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(-yDes*spaceGrid), c_float(-zDes*spaceGrid))
+
+                        elif self.visionOption == 5:# agora, se está na visao de cima, move os o objetos na direção correspondente
                             xDes = (self.lastx - self.x)/100
                             yDes = (self.lasty - self.y)/100
-                            if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:
-                               Vars.KitLib.moveSelect(c_float(-xDes), c_float(0.0), c_float(0.0))
-                            elif Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:
-                                Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes), c_float(0.0))
-                            elif Vars.moveObjetosEixo == -2:
-                                Vars.KitLib.moveSelect(c_float(-xDes), c_float(yDes), c_float(0.0))
 
-                        elif Vars.KitLib.getVisionOption() == 1 or Vars.KitLib.getVisionOption() == 2:
+                            spaceGrid = c_float(Vars.KitLib.getEspacoGrid()).value
+
+                            if spaceGrid == 9.0:
+                                spaceGrid *= 0.6
+                            elif spaceGrid == 18.0:
+                                spaceGrid *= 0.4
+
+                            if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:
+                               Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(0.0), c_float(0.0))
+                            elif Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:
+                                Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes*spaceGrid), c_float(0.0))
+                            elif Vars.moveObjetosEixo == -2:
+                                Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(yDes*spaceGrid), c_float(0.0))
+
+                        elif self.visionOption == 1 or self.visionOption == 2:# agora, se está na visao de frente ou de trás, move os o objetos na direção correspondente
                             yDes = (self.lastx - self.x) / 100
                             zDes = (self.lasty - self.y) / 100
-                            if Vars.KitLib.getVisionOption() == 1:
+
+                            spaceGrid = c_float(Vars.KitLib.getEspacoGrid()).value
+
+                            if spaceGrid == 9.0:
+                                spaceGrid *= 0.6
+                            elif spaceGrid == 18.0:
+                                spaceGrid *= 0.4
+
+                            if self.visionOption == 1:
                                 if Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes), c_float(0.0))
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes*spaceGrid), c_float(0.0))
                                 elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes))
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
                                 elif Vars.moveObjetosEixo == -2:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes), c_float(zDes))
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes*spaceGrid), c_float(zDes*spaceGrid))
                             else:
                                 if Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes), c_float(0.0))
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes*spaceGrid), c_float(0.0))
                                 elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes))
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
                                 elif Vars.moveObjetosEixo == -2:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes), c_float(zDes))
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes*spaceGrid), c_float(zDes*spaceGrid))
 
 
-                        elif Vars.KitLib.getVisionOption() == 3 or Vars.KitLib.getVisionOption() == 4:
+                        elif self.visionOption == 3 or self.visionOption == 4:# agora, se está na visao da direita ou da esquerda, move os o objetos na direção correspondente
                             xDes = (self.lastx - self.x) / 100
                             zDes = (self.lasty - self.y) / 100
 
-                            if Vars.KitLib.getVisionOption() == 3:
+                            spaceGrid = c_float(Vars.KitLib.getEspacoGrid()).value
+
+                            if spaceGrid == 9.0:
+                                spaceGrid *= 0.6
+                            elif spaceGrid == 18.0:
+                                spaceGrid *= 0.4
+
+                            if self.visionOption == 3:
                                 if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:
-                                    Vars.KitLib.moveSelect(c_float(xDes), c_float(0.0), c_float(0.0))
+                                    Vars.KitLib.moveSelect(c_float(xDes*spaceGrid), c_float(0.0), c_float(0.0))
                                 elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes))
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
                                 elif Vars.moveObjetosEixo == -2:
-                                    Vars.KitLib.moveSelect(c_float(xDes), c_float(0.0), c_float(zDes))
+                                    Vars.KitLib.moveSelect(c_float(xDes*spaceGrid), c_float(0.0), c_float(zDes*spaceGrid))
                             else:
                                 if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:
-                                    Vars.KitLib.moveSelect(c_float(-xDes), c_float(0.0), c_float(0.0))
+                                    Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(0.0), c_float(0.0))
                                 elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes))
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
                                 elif Vars.moveObjetosEixo == -2:
-                                    Vars.KitLib.moveSelect(c_float(-xDes), c_float(0.0), c_float(zDes))
+                                    Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(0.0), c_float(zDes*spaceGrid))
 
-                else:
-                    if Vars.KitLib.getVisionOption() == 0:
-                        Vars.theta = Vars.theta + (self.lastx - self.x) / 100
-                        Vars.phi = Vars.phi + (self.lasty - self.y) / 100
-                        if Vars.phi > math.pi / 2:
-                           Vars.phi = math.pi / 2
-                        elif Vars.phi < 0:
-                           Vars.phi = 0.001
-                    else:
-                        Vars.orthoCenter = (
-                           (self.lasty - self.y) / 60 + Vars.orthoCenter[0],
-                           (self.lastx - self.x) / 60 + Vars.orthoCenter[1])
+                else: #se a opção de movimentar objetos não foi selecionado pelo usuário
+                    if self.visionOption == 0: #e está na visao perspectiva, apenas altera os parâmetros da coordenada esférica
+                        self.theta = self.theta + (self.lastx - self.x) / 100
+                        self.phi = self.phi + (self.lasty - self.y) / 100
+                        if self.phi > math.pi / 2:
+                           self.phi = math.pi / 2
+                        elif self.phi < 0:
+                           self.phi = 0.001
+                    else: #se não, apenas altera os parametros da visão ortogonal
+                        self.orthoCenter = (
+                            ((self.lasty - self.y) / 100) * c_float(Vars.KitLib.getEspacoGrid()).value + self.orthoCenter[0],
+                            ((self.lastx - self.x) / 100) * c_float(Vars.KitLib.getEspacoGrid()).value + self.orthoCenter[1])
 
-            self.Refresh(False)
+            self.atualizaCentroFocus()
+            self.Refresh(True)
+
+        if self.dClickEvent:
+            self.dClickEvent = False
 
     """
         -> Função OnMouseScroll:
@@ -220,29 +398,29 @@ class MyCanvasBase(glcanvas.GLCanvas):
     """
     def OnMouseScroll(self, evt):
 
-        if Vars.KitLib.getVisionOption() == 0:
+        if self.visionOption == Vars.VISION_Z_PERSP:
 
-            zoom = 0.8
+            zoom = 0.5
             if evt.GetWheelRotation() > 0:
 
-                Vars.camZoom += zoom
+                self.camZoom += zoom
 
             else:
 
-                Vars.camZoom -= zoom
-                if Vars.camZoom <= 0:
-                    Vars.camZoom = 0.2
+                self.camZoom -= zoom
+                if self.camZoom <= 0:
+                    self.camZoom = 0.2
         else:
             zoom = 0.8
             if evt.GetWheelRotation() > 0:
 
-                Vars.orthoZoom += zoom
+                self.orthoZoom += zoom
 
             else:
 
-                Vars.orthoZoom -= zoom
-                if Vars.orthoZoom <= 0:
-                    Vars.orthoZoom = 0.2
+                self.orthoZoom -= zoom
+                if self.orthoZoom <= 0:
+                    self.orthoZoom = 0.2
 
 
         self.Refresh(False)
@@ -256,24 +434,16 @@ class MyCanvasBase(glcanvas.GLCanvas):
         -> Retorno: vazio
     """
     def OnRightDown(self,e):
+        Vars.ultimoDrawSelected = self
+        self.atualizaCentroFocus()
         Vars.toolBox.SetFocus()
+        self.Refresh()
         Vars.rightMouse = (e.GetPosition()[0],e.GetPosition()[1])
         try:
-            self.PopupMenu(RightMenu(self.parent), e.GetPosition())
+            self.PopupMenu(RightMenu(self), e.GetPosition())
         except:
             pass
-        self.Refresh()
-
-#########################################################################################################################################################################################
-
-"""
-    -> Classe CubeCanvas:
-        Classe para desenhar os objetos em OpenGL
-
-"""
-
-class CubeCanvas(MyCanvasBase):
-
+        self.Refresh(True)
     def InitGL(self):
 
         luzAmbiente = (0.2, 0.2, 0.2, 1.0)
@@ -284,24 +454,31 @@ class CubeCanvas(MyCanvasBase):
         glEnable(GL_CULL_FACE)
         glEnable(GL_NORMALIZE)
         glEnable(GL_LIGHTING)
+
         glShadeModel(GL_SMOOTH)
+        """glEnable( GL_LINE_SMOOTH )
+        glEnable(GL_BLEND)
+        glEnable( GL_POLYGON_SMOOTH )
+        glHint( GL_LINE_SMOOTH_HINT, GL_NICEST )
+        glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST )
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)"""
+
 
         glLightfv(GL_LIGHT0, GL_AMBIENT, luzAmbiente)
         glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa)
         glLightfv(GL_LIGHT0, GL_POSITION, Vars.posLuz)
 
         glEnable(GL_LIGHT0)
-        #glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST)
-
 
     def OnDraw(self):
 
         #Definições de câmera perspectiva
-        if Vars.KitLib.getVisionOption() == 0:
-            eye = (Vars.camZoom * math.cos(Vars.theta) * math.sin(Vars.phi) + Vars.centro[0],
-                   Vars.camZoom * math.sin(Vars.theta) * math.sin(Vars.phi) + Vars.centro[1], Vars.camZoom * math.cos(Vars.phi) + Vars.centro[2])
-            up = (-Vars.camZoom * math.cos(Vars.theta) * math.cos(Vars.phi),
-                  -Vars.camZoom * math.sin(Vars.theta) * math.cos(Vars.phi), Vars.camZoom * math.sin(Vars.phi))
+        if self.visionOption == 0:
+            zoom = self.camZoom * c_float(Vars.KitLib.getEspacoGrid()).value
+            eye = (zoom * math.cos(self.theta) * math.sin(self.phi) + self.centro[0],
+                   zoom * math.sin(self.theta) * math.sin(self.phi) + self.centro[1], zoom * math.cos(self.phi) + self.centro[2])
+            up = (-zoom * math.cos(self.theta) * math.cos(self.phi),
+                  -zoom * math.sin(self.theta) * math.cos(self.phi), zoom * math.sin(self.phi))
 
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -312,43 +489,46 @@ class CubeCanvas(MyCanvasBase):
             glViewport(0, 0, self.GetClientSize()[0], self.GetClientSize()[1])
             glMatrixMode(GL_PROJECTION)
             glLoadIdentity()
-            gluPerspective(60.0, self.GetClientSize()[0] / self.GetClientSize()[1], 0.01, 500)
+            gluPerspective(60.0, self.GetClientSize()[0] / self.GetClientSize()[1], 0.01, 500*c_float(Vars.KitLib.getEspacoGrid()).value)
             glMatrixMode(GL_MODELVIEW)
             glLoadIdentity()
-            gluLookAt(eye[0], eye[1], eye[2], Vars.centro[0], Vars.centro[1], Vars.centro[2], up[0], up[1], up[2])
+            gluLookAt(eye[0], eye[1], eye[2], self.centro[0], self.centro[1], self.centro[2], up[0], up[1], up[2])
 
         #Definições de câmera ortho positiva
-        elif Vars.KitLib.getVisionOption() == 5 or Vars.KitLib.getVisionOption() == 1 or Vars.KitLib.getVisionOption() == 4:
+        elif self.visionOption == 5 or self.visionOption == 1 or self.visionOption == 4:
+            zoom = self.orthoZoom * c_float(Vars.KitLib.getEspacoGrid()).value
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             Vars.posLuz = (0,0,500000, 1.0)
             glLightfv(GL_LIGHT0, GL_POSITION, Vars.posLuz)
             glViewport(0, 0, self.GetClientSize()[0], self.GetClientSize()[1])
             glMatrixMode(GL_PROJECTION)
             glLoadIdentity()
-            glOrtho(-Vars.orthoZoom*self.GetClientSize()[0]/self.GetClientSize()[1] + Vars.orthoCenter[1],
-                    Vars.orthoZoom*self.GetClientSize()[0]/self.GetClientSize()[1] + Vars.orthoCenter[1],
-                    -Vars.orthoZoom - Vars.orthoCenter[0], Vars.orthoZoom - Vars.orthoCenter[0], -100, 100.0)
+            glOrtho(-zoom*self.GetClientSize()[0]/self.GetClientSize()[1] + self.orthoCenter[1],
+                    zoom*self.GetClientSize()[0]/self.GetClientSize()[1] + self.orthoCenter[1],
+                    -zoom - self.orthoCenter[0], zoom - self.orthoCenter[0], -10000, 10000.0)
             glMatrixMode(GL_MODELVIEW)
             glLoadIdentity()
         #Definições de câmera ortho negativa
-        elif Vars.KitLib.getVisionOption() == 2 or Vars.KitLib.getVisionOption() == 3:
+        elif self.visionOption == 2 or self.visionOption == 3:
+            zoom = self.orthoZoom * c_float(Vars.KitLib.getEspacoGrid()).value
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             Vars.posLuz = (0, 0, -500000, 1.0)
             glLightfv(GL_LIGHT0, GL_POSITION, Vars.posLuz)
             glViewport(0, 0, self.GetClientSize()[0], self.GetClientSize()[1])
             glMatrixMode(GL_PROJECTION)
             glLoadIdentity()
-            glOrtho(Vars.orthoZoom*self.GetClientSize()[0]/self.GetClientSize()[1] - Vars.orthoCenter[1],
-                    -Vars.orthoZoom*self.GetClientSize()[0]/self.GetClientSize()[1] - Vars.orthoCenter[1],
-                    -Vars.orthoZoom - Vars.orthoCenter[0], Vars.orthoZoom - Vars.orthoCenter[0], -100, 100.0)
+            glOrtho(zoom*self.GetClientSize()[0]/self.GetClientSize()[1] - self.orthoCenter[1],
+                    -zoom*self.GetClientSize()[0]/self.GetClientSize()[1] - self.orthoCenter[1],
+                    -zoom - self.orthoCenter[0], zoom - self.orthoCenter[0], 10000, -10000.0)
             glMatrixMode(GL_MODELVIEW)
             glLoadIdentity()
 
-        Vars.KitLib.drawCena()
-        Vars.KitLib.drawAxis()
-        Vars.KitLib.drawGrid()
-        if Vars.moveObjetos:
-            Vars.KitLib.drawMoveAxis()
+        Vars.KitLib.drawCena(self.visionAxis, self.visionOption)
+        Vars.KitLib.drawAxis(self.visionAxis)
+        Vars.KitLib.drawGrid(self.visionAxis)
 
+        if Vars.moveObjetos:
+            Vars.KitLib.drawMoveAxis(self.visionAxis)
 
         self.SwapBuffers()
+

@@ -2,6 +2,8 @@
 
 from TabConfig import *
 from TabCam import *
+from TabTools import *
+from TabInfo import *
 
 
 """
@@ -25,13 +27,13 @@ class Tabs(wx.Notebook):
                              )
 
         # Create the first tab and add it to the notebook
-        self.tabOne = TabPanel(self)
-        self.AddPage(self.tabOne, "Objetos")
+        self.tabInfo = TabInfo(self)
+        self.AddPage(self.tabInfo, "Objetos")
         imL = wx.ImageList(32,32)
 
         # Create and add the second tab
-        self.tabTwo = TabPanel(self)
-        self.AddPage(self.tabTwo, "Ferramentas")
+        self.tabTools = TabTools(self)
+        self.AddPage(self.tabTools, "Ferramentas")
 
         # Create and add the third tab
         self.tabConfig = TabConfig(self)
@@ -45,35 +47,6 @@ class Tabs(wx.Notebook):
         self.SetPageImage(0, imgObj)
         self.SetPageImage(1, imgTool)
         self.SetPageImage(2, imgConfig)
-
-#########################################################################################################################################################################################
-"""
-    ->Classe TabPanel:
-        Classe utilizada para instânciar uma das abas, será substituida futuramente por classes específicas para cada aba.
-
-"""
-class TabPanel(wx.lib.scrolledpanel.ScrolledPanel):
-    """
-    This will be the first notebook tab
-    """
-
-    # ----------------------------------------------------------------------
-    def __init__(self, parent):
-
-
-
-        wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent=parent,size=(100,0), id=wx.ID_ANY,style=wx.DOUBLE_BORDER)
-        self.SetupScrolling()
-
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        txtOne = wx.TextCtrl(self, wx.ID_ANY, "")
-        txtTwo = wx.TextCtrl(self, wx.ID_ANY, "")
-
-        sizer.Add(txtOne, 0, wx.ALIGN_CENTER, 5)
-        sizer.Add(txtTwo, 0, wx.ALIGN_CENTER, 5)
-
-        self.SetSizer(sizer)
-
 
 ################################################################################################################################################################################################
 
@@ -99,9 +72,9 @@ class CamOp(wx.Notebook):
                              )
 
         # Create the first tab and add it to the notebook
-        tabOne = CamPanel(self)
+        self.tabCam = CamPanel(self)
         #tabOne.SetBackgroundColour("Gray")
-        self.AddPage(tabOne, "Câmera")
+        self.AddPage(self.tabCam, "Câmera")
         imL = wx.ImageList(32,32)
         # Adiciona os icones nas tabs
         imgObj = imL.Add(wx.Bitmap('icones/cam.ico'))
