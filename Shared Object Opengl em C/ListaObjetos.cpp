@@ -28,34 +28,6 @@ Objeto3D *ListaObjetos::duplicarObj(Objeto3D *obj){
     return objOut;
 
 }
-void ListaObjetos::addCubo(float x, float y, float z){
-
-    if(pri == NULL){
-
-        pri = new Objeto3D();
-        pri->setObjeto(0);
-        pri->setCentro(x,y,z);
-        pri->setMBR(-0.5+x,-0.5+y,-0.5+z,0.5+x,0.5+y,0.5+z);
-
-    }else{
-
-        Objeto3D *aux = new Objeto3D();
-        aux->setObjeto(0);
-        aux->setCentro(x,y,z);
-        aux->setProx(pri);
-        pri->setAnt(aux);
-        aux->setMBR(-0.5+x,-0.5+y,-0.5+z,0.5+x,0.5+y,0.5+z);
-        pri = aux;
-
-    }
-    pri->setId(idDis);
-    idDis++;
-    indexId->insere(pri->getId(),pri);
-    desfazer->insere(ADICAO_OBJETOS,duplicarObj(pri));
-    refazer->clear();
-    tam++;
-
-}
 Objeto3D* ListaObjetos::get(){
 
     return pri;
@@ -293,34 +265,8 @@ bool ListaObjetos::remover(float x, float y, float z){
 
             if((aux->getMBR()[1].x + 0.05>= x) && (aux->getMBR()[1].y + 0.05 >= y) && (aux->getMBR()[1].z + 0.05 >= z)){
 
-                indexId->remover(aux->getId());
-                if(aux->getAnt() == NULL){
-
-                    pri = aux->getProx();
-                    if(pri != NULL){
-
-                        pri->setAnt(NULL);
-
-                    }
-
-                }else if(aux->getProx() == NULL){
-
-                    aux->getAnt()->setProx(NULL);
-
-                }else{
-
-                    aux->getAnt()->setProx(aux->getProx());
-                    aux->getProx()->setAnt(aux->getAnt());
-
-                }
                 desfazer->insere(REMOCAO_OBJETOS,duplicarObj(aux));
-                if(aux->getSelecionado()){
-
-                    tamSelect--;
-
-                }
-                delete aux;
-                tam--;
+                deletar(aux);
                 return true;
 
             }
@@ -334,103 +280,29 @@ bool ListaObjetos::remover(float x, float y, float z){
 void ListaObjetos::removeAll(){
 
     Objeto3D *aux = pri;
+    Objeto3D *prox = NULL;
     Objeto3D *refOut = NULL;
     while(aux != NULL){
 
         if(aux->getSelecionado()){
 
-            indexId->remover(aux->getId());
-            if(aux->getAnt() == NULL && aux->getProx() != NULL){
+            if(refOut == NULL){
 
-                pri = aux->getProx();
-                if(refOut == NULL){
-
-                    refOut = duplicarObj(aux);
-                    refOut->setProx(NULL);
-                    refOut->setAnt(NULL);
-
-                }else{
-
-                    Objeto3D *ant = duplicarObj(aux);
-                    ant->setProx(refOut);
-                    refOut->setAnt(ant);
-                    refOut = ant;
-
-                }
-                delete aux;
-                if(pri != NULL){
-
-                    pri->setAnt(NULL);
-
-                }
-                aux = pri;
-
-            }else if(aux->getProx() == NULL && aux->getAnt() != NULL){
-
-                aux->getAnt()->setProx(NULL);
-                if(refOut == NULL){
-
-                    refOut = duplicarObj(aux);
-                    refOut->setProx(NULL);
-                    refOut->setAnt(NULL);
-
-                }else{
-
-                    Objeto3D *ant = duplicarObj(aux);
-                    ant->setProx(refOut);
-                    refOut->setAnt(ant);
-                    refOut = ant;
-
-                }
-                delete aux;
-                aux = NULL;
-
-            }else if(aux->getProx() == NULL && aux->getAnt() == NULL){
-
-                pri = NULL;
-                if(refOut == NULL){
-
-                    refOut = duplicarObj(aux);
-                    refOut->setProx(NULL);
-                    refOut->setAnt(NULL);
-
-                }else{
-
-                    Objeto3D *ant = duplicarObj(aux);
-                    ant->setProx(refOut);
-                    refOut->setAnt(ant);
-                    refOut = ant;
-
-                }
-                delete aux;
-                aux = NULL;
+                refOut = duplicarObj(aux);
+                refOut->setProx(NULL);
+                refOut->setAnt(NULL);
 
             }else{
 
-                Objeto3D *prox;
-                prox = aux->getProx();
-                aux->getAnt()->setProx(aux->getProx());
-                aux->getProx()->setAnt(aux->getAnt());
-                if(refOut == NULL){
-
-                    refOut = duplicarObj(aux);
-                    refOut->setProx(NULL);
-                    refOut->setAnt(NULL);
-
-                }else{
-
-                    Objeto3D *ant = duplicarObj(aux);
-                    ant->setProx(refOut);
-                    refOut->setAnt(ant);
-                    refOut = ant;
-
-                }
-                delete aux;
-                aux = prox;
+                Objeto3D *ant = duplicarObj(aux);
+                ant->setProx(refOut);
+                refOut->setAnt(ant);
+                refOut = ant;
 
             }
-            tam--;
-
+            prox = aux->getProx();
+            deletar(aux);
+            aux = prox;
         }else{
 
             aux = aux->getProx();
@@ -494,36 +366,7 @@ void ListaObjetos::desfazerAcao(){
         while(refObj != NULL){
 
             obj = indexId->busca(refObj->getId());
-            indexId->remover(refObj->getId());
-            if(obj->getAnt() == NULL && obj->getProx() != NULL){
-
-                pri = pri->getProx();
-                delete obj;
-                if(pri != NULL){
-
-                    pri->setAnt(NULL);
-
-                }
-
-            }else if(obj->getProx() == NULL && obj->getAnt() != NULL){
-
-                obj->getAnt()->setProx(NULL);
-                delete obj;
-
-            }else if(obj->getProx() == NULL && obj->getAnt() == NULL){
-
-                pri = NULL;
-                delete obj;
-
-            }else{
-
-                obj->getAnt()->setProx(obj->getProx());
-                obj->getProx()->setAnt(obj->getAnt());
-                delete obj;
-
-            }
-
-            tam--;
+            deletar(obj);
             refObj = refObj->getProx();
 
         }
@@ -551,14 +394,6 @@ void ListaObjetos::desfazerAcao(){
 
         }
         refazer->insere(ADICAO_OBJETOS,aux->getObjs());
-
-    }else if(aux->getAcao() == SELECAO_OBJETOS){
-
-        printf("SELECAO_OBJETOS\n");
-
-    }else if(aux->getAcao() == DESELECAO_OBJETOS){
-
-        printf("DESELECAO_OBJETOS\n");
 
     }
 
@@ -632,14 +467,6 @@ void ListaObjetos::refazerAcao(){
         }
         desfazer->insere(ADICAO_OBJETOS, aux->getObjs());
 
-    }else if(aux->getAcao() == SELECAO_OBJETOS){
-
-        printf("SELECAO_OBJETOS\n");
-
-    }else if(aux->getAcao() == DESELECAO_OBJETOS){
-
-        printf("DESELECAO_OBJETOS\n");
-
     }
 
 }
@@ -678,14 +505,19 @@ Ponto* ListaObjetos::setFocusToSelect(){
     return saida;
 
 }
-void ListaObjetos::moveSelect(float x, float y, float z){
+bool ListaObjetos::moveSelect(float x, float y, float z){
 
     Objeto3D *aux = pri;
+    if(tamSelect <= 0){
+
+        return false;
+
+    }
     while(aux != NULL){
 
         if(aux->getSelecionado()){
 
-            if(aux->getObjeto() == CUBE || aux->getObjeto() == SPHERE){
+            if(aux->getObjeto() == SPHERE || aux->getObjeto() == BASE){
 
                 aux->setCentro(aux->getCentro()->x + x,aux->getCentro()->y + y,aux->getCentro()->z + z);
                 aux->setMBR(aux->getMBR()[0].x + x,aux->getMBR()[0].y + y,aux->getMBR()[0].z + z,aux->getMBR()[1].x + x,aux->getMBR()[1].y + y,aux->getMBR()[1].z + z);
@@ -695,7 +527,7 @@ void ListaObjetos::moveSelect(float x, float y, float z){
         }
         aux = aux->getProx();
     }
-
+    return true;
 }
 void ListaObjetos::recalculaMBRSelect(Ponto* MBRSelect){
 
@@ -874,8 +706,8 @@ bool ListaObjetos::addBar(int tipoBar){
 
     }else{
 
-        XMBR = objId1->getCentro()->x - BAR_RADIUS;
-        xMBR = objId2->getCentro()->x + BAR_RADIUS;
+        XMBR = objId1->getCentro()->x + BAR_RADIUS;
+        xMBR = objId2->getCentro()->x - BAR_RADIUS;
 
     }
     if(objId1->getCentro()->y < objId2->getCentro()->y){
@@ -885,8 +717,8 @@ bool ListaObjetos::addBar(int tipoBar){
 
     }else{
 
-        YMBR = objId1->getCentro()->y - BAR_RADIUS;
-        yMBR = objId2->getCentro()->y + BAR_RADIUS;
+        YMBR = objId1->getCentro()->y + BAR_RADIUS;
+        yMBR = objId2->getCentro()->y - BAR_RADIUS;
 
     }
     if(objId1->getCentro()->z < objId2->getCentro()->z){
@@ -896,8 +728,8 @@ bool ListaObjetos::addBar(int tipoBar){
 
     }else{
 
-        ZMBR = objId1->getCentro()->z - BAR_RADIUS;
-        zMBR = objId2->getCentro()->z + BAR_RADIUS;
+        ZMBR = objId1->getCentro()->z + BAR_RADIUS;
+        zMBR = objId2->getCentro()->z - BAR_RADIUS;
 
     }
     pri->setMBR(xMBR, yMBR, zMBR, XMBR, YMBR, ZMBR);
@@ -971,14 +803,110 @@ Objeto3D* ListaObjetos::getObj(double *ponto){
         return NULL;
 
 }
-void ListaObjetos::moveObj(int id, float x, float y, float z){
+bool ListaObjetos::moveObj(int id, float x, float y, float z){
 
     Objeto3D *aux = indexId->busca(id);
+    if(aux == NULL){
+
+        return false;
+
+    }
     if(aux->getObjeto() == SPHERE){
 
         aux->setCentro(x,y,z);
         aux->setMBR(-SPHERE_RADIUS + x,-SPHERE_RADIUS + y,-SPHERE_RADIUS + z,SPHERE_RADIUS + x,SPHERE_RADIUS + y,SPHERE_RADIUS + z);
 
     }
+    return true;
+}
+void ListaObjetos::deletar(Objeto3D *p){
+
+    if(p != NULL){
+
+        indexId->remover(p->getId());
+        if(p->getAnt() == NULL){
+
+            pri = p->getProx();
+            if(pri != NULL){
+
+                pri->setAnt(NULL);
+
+            }
+
+        }else if(p->getProx() == NULL){
+
+            p->getAnt()->setProx(NULL);
+
+        }else{
+
+            p->getAnt()->setProx(p->getProx());
+            p->getProx()->setAnt(p->getAnt());
+
+        }
+        if(p->getSelecionado()){
+
+            tamSelect--;
+
+        }
+        delete p;
+        tam--;
+
+    }
+
+}
+bool ListaObjetos::duplicaSelect(){
+
+    Objeto3D *aux = pri;
+    Objeto3D *prox = NULL;
+    if(tamSelect <= 0){
+
+        return false;
+
+    }
+    while(aux != NULL){
+
+        if(aux->getSelecionado()){
+
+            prox = duplicarObj(aux);
+            prox->setProx(pri);
+            prox->setSelecionado(true);
+            pri->setAnt(prox);
+            pri = prox;
+            aux->setSelecionado(false);
+
+        }
+        aux = aux->getProx();
+    }
+    return true;
+}
+void ListaObjetos::addBase(float x, float y, float z){
+
+    float erro = 0.0;
+    if(pri == NULL){
+
+        pri = new Objeto3D();
+        pri->setObjeto(BASE);
+        pri->setCentro(x,y,z);
+        pri->setMBR(-BASE_RADIUS + erro + x,-BASE_RADIUS + erro + y,-SPHERE_RADIUS + erro + z,BASE_RADIUS + erro + x,BASE_RADIUS + erro + y,erro + z);
+        pri->setAnt(NULL);
+        pri->setProx(NULL);
+
+    }else{
+
+        Objeto3D *aux = new Objeto3D();
+        aux->setObjeto(BASE);
+        aux->setCentro(x,y,z);
+        aux->setProx(pri);
+        pri->setAnt(aux);
+        aux->setMBR(-BASE_RADIUS + erro + x,-BASE_RADIUS + erro + y,-SPHERE_RADIUS + erro + z,BASE_RADIUS + erro + x,BASE_RADIUS + erro + y,erro + z);
+        pri = aux;
+
+    }
+    pri->setId(idDis);
+    idDis++;
+    indexId->insere(pri->getId(),pri);
+    desfazer->insere(ADICAO_OBJETOS,duplicarObj(pri));
+    refazer->clear();
+    tam++;
 
 }

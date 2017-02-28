@@ -3,15 +3,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define CUBE 0
 #define SPHERE 1
 #define BAR_SMALL 2
 #define BAR_LARGE 3
+#define BASE 4
 
 #define SPHERE_RADIUS 0.75 /// em centimetros
 #define BAR_RADIUS 0.3 /// em centimetros
 #define BAR_LENGTH_SMALL 7.5 /// em Centrimetros
 #define BAR_LENGTH_LARGE 16.5 /// em centrimetros
+#define BASE_RADIUS 2.2 /// em centrimetros
 
 
 /**Struct cabecalhoKMP: cabeçalho do arquivo binario do projeto .kmp**/
@@ -31,7 +32,7 @@ struct Ponto{
 
 };
 /**Struct objeto: armazena um objeto3d para armazenamento no arquivo binario do projeto .kmp**/
-struct Objeto{
+typedef struct objeto{
 
     int obj;
     int id;
@@ -39,7 +40,7 @@ struct Objeto{
     Ponto MBR[2];
     int idExtremidades[2];
 
-};
+}Objeto;
 /** Classe Objeto3D: um nó da lista de objetos, armazena informacoes essenciais sobre um objeto da cena**/
 class Objeto3D
 {

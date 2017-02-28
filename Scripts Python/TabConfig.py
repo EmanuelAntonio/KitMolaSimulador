@@ -11,10 +11,12 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
     # ----------------------------------------------------------------------
     def __init__(self, parent):
 
+        self.blockInsert = True #Variavel que armazena se a opção de bloquear a posição da inserção está ativado
 
-        wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent=parent, id=wx.ID_ANY,style=wx.DOUBLE_BORDER)
-        self.SetupScrolling()
-        sizer = wx.BoxSizer(wx.VERTICAL)
+        wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent=parent, size = (10,-1), id=wx.ID_ANY, style=wx.DOUBLE_BORDER)
+        self.SetupScrolling(scroll_x=False)
+
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.parent = parent
 
         #Configurações de tamanho do grid
@@ -31,7 +33,7 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
         cbxDistGrid.Append("1cm",1)
         cbxDistGrid.Append("9cm",2)
         cbxDistGrid.Append("18cm",3)
-        sizerDistGrid.Add(lblDistGrid, 0, wx.ALIGN_CENTRE, 5)
+        #sizerDistGrid.Add(lblDistGrid, 0, wx.ALIGN_CENTRE, 5)
         sizerDistGrid.Add(cbxDistGrid, 0, wx.ALIGN_CENTRE, 5)
 
         # Configurações de foco da câmera
@@ -78,24 +80,41 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
         sizerQuality = wx.BoxSizer(wx.VERTICAL)
         lblQuality = wx.StaticText(self,wx.ID_ANY, "Qualidade da Malha:")
         sldQuality = wx.Slider(self, value=100, minValue=5, maxValue=100,style=wx.SL_HORIZONTAL | wx.SL_LABELS)
-        sizerQuality.Add(lblQuality, 0, wx.ALIGN_CENTRE, 5)
         sizerQuality.Add(sldQuality, 1, wx.ALIGN_CENTRE | wx.EXPAND, 5)
         sldQuality.Bind(wx.EVT_SLIDER, self.OnSliderScroll)
 
+        # Configurações de bloqueio de inserção
+        sizerBlock = wx.BoxSizer(wx.VERTICAL)
+        lblBlock = wx.StaticText(self,wx.ID_ANY, "Bloqueio de Inserção:")
+        chkBox = wx.CheckBox(self,wx.ID_ANY,'Multiplos do Grid')
+        chkBox.SetValue(self.blockInsert)
+        sizerBlock.Add(chkBox, 0, wx.ALIGN_CENTER,5)
+
+
         # Adição do sizer principal
-        sizer.Add(lblTamGrid, 0, wx.ALIGN_CENTER,5)
-        sizer.Add(self.txtTamGrid, 0, wx.ALIGN_CENTER, 5)
-        sizer.Add(btnTamGrid, 0, wx.ALIGN_CENTER, 5)
-        sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
-        sizer.Add(sizerDistGrid,0,wx.ALIGN_CENTRE,5)
-        sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        self.sizer.Add(lblTamGrid, 0, wx.ALIGN_CENTER,5)
+        self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        self.sizer.Add(self.txtTamGrid, 0, wx.ALIGN_CENTER, 5)
+        self.sizer.Add(btnTamGrid, 0, wx.ALIGN_CENTER, 5)
+        self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        self.sizer.Add(lblDistGrid, 0, wx.ALIGN_CENTER,5)
+        self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        self.sizer.Add(sizerDistGrid,0,wx.ALIGN_CENTRE,5)
+        self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
 
+        self.sizer.Add(self.lblFocus, 0, wx.ALIGN_CENTER, 5)
+        self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        self.sizer.Add(self.sizerFocus, 0, wx.ALIGN_CENTER, 5)
+        self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        self.sizer.Add(lblQuality, 0, wx.ALIGN_CENTER, 5)
+        self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        self.sizer.Add(sizerQuality, 0, wx.ALIGN_CENTRE | wx.EXPAND, 5)
+        self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
 
-        sizer.Add(self.lblFocus, 0, wx.ALIGN_CENTER, 5)
-        sizer.Add(self.sizerFocus, 0, wx.ALIGN_CENTER, 5)
-        sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
-        sizer.Add(sizerQuality, 0, wx.ALIGN_CENTRE | wx.EXPAND, 5)
-        sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        self.sizer.Add(lblBlock, 0, wx.ALIGN_CENTER, 5)
+        self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
+        self.sizer.Add(sizerBlock, 0, wx.ALIGN_CENTRE | wx.EXPAND, 5)
+        self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
 
         self.Bind(wx.EVT_BUTTON, self.OnTamGrid,btnTamGrid)
         self.Bind(wx.EVT_TEXT_ENTER, self.OnTamGrid,self.txtTamGrid)
@@ -105,8 +124,13 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
         self.Bind(wx.EVT_TEXT_ENTER, self.OnEnterFocus, self.txtFocusZ)
         self.Bind(wx.EVT_BUTTON, self.OnEnterFocus, self.btnFocus)
         cbxDistGrid.Bind(wx.EVT_COMBOBOX, self.OnGridCombox)
+        self.Bind(wx.EVT_CHECKBOX, self.OnBlockInsert)
 
-        self.SetSizer(sizer)
+        self.SetSizer(self.sizer)
+
+    def OnBlockInsert(self,e):
+
+        self.blockInsert = e.GetEventObject().GetValue()
 
     def OnSliderScroll(self, e):
         obj = e.GetEventObject()

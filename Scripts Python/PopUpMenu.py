@@ -19,13 +19,16 @@ class RightMenu(wx.Menu):
             addSphere = wx.MenuItem(self, wx.NewId(),'Esfera')
             addSBar = wx.MenuItem(self, wx.NewId(), 'Barra Pequena')
             addLBar = wx.MenuItem(self, wx.NewId(), 'Barra Grande')
+            addBase = wx.MenuItem(self, wx.NewId(), 'Base')
             addMenu.Append(addSphere)
             addMenu.Append(addSBar)
             addMenu.Append(addLBar)
+            addMenu.Append(addBase)
             self.AppendSubMenu(addMenu, 'Adicionar')
             self.Bind(wx.EVT_MENU, self.OnAddSphere, addSphere)
             self.Bind(wx.EVT_MENU, self.OnAddSmallBar, addSBar)
             self.Bind(wx.EVT_MENU, self.OnAddLargeBar, addLBar)
+            self.Bind(wx.EVT_MENU, self.OnAddBase, addBase)
 
         #Submenu camera
         camMenu = wx.Menu()
@@ -105,66 +108,91 @@ class RightMenu(wx.Menu):
             ponto = [0, 0, 0]
             ponto_size = len(ponto)
             ponto = (ctypes.c_float * ponto_size)(*ponto)
-            Vars.KitLib.getPonto3DFloat(c_int(x), c_int(y), ponto, self.parent.visionAxis)
+            Vars.KitLib.getPonto3DFloat(c_int(x), c_int(y), ponto)
             if self.parent.visionAxis == Vars.ASCII_Z:  # 122 Codigo ASCII para 'z'
                 x = ponto[0]
                 y = ponto[1]
-                space = c_float(Vars.KitLib.getEspacoGrid()).value
-                x = x / space
-                dx = x - int(x)
-                if dx < 0.5:
-                    x = int(x) * space
-                else:
-                    x = (int(x) + 1) * space
-                y = y / space
-                dy = y - int(y)
-                if dy < 0.5:
-                    y = int(y) * space
-                else:
-                    y = (int(y) + 1) * space
+                if self.parent.parent.tabs.tabConfig.blockInsert:
+                    space = c_float(Vars.KitLib.getEspacoGrid()).value
+                    x = x / space
+                    dx = x - int(x)
+                    dx = math.fabs(dx)
+                    if dx < 0.5:
+                        x = int(x) * space
+                    else:
+                        if x >= 0:
+                            x = (int(x) + 1) * space
+                        else:
+                            x = (int(x) - 1) * space
+                    y = y / space
+                    dy = y - int(y)
+                    dy = math.fabs(dy)
+                    if dy < 0.5:
+                        y = int(y) * space
+                    else:
+                        if y >= 0:
+                            y = (int(y) + 1) * space
+                        else:
+                            y = (int(y) - 1) * space
                 Vars.KitLib.addSphere(c_float(x), c_float(y), 0)
             elif self.parent.visionAxis == Vars.ASCII_X:  # 120 Codigo ASCII para 'x'
 
-                x = ponto[1]
-                y = ponto[2]
-                space = c_float(Vars.KitLib.getEspacoGrid()).value
-                x = x / space
-                dx = x - int(x)
-                if dx < 0.5:
-                    x = int(x) * space
-                else:
-                    x = (int(x) + 1) * space
-                y = y / space
-                dy = y - int(y)
-                if dy < 0.5:
-                    y = int(y) * space
-                else:
-                    y = (int(y) + 1) * space
+                x = ponto[0]
+                y = ponto[1]
+                if self.parent.parent.tabs.tabConfig.blockInsert:
+                    space = c_float(Vars.KitLib.getEspacoGrid()).value
+                    x = x / space
+                    dx = x - int(x)
+                    dx = math.fabs(dx)
+                    if dx < 0.5:
+                        x = int(x) * space
+                    else:
+                        if x >= 0:
+                            x = (int(x) + 1) * space
+                        else:
+                            x = (int(x) - 1) * space
+                    y = y / space
+                    dy = y - int(y)
+                    dy = math.fabs(dy)
+                    if dy < 0.5:
+                        y = int(y) * space
+                    else:
+                        if y >= 0:
+                            y = (int(y) + 1) * space
+                        else:
+                            y = (int(y) - 1) * space
                 if self.parent.visionOption == Vars.VISION_X_POS:
                     Vars.KitLib.addSphere(0, ctypes.c_float(x), ctypes.c_float(y))
                 else:
                     Vars.KitLib.addSphere(0, ctypes.c_float(y), ctypes.c_float(x))
             elif self.parent.visionAxis == Vars.ASCII_Y:  # 121 Codigo ASCII para 'y'
                 x = ponto[0]
-                y = ponto[2]
-                space = c_float(Vars.KitLib.getEspacoGrid()).value
-                x = x / space
-                dx = x - int(x)
-                if dx < 0.5:
-                    x = int(x) * space
-                else:
-                    x = (int(x) + 1) * space
-                y = y / space
-                if y - int(y) < 0.5:
-                    y = int(y) * space
-                else:
-                    y = (int(y) + 1) * space
+                y = ponto[1]
+                if self.parent.parent.tabs.tabConfig.blockInsert:
+                    space = c_float(Vars.KitLib.getEspacoGrid()).value
+                    x = x / space
+                    dx = x - int(x)
+                    dx = math.fabs(dx)
+                    if dx < 0.5:
+                        x = int(x) * space
+                    else:
+                        if x >= 0:
+                            x = (int(x) + 1) * space
+                        else:
+                            x = (int(x) - 1) * space
+                    y = y / space
+                    dy = y - int(y)
+                    dy = math.fabs(dy)
+                    if dy < 0.5:
+                        y = int(y) * space
+                    else:
+                        if y >= 0:
+                            y = (int(y) + 1) * space
+                        else:
+                            y = (int(y) - 1) * space
 
                 Vars.KitLib.addSphere(ctypes.c_float(x), 0, ctypes.c_float(y))
 
-
-
-        Vars.toolBar.EnableTool(wx.ID_UNDO, True)
         Vars.drawArea0.Refresh(False)
         Vars.drawArea1.Refresh(False)
         Vars.drawArea2.Refresh(False)
@@ -370,6 +398,105 @@ class RightMenu(wx.Menu):
             msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
             msgCx.ShowModal()
             msgCx.Destroy()
+
+        Vars.drawArea0.Refresh()
+        Vars.drawArea1.Refresh()
+        Vars.drawArea2.Refresh()
+        Vars.drawArea3.Refresh()
+        self.parent.Refresh()
+
+    def OnAddBase(self,e):
+
+        x, y = Vars.rightMouse
+        if self.parent.visionOption != Vars.VISION_Z_PERSP:
+
+            ponto = [0, 0, 0]
+            ponto_size = len(ponto)
+            ponto = (ctypes.c_float * ponto_size)(*ponto)
+            Vars.KitLib.getPonto3DFloat(c_int(x), c_int(y), ponto)
+            if self.parent.visionAxis == Vars.ASCII_Z:  # 122 Codigo ASCII para 'z'
+                x = ponto[0]
+                y = ponto[1]
+                if self.parent.parent.tabs.tabConfig.blockInsert:
+                    space = c_float(Vars.KitLib.getEspacoGrid()).value
+                    x = x / space
+                    dx = x - int(x)
+                    dx = math.fabs(dx)
+                    if dx < 0.5:
+                        x = int(x) * space
+                    else:
+                        if x >= 0:
+                            x = (int(x) + 1) * space
+                        else:
+                            x = (int(x) - 1) * space
+                    y = y / space
+                    dy = y - int(y)
+                    dy = math.fabs(dy)
+                    if dy < 0.5:
+                        y = int(y) * space
+                    else:
+                        if y >= 0:
+                            y = (int(y) + 1) * space
+                        else:
+                            y = (int(y) - 1) * space
+                Vars.KitLib.addBase(c_float(x), c_float(y), 0)
+            elif self.parent.visionAxis == Vars.ASCII_X:  # 120 Codigo ASCII para 'x'
+
+                x = ponto[0]
+                y = ponto[1]
+                if self.parent.parent.tabs.tabConfig.blockInsert:
+                    space = c_float(Vars.KitLib.getEspacoGrid()).value
+                    x = x / space
+                    dx = x - int(x)
+                    dx = math.fabs(dx)
+                    if dx < 0.5:
+                        x = int(x) * space
+                    else:
+                        if x >= 0:
+                            x = (int(x) + 1) * space
+                        else:
+                            x = (int(x) - 1) * space
+                    y = y / space
+                    dy = y - int(y)
+                    dy = math.fabs(dy)
+                    if dy < 0.5:
+                        y = int(y) * space
+                    else:
+                        if y >= 0:
+                            y = (int(y) + 1) * space
+                        else:
+                            y = (int(y) - 1) * space
+                if self.parent.visionOption == Vars.VISION_X_POS:
+                    Vars.KitLib.addBase(0, ctypes.c_float(x), ctypes.c_float(y))
+                else:
+                    Vars.KitLib.addBase(0, ctypes.c_float(y), ctypes.c_float(x))
+            elif self.parent.visionAxis == Vars.ASCII_Y:  # 121 Codigo ASCII para 'y'
+                x = ponto[0]
+                y = ponto[1]
+                if self.parent.parent.tabs.tabConfig.blockInsert:
+                    space = c_float(Vars.KitLib.getEspacoGrid()).value
+                    x = x / space
+                    dx = x - int(x)
+                    dx = math.fabs(dx)
+                    if dx < 0.5:
+                        x = int(x) * space
+                    else:
+                        if x >= 0:
+                            x = (int(x) + 1) * space
+                        else:
+                            x = (int(x) - 1) * space
+                    y = y / space
+                    dy = y - int(y)
+                    dy = math.fabs(dy)
+                    if dy < 0.5:
+                        y = int(y) * space
+                    else:
+                        if y >= 0:
+                            y = (int(y) + 1) * space
+                        else:
+                            y = (int(y) - 1) * space
+
+                Vars.KitLib.addBase(ctypes.c_float(x), 0, ctypes.c_float(y))
 
         Vars.drawArea0.Refresh()
         Vars.drawArea1.Refresh()

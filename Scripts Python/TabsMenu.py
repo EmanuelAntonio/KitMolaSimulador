@@ -18,13 +18,15 @@ class Tabs(wx.Notebook):
 
     # ----------------------------------------------------------------------
     def __init__(self, parent):
+        self.parent = parent
         wx.Notebook.__init__(self, parent, id=wx.ID_ANY, style=
-        #wx.BK_DEFAULT
-                             # wx.BK_TOP
-                             # wx.BK_BOTTOM
+                            # wx.BK_DEFAULT
+                            # wx.BK_TOP
+                            # wx.BK_BOTTOM
                               wx.BK_LEFT
-                             # wx.BK_RIGHT
-                             )
+                            # wx.BK_RIGHT
+
+        )
 
         # Create the first tab and add it to the notebook
         self.tabInfo = TabInfo(self)

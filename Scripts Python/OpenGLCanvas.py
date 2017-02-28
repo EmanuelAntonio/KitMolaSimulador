@@ -151,21 +151,21 @@ class CanvasBase(glcanvas.GLCanvas):
         self.OnDraw()
 
     def OnScrollClick(self,e):
+        self.Refresh(False)
         Vars.ultimoDrawSelected = self
         self.atualizaCentroFocus()
         self.x, self.y = e.GetPosition()
-        self.Refresh(True)
         ponto = Vars.KitLib.getPonto3D(c_int(self.x), c_int(self.y))
         if not(Vars.shiftPress):
             Vars.KitLib.deSelectAll()
             Vars.moveObjetos = False
-        idObj = Vars.KitLib.select(ponto)
+        idObj = Vars.KitLib.select(ponto, self.visionAxis)
         if idObj != 0:
             obj = Vars.KitLib.getObjById(idObj)
             centro = (obj.contents.centro.x, obj.contents.centro.y, obj.contents.centro.z)
-            self.parent.tabs.tabInfo.AlteraLayoutInfo(obj.contents.id, obj.contents.obj,centro)
+            self.parent.tabs.tabInfo.AlteraLayoutInfo(obj.contents.id, obj.contents.obj,centro,0,0)
         else:
-            self.parent.tabs.tabInfo.AlteraLayoutInfo(0, 0, None)
+            self.parent.tabs.tabInfo.AlteraLayoutInfo(0, 0, None,None,None)
 
         Vars.drawArea0.Refresh()
         Vars.drawArea1.Refresh()
@@ -210,7 +210,7 @@ class CanvasBase(glcanvas.GLCanvas):
         Vars.centroAux = self.centro
         if(Vars.moveObjetos):
             ponto = Vars.KitLib.getPonto3D(c_int(self.x), c_int(self.y))
-            Vars.moveObjetosEixo = Vars.KitLib.selectMoveSeta(ponto)
+            Vars.moveObjetosEixo = Vars.KitLib.selectMoveSeta(ponto, self.visionAxis)
             if(Vars.moveObjetosEixo == -1):
                 if(Vars.KitLib.MBRSelectPonto(ponto)):
                     Vars.moveObjetosEixo = -2
@@ -411,7 +411,7 @@ class CanvasBase(glcanvas.GLCanvas):
                 if self.camZoom <= 0:
                     self.camZoom = 0.2
         else:
-            zoom = 0.8
+            zoom = 0.5
             if evt.GetWheelRotation() > 0:
 
                 self.orthoZoom += zoom

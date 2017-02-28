@@ -30,23 +30,20 @@ class WindowClass(wx.Frame):
         self.SetTitle("Simulador KitMola")
 
         #definição dos sizers
-        boxMain = wx.BoxSizer(wx.HORIZONTAL)
+        self.boxMain = wx.BoxSizer(wx.HORIZONTAL)
         box = wx.BoxSizer(wx.VERTICAL)
-        boxBtn = wx.BoxSizer(wx.VERTICAL)
+        self.boxBtn = wx.BoxSizer(wx.VERTICAL)
         Vars.boxUp = wx.BoxSizer(wx.HORIZONTAL)
         Vars.boxDown = wx.BoxSizer(wx.HORIZONTAL)
 
         #Criação da area das tabs
         self.tabs = Tabs(self)
-
-        #self.cam = CamOp(self)
-        boxBtn.Add(self.tabs, 1, wx.ALIGN_TOP | wx.EXPAND, 1)
-        #boxBtn.Add(self.cam,0,wx.ALIGN_BOTTOM | wx.EXPAND, 1)
+        self.showTabs = True
+        self.boxBtn.Add(self.tabs, 1, wx.ALIGN_TOP | wx.EXPAND, 1)
 
         #Definição dos menus
         menuBar = wx.MenuBar()
         fileMenu = wx.Menu()
-        editMenu = wx.Menu()
         aboutMenu = wx.Menu()
 
         #Criação dos itens dos menus
@@ -54,11 +51,10 @@ class WindowClass(wx.Frame):
         saveItem = fileMenu.Append(wx.ID_SAVE, 'Salvar', 'Salvar projeto')
         saveAsItem = fileMenu.Append(wx.ID_SAVEAS, 'Salvar como...', 'Salvar como...')
         exitItem = fileMenu.Append(wx.ID_EXIT, 'Sair', 'Fechar Programa')
-
         helpItem = aboutMenu.Append(wx.ID_ABOUT, 'Ajuda', 'Ajuda')
+        versionItem = aboutMenu.Append(wx.ID_DEFAULT, 'Versão', 'Informações sobre a versão')
 
         #Criação do label de visao(ao lado esquerdo)
-        versionItem = aboutMenu.Append(wx.ID_DEFAULT, 'Versão', 'Informações sobre a versão')
         visionItem = wx.StaticText(self,0,Vars.visionModes[0], pos=(10,10), style=wx.ALIGN_CENTER)
         visionItem.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD))
         visionItem.SetBackgroundColour((128,128,128))
@@ -74,7 +70,6 @@ class WindowClass(wx.Frame):
         Vars.drawArea1 = CanvasBase(self,1)
         Vars.drawArea2 = CanvasBase(self,2)
         Vars.drawArea3 = CanvasBase(self,3)
-
         Vars.drawArea0.visionAxis = Vars.ASCII_Z
         Vars.drawArea0.visionOption = Vars.VISION_Z_ORTHO
         Vars.drawArea1.visionAxis = Vars.ASCII_X
@@ -97,38 +92,42 @@ class WindowClass(wx.Frame):
 
         Vars.boxDraw = box
 
-
         #Junção dos sizers das tabs com o sizer principal
-        boxMain.Add(box, 1, wx.ALIGN_RIGHT | wx.EXPAND,0)
-        boxMain.Add(boxBtn,0, wx.ALIGN_LEFT | wx.EXPAND, 0)
+        self.boxMain.Add(box, 1, wx.ALIGN_RIGHT | wx.EXPAND,15)
+        self.boxMain.Add(self.boxBtn,0, wx.ALIGN_LEFT | wx.EXPAND, 15)
 
         #adicionar atalhos de teclado
 
         #CTRL+Z desfazer
         undoId = wx.NewId()
-        self.Bind(wx.EVT_MENU, self.OnUndo, id=undoId)
+        self.Bind(wx.EVT_MENU, self.OnUndo, id = undoId)
 
         #CTRL+SHIFT+Z refazer
         redoId = wx.NewId()
-        self.Bind(wx.EVT_MENU, self.OnRedo, id=redoId)
+        self.Bind(wx.EVT_MENU, self.OnRedo, id = redoId)
 
         #CTRL+S salvar
         saveId = wx.NewId()
-        self.Bind(wx.EVT_MENU, self.onSave, id=saveId)
+        self.Bind(wx.EVT_MENU, self.onSave, id = saveId)
 
         #CTRL+O abrir
         openId = wx.NewId()
-        self.Bind(wx.EVT_MENU, self.onOpen, id=openId)
+        self.Bind(wx.EVT_MENU, self.onOpen, id = openId)
 
         #CTRL+A selecionar tudo
         selectId = wx.NewId()
-        self.Bind(wx.EVT_MENU, self.OnSelectAll, id=selectId)
+        self.Bind(wx.EVT_MENU, self.OnSelectAll, id = selectId)
+
+        #SHIFT+D duplica objetos selecionados
+        duplicaId = wx.NewId()
+        self.Bind(wx.EVT_MENU, self.OnDuplica, id = duplicaId)
 
         accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord('Z'), undoId),
                                          (wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord('Z'), redoId),
                                          (wx.ACCEL_CTRL, ord('S'), saveId),
                                          (wx.ACCEL_CTRL, ord('O'), openId),
-                                         (wx.ACCEL_CTRL, ord('A'), selectId)
+                                         (wx.ACCEL_CTRL, ord('A'), selectId),
+                                         (wx.ACCEL_SHIFT, ord('D'), duplicaId)
                                         ])
         self.SetAcceleratorTable(accel_tbl)
 
@@ -142,8 +141,6 @@ class WindowClass(wx.Frame):
         self.Bind(wx.EVT_MENU, self.onSaveAs, saveAsItem)
         self.Bind(wx.EVT_MENU, self.onHelp, helpItem)
         self.Bind(wx.EVT_MENU, self.version, versionItem)
-        #self.cam.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
-        #self.cam.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
         self.tabs.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
         self.tabs.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
 
@@ -152,7 +149,7 @@ class WindowClass(wx.Frame):
 
         #Configurações finais
         self.Maximize(True)
-        self.SetSizer(boxMain)
+        self.SetSizer(self.boxMain)
         self.Show()
 
     def createToolbar(self):
@@ -187,10 +184,26 @@ class WindowClass(wx.Frame):
         self.redoTool = self.toolbar.AddTool(wx.ID_REDO, "Refazer", redo_ico,"Refazer")
         self.toolbar.EnableTool(wx.ID_REDO, False)
         self.Bind(wx.EVT_TOOL, self.OnRedo, self.redoTool)
+        self.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
+        self.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
 
         # This basically shows the toolbar
         self.toolbar.Realize()
 
+    """
+        -> Função OnDuplica:
+            Função para duplicar objetos selecionados na cena
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
+    def OnDuplica(self, e):
+        if Vars.KitLib.duplicaSelect():
+            Vars.moveObjetos = True
+        Vars.drawArea0.Refresh()
+        Vars.drawArea1.Refresh()
+        Vars.drawArea2.Refresh()
+        Vars.drawArea3.Refresh()
     """
         -> Função OnSelectAll:
             Função para selecionar todos os objetos da cena
@@ -389,40 +402,40 @@ class WindowClass(wx.Frame):
 
         elif(e.GetKeyCode() == Vars.W_PRESS and Vars.moveObjetos):
 
-            if(Vars.KitLib.getVisionOption() == 5):
+            if(Vars.ultimoDrawSelected.visionOption == 5):
                 Vars.KitLib.moveSelect(c_float(0.0), c_float(0.1), c_float(0.0))
-            elif(Vars.KitLib.getVisionOption() != 0):
+            elif(Vars.ultimoDrawSelected.visionOption != 0):
                 Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(0.1))
 
         elif (e.GetKeyCode() == Vars.S_PRESS and Vars.moveObjetos):
 
-            if (Vars.KitLib.getVisionOption() == 5):
+            if (Vars.ultimoDrawSelected.visionOption == 5):
                 Vars.KitLib.moveSelect(c_float(0.0), c_float(-0.1), c_float(0.0))
-            elif(Vars.KitLib.getVisionOption() != 0):
+            elif(Vars.ultimoDrawSelected.visionOption != 0):
                 Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(-0.1))
 
         elif (e.GetKeyCode() == Vars.A_PRESS and Vars.moveObjetos):
-            if (Vars.KitLib.getVisionOption() == 5):
+            if (Vars.ultimoDrawSelected.visionOption == 5):
                 Vars.KitLib.moveSelect(c_float(-0.1), c_float(0.0), c_float(0.0))
-            elif(Vars.KitLib.getVisionOption() == 1):
+            elif(Vars.ultimoDrawSelected.visionOption == 1):
                 Vars.KitLib.moveSelect(c_float(0.0), c_float(-0.1), c_float(0.0))
-            elif(Vars.KitLib.getVisionOption() == 2):
+            elif(Vars.ultimoDrawSelected.visionOption == 2):
                 Vars.KitLib.moveSelect(c_float(0.0), c_float(0.1), c_float(0.0))
-            elif(Vars.KitLib.getVisionOption() == 3):
+            elif(Vars.ultimoDrawSelected.visionOption == 3):
                 Vars.KitLib.moveSelect(c_float(0.1), c_float(0.0), c_float(0.0))
-            elif(Vars.KitLib.getVisionOption() == 4):
+            elif(Vars.ultimoDrawSelected.visionOption == 4):
                 Vars.KitLib.moveSelect(c_float(-0.1), c_float(0.0), c_float(0.0))
 
         elif (e.GetKeyCode() == Vars.D_PRESS and Vars.moveObjetos):
-            if (Vars.KitLib.getVisionOption() == 5):
+            if (Vars.ultimoDrawSelected.visionOption == 5):
                 Vars.KitLib.moveSelect(c_float(0.1), c_float(0.0), c_float(0.0))
-            elif(Vars.KitLib.getVisionOption() == 1):
+            elif(Vars.ultimoDrawSelected.visionOption == 1):
                 Vars.KitLib.moveSelect(c_float(0.0), c_float(0.1), c_float(0.0))
-            elif(Vars.KitLib.getVisionOption() == 2):
+            elif(Vars.ultimoDrawSelected.visionOption == 2):
                 Vars.KitLib.moveSelect(c_float(0.0), c_float(-0.1), c_float(0.0))
-            elif(Vars.KitLib.getVisionOption() == 3):
+            elif(Vars.ultimoDrawSelected.visionOption == 3):
                 Vars.KitLib.moveSelect(c_float(-0.1), c_float(0.0), c_float(0.0))
-            elif(Vars.KitLib.getVisionOption() == 4):
+            elif(Vars.ultimoDrawSelected.visionOption == 4):
                 Vars.KitLib.moveSelect(c_float(0.1), c_float(0.0), c_float(0.0))
 
         elif (e.GetKeyCode() == Vars.G_PRESS ):
@@ -468,6 +481,17 @@ class WindowClass(wx.Frame):
                 Vars.ultimoDrawSelected.Refresh()
         elif (e.GetKeyCode() == Vars.ESC_PRESS):
             self.Close()
+        elif (e.GetKeyCode() == Vars.T_PRESS):
+            if self.showTabs:
+                self.showTabs = False
+                self.tabs.Hide()
+                self.boxMain.Layout()
+                self.tabs.SetFocus()
+            else:
+                self.showTabs = True
+                self.tabs.Show(True)
+                self.boxMain.Layout()
+                self.tabs.SetFocus()
         else:
             print(e.GetKeyCode())
 

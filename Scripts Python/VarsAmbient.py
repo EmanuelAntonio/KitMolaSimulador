@@ -26,8 +26,8 @@ except ImportError:
 
 class Vars(object):
 
-    version = "0.6.8"  # Variável de controle de versão
-    dateModificacao = "21/02/2017"  # Data da última atualização do programa
+    version = "0.6.9"  # Variável de controle de versão
+    dateModificacao = "27/02/2017"  # Data da última atualização do programa
     drawArea0 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
     drawArea1 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
     drawArea2 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
@@ -68,7 +68,9 @@ class Vars(object):
     SPHERE = 1
     BAR_SMALL = 2
     BAR_LARGE = 3
+    BASE = 4
     SPHERE_RADIUS = 0.75 # em centimetros
+    BASE_RADIUS = 2.2 # em centimetros
     BAR_RADIUS = 0.3 # em centimetros
     BAR_LENGTH_SMALL = 7.5 # em Centrimetros
     BAR_LENGTH_LARGE = 16.5 # em centrimetros
@@ -87,6 +89,7 @@ class Vars(object):
     A_PRESS = 65
     D_PRESS = 68
     Z_PRESS = 90
+    T_PRESS = 84
     NUM_0_PRESS = 324
     NUM_1_PRESS = 325
     NUM_2_PRESS = 326

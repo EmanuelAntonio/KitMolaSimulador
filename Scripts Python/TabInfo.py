@@ -14,9 +14,11 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
     def __init__(self, parent):
 
 
+        self.parent = parent
 
-        wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent=parent,size=(100,0), id=wx.ID_ANY,style=wx.DOUBLE_BORDER)
-        self.SetupScrolling()
+        wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent=parent,size = (10,-1), id=wx.ID_ANY,style=wx.DOUBLE_BORDER)
+        self.SetScrollbar(wx.VERTICAL, 0, 0, 2, 0)
+        self.SetupScrolling(scroll_x=False)
 
         self.idUltObj = 0
         self.sizer = wx.BoxSizer(wx.VERTICAL)
@@ -86,6 +88,7 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
         self.SetSizer(self.sizer)
 
 
+
     def OnMoveObj(self,e):
         if self.idUltObj != 0:
             Vars.KitLib.moveObjSelect(c_int(self.idUltObj), c_float(float(self.txtFocusX.GetValue())),
@@ -100,6 +103,7 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
             msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
             msgCx.ShowModal()
             msgCx.Destroy()
+        self.parent.SetFocus()
 
 
     def OnMoveObjSelect(self,e):
@@ -108,26 +112,38 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
         Vars.drawArea1.Refresh()
         Vars.drawArea2.Refresh()
         Vars.drawArea3.Refresh()
+        self.parent.SetFocus()
 
-    def AlteraLayoutInfo(self, id, obj, centro):
+    def AlteraLayoutInfo(self, id, obj, centro, extId1, extId2):
         if id == 0:
             self.idUltObj = 0
             self.lblTipo.SetLabel(self.strTipo + "Nenhum Objeto Selecionado")
-            self.lblId.SetLabel(self.strId + "0")
-            self.lblTam.SetLabel(self.strTam + "0mm")
-            self.lblRaio.SetLabel(self.strRaio + "0mm")
+            self.lblId.SetLabel(self.strId + "---")
+            self.lblTam.SetLabel(self.strTam + "---")
+            self.lblRaio.SetLabel(self.strRaio + "---")
             self.lblCentro.SetLabel(self.strCentro + "(-,-,-)")
         else:
 
             self.idUltObj = id
             if obj == Vars.SPHERE:
                 self.lblTipo.SetLabel(self.strTipo + "Esfera de Ligação")
-                self.lblTam.Hide()
                 self.lblRaio.SetLabel(self.strRaio + str(Vars.SPHERE_RADIUS) + "cm")
                 self.lblCentro.SetLabel(self.strCentro + "(" + str(centro[0]) + "," +str(centro[1]) + "," + str(centro[2]) + ")")
+                self.lblTam.SetLabel(self.strTam + "---")
+            elif obj == Vars.BAR_SMALL:
+                self.lblTipo.SetLabel(self.strTipo + "Barra Pequena")
+                self.lblRaio.SetLabel(self.strRaio + str(Vars.BAR_RADIUS) + "cm")
+                self.lblTam.SetLabel(self.strTam + str(Vars.BAR_LENGTH_SMALL) + "cm")
+                self.lblCentro.SetLabel(self.strCentro + "(-,-,-)")
+            elif obj == Vars.BAR_LARGE:
+                self.lblTipo.SetLabel(self.strTipo + "Barra Grande")
+                self.lblRaio.SetLabel(self.strRaio + str(Vars.BAR_RADIUS) + "cm")
+                self.lblTam.SetLabel(self.strTam + str(Vars.BAR_LENGTH_LARGE) + "cm")
+                self.lblCentro.SetLabel(self.strCentro + "(-,-,-)")
+            elif obj == Vars.BASE:
+                self.lblTipo.SetLabel(self.strTipo + "Base")
+                self.lblRaio.SetLabel(self.strRaio + str(Vars.BASE_RADIUS) + "cm")
+                self.lblCentro.SetLabel(self.strCentro + "(" + str(centro[0]) + "," +str(centro[1]) + "," + str(centro[2]) + ")")
+                self.lblTam.SetLabel(self.strTam + "---")
             self.lblId.SetLabel(self.strId + str(id))
-            self.sizer.Layout()
-
-
-
-
+        self.parent.SetFocus()

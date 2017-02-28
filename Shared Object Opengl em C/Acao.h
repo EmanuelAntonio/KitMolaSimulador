@@ -4,8 +4,6 @@
 
 #define ADICAO_OBJETOS 0
 #define REMOCAO_OBJETOS 1
-#define SELECAO_OBJETOS 2
-#define DESELECAO_OBJETOS 3
 
 /**Classe Acao: acao feita no projeto**/
 

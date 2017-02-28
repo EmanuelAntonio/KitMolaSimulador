@@ -251,11 +251,6 @@ extern "C"{
         glLineWidth(0.5);
         glEnable(GL_LIGHTING);
 	}
-    void addCubo(float x, float y, float z){
-
-        l->addCubo(x,y,z);
-
-    }
     int tamanhoListaObjetos(){
 
         return l->size();
@@ -302,14 +297,14 @@ extern "C"{
         if(!wireframe){
 
             glPushMatrix();
-            glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
-            glMaterialfv(GL_FRONT,GL_AMBIENT, object_ambient);
-            glMaterialfv(GL_FRONT, GL_SHININESS, object_brilho);
-            glMaterialfv(GL_FRONT, GL_SPECULAR, object_especular);
-            GLUquadricObj *quadric;
-            quadric = gluNewQuadric();
-            gluSphere( quadric , SPHERE_RADIUS , resolucao, resolucao);
-            gluDeleteQuadric(quadric);
+                glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
+                glMaterialfv(GL_FRONT,GL_AMBIENT, object_ambient);
+                glMaterialfv(GL_FRONT, GL_SHININESS, object_brilho);
+                glMaterialfv(GL_FRONT, GL_SPECULAR, object_especular);
+                GLUquadricObj *quadric;
+                quadric = gluNewQuadric();
+                gluSphere( quadric , SPHERE_RADIUS , resolucao, resolucao);
+                gluDeleteQuadric(quadric);
             glPopMatrix();
 
         }
@@ -349,10 +344,10 @@ extern "C"{
             }else if(aux->getObjeto() == BAR_SMALL || aux->getObjeto() == BAR_LARGE){
 
                 drawBar(aux->getExtremidades()[0],aux->getExtremidades()[1], aux->getSelecionado(),visionAxis);
-                glBegin(GL_LINES);
-                    glVertex3f(aux->getMBR()[0].x,aux->getMBR()[0].y,aux->getMBR()[0].z);
-                    glVertex3f(aux->getMBR()[1].x,aux->getMBR()[1].y,aux->getMBR()[1].z);
-                glEnd();
+
+            }else if(aux->getObjeto() == BASE){
+
+                drawBase(aux->getCentro()->x, aux->getCentro()->y, aux->getCentro()->z, aux->getSelecionado(),visionAxis);
 
             }
             aux = aux->getProx();
@@ -381,7 +376,7 @@ extern "C"{
         return tamGrid;
 
     }
-    double* getPonto3D(int x, int y,char visionAxis){
+    double* getPonto3D(int x, int y){
 
         double modelview[16], projection[16];
         int viewport[4];
@@ -393,43 +388,30 @@ extern "C"{
         glReadPixels( x, viewport[3]-y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z );
         gluUnProject( x, viewport[3]-y, z, modelview, projection, viewport, &ponto[0], &ponto[1], &ponto[2]);
 
-        if(visionAxis == 'x'){
-
-            double X,Y,Z;
-            X = ponto[0];
-            Y = ponto[1];
-            Z = ponto[2];
-
-            ponto[0] = Z;
-            ponto[1] = X;
-            ponto[2] = Y;
-
-        }else if(visionAxis == 'y'){
-
-            double X,Y,Z;
-            X = ponto[0];
-            Y = ponto[1];
-            Z = ponto[2];
-
-            ponto[0] = X;
-            ponto[1] = Z;
-            ponto[2] = Y;
-
-        }
         return ponto;
 
     }
-    void getPonto3DFloat(int x, int y, float *ponto,char visionAxis){
+    void getPonto3DFloat(int x, int y, float *ponto){
 
-        double *p = getPonto3D(x,y,visionAxis);
+        double *p = getPonto3D(x,y);
         ponto[0] = p[0];
         ponto[1] = p[1];
         ponto[2] = p[2];
+        delete p;
 
     }
-    int select(double *ponto){
+    int select(double *ponto, char visionAxis){
 
-        return l->select(ponto[0], ponto[1], ponto[2], MBRSelect);
+        if(visionAxis == 'z'){
+
+            return l->select(ponto[0], ponto[1], ponto[2], MBRSelect);
+
+        }else if(visionAxis == 'x'){
+
+            return l->select(ponto[2], ponto[0], ponto[1], MBRSelect);
+
+        }
+        return l->select(ponto[0], ponto[2], ponto[1], MBRSelect);
 
     }
     void deSelectAll(){
@@ -730,12 +712,28 @@ extern "C"{
         glEnd();
 
     }
-    int selectMoveSeta(double *ponto){
+    int selectMoveSeta(double *ponto, char visionAxis){
 
         double x,y,z;
-        x = ponto[0];
-        y = ponto[1];
-        z = ponto[2];
+        if(visionAxis == 'z'){
+
+            x = ponto[0];
+            y = ponto[1];
+            z = ponto[2];
+
+        }else if(visionAxis == 'x'){
+
+            x = ponto[2];
+            y = ponto[0];
+            z = ponto[1];
+
+        }else{
+
+            x = ponto[0];
+            y = ponto[2];
+            z = ponto[1];
+
+        }
 
         if((x >= MBRMoveX[0].x) && (y >= MBRMoveX[0].y) && (z >= MBRMoveX[0].z)){
 
@@ -989,7 +987,16 @@ extern "C"{
     }
     void moveObj(int id, float x, float y, float z){
 
-        l->moveObj(id,x,y,z);
+        if(l->moveObj(id,x,y,z)){
+
+            MBRSelect[0].x += x;
+            MBRSelect[0].y += y;
+            MBRSelect[0].z += z;
+            MBRSelect[1].x += x;
+            MBRSelect[1].y += y;
+            MBRSelect[1].z += z;
+
+        }
 
     }
     void moveObjSelect(float x, float y, float z){
@@ -1000,9 +1007,80 @@ extern "C"{
             vetDeslocamento.x = x - (MBRSelect[1].x + MBRSelect[0].x)/2.0;
             vetDeslocamento.y = y - (MBRSelect[1].y + MBRSelect[0].y)/2.0;
             vetDeslocamento.z = z - (MBRSelect[1].z + MBRSelect[0].z)/2.0;
-            l->moveSelect(vetDeslocamento.x, vetDeslocamento.y, vetDeslocamento.z);
+            if(l->moveSelect(vetDeslocamento.x, vetDeslocamento.y, vetDeslocamento.z)){
+
+                MBRSelect[0].x += vetDeslocamento.x;
+                MBRSelect[0].y += vetDeslocamento.y;
+                MBRSelect[0].z += vetDeslocamento.z;
+                MBRSelect[1].x += vetDeslocamento.x;
+                MBRSelect[1].y += vetDeslocamento.y;
+                MBRSelect[1].z += vetDeslocamento.z;
+
+            }
 
         }
+
+    }
+    bool duplicaSelect(){
+
+        return l->duplicaSelect();
+
+    }
+    void drawBase(float x, float y, float z, bool selected, char visionAxis){
+
+        float resolucao = 64*meshQual;
+
+        Ponto p1,p2;
+        if(visionAxis == 'z'){
+
+            p2.x = x;
+            p2.y = y;
+            p2.z = z;
+            p1.x = x;
+            p1.y = y;
+            p1.z = z - SPHERE_RADIUS/2;
+
+        }else if(visionAxis == 'x'){
+
+            p2.x = y;
+            p2.y = z;
+            p2.z = x;
+            p1.x = y;
+            p1.y = z - SPHERE_RADIUS/2;
+            p1.z = x;
+
+        }else{
+
+            p2.x = x;
+            p2.y = z;
+            p2.z = y;
+            p1.x = x;
+            p1.y = z - SPHERE_RADIUS/2;
+            p1.z = y;
+
+        }
+        GLdouble eq[] = {0.0,0.0,1.0,z};
+        if(visionAxis == 'y' || visionAxis == 'x'){
+
+            eq[1] = 1.0;
+            eq[2] = 0.0;
+
+        }
+        glClipPlane(GL_CLIP_PLANE0,eq);
+        glEnable(GL_CLIP_PLANE0);
+        drawSphere(x,y,z,selected,visionAxis);
+        glDisable(GL_CLIP_PLANE0);
+
+        GLUquadricObj *quadric=gluNewQuadric();
+        gluQuadricOrientation(quadric,GLU_INSIDE);
+        gluQuadricNormals(quadric, GLU_SMOOTH);
+        drawBarZero(&p1,&p2,BASE_RADIUS,resolucao,quadric,selected);
+        gluDeleteQuadric(quadric);
+
+    }
+    void addBase(float x, float y, float z){
+
+        l->addBase(x,y,z);
 
     }
 }

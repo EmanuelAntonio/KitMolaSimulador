@@ -54,7 +54,7 @@ extern "C"{
 	**/
     void drawSphere(float x, float y, float z, bool selected,char visionAxis);
     /**
-	*   ->Função drawCubeZero:
+	*   ->Função drawSphereZero:
 	*		Desenha uma esfera de ligacao na origem
 	*	->Parâmetros: 'bool', se a esfera está selecionada, se estiver desenha de uma outra cor
 	*	->Retorno: vazio
@@ -75,26 +75,26 @@ extern "C"{
 	**/
     void drawBarZero(Ponto *p1, Ponto *p2,float radius,int subdivisions,GLUquadricObj *quadric, bool selecionado);
     /**
-	*   ->Função setVisionAxis:
-	*		Altera a variável visionAxis
-	*	->Parâmetros: 'c' é o novo valor da variavel visionAxis
+	*   ->Função drawSphere:
+	*		Desenha uma base em uma posicao do espaco
+	*	->Parâmetros: 'x','y','z' é a posição do centro da semi-esfera e 'selected' se esta selecionada
 	*	->Retorno: vazio
+	**/
+    void drawBase(float x, float y, float z, bool selected,char visionAxis);
+    /**
+	*   ->Função setTamGrid:
+	*		Altera a variável tamGrid
+	*	->Parâmetros: 'int', novo valor da variável tamGrid
+	*	->Retorno: 'int', retorna o modo de visao armazenado em tamGrid
 	**/
     void setTamGrid(int p);
     /**
 	*   ->Função getTamGrid:
-	*		Retorna a variável visionOption
+	*		Retorna a variável tamGrid
 	*	->Parâmetros: vazio
-	*	->Retorno: 'int', retorna o modo de visao armazenado em tamGrid
+	*	->Retorno: 'int', valor da variável tamGrid
 	**/
     int getTamGrid();
-    /**
-	*   ->Função addCubo:
-	*		Adiciona um cubo na lista de objetos com o centro em x,y,z
-	*	->Parâmetros: x,y,z, centro do cubo
-	*	->Retorno: vazio
-	**/
-    void addCubo(float x, float y, float z);
     /**
 	*   ->Função tamanhoListaObjetos:
 	*		Retorna o tamanho da lista de objetos
@@ -129,21 +129,21 @@ extern "C"{
 	*	->Parâmetros: (x,y) ponto da janela
 	*	->Retorno: (float[3])(x,y,z) ponto em 3d da cena
 	**/
-    double* getPonto3D(int x, int y,char visionAxis);
+    double* getPonto3D(int x, int y);
     /**
 	*   ->Função getPonto3DFloat:
 	*		Converte um ponto da janela em seu respectivo ponto 3d da cena
 	*	->Parâmetros: (x,y) ponto da janela, 'ponto' ponto em 3d da cena
 	*	->Retorno: 'vazio'
 	**/
-    void getPonto3DFloat(int x, int y, float *ponto,char visionAxis);
+    void getPonto3DFloat(int x, int y, float *ponto);
     /**
 	*   ->Função select:
 	*       Seleciona um objeto da cena de acordo com o ponto passado cmo parametro
 	*	->Parâmetros: 'double*' um ponto em R^3
 	*	->Retorno: 'bool' se o select encontrou algum objeto que corresponde ao ponto passado
 	**/
-    int select(double *ponto);
+    int select(double *ponto, char visionAxis);
     /**
 	*   ->Função deSelectAll:
 	*       Desseleciona todos os objetos da cena
@@ -253,7 +253,7 @@ extern "C"{
     *                   4 -> pertence a Z positivo
     *                   5 -> pertence a Z negativo
     **/
-    int selectMoveSeta(double *ponto);
+    int selectMoveSeta(double *ponto, char visionAxis);
     /**
 	*   ->Função addSphere:
 	*		Adiciona uma esfera de ligação na lista de objetos com o centro em x,y,z
@@ -343,5 +343,18 @@ extern "C"{
     *   Retorno: 'vazio'
     **/
     void moveObjSelect(float x, float y, float z);
+    /**
+    *   Função duplicaSelect: duplica objetos da cena
+    *   Parâmetros: (x,y,z) a quantidade que sera movido por eixo
+    *   Retorno: 'vazio'
+    **/
+    bool duplicaSelect();
+    /**
+	*   ->Função addBase:
+	*		Adiciona uma base na lista de objetos com o centro da semi-esfera em x,y,z
+	*	->Parâmetros: x,y,z, centro da semi-esfera
+	*	->Retorno: 'vazio'
+	**/
+    void addBase(float x, float y, float z);
 
 }

@@ -9,12 +9,6 @@ class ListaObjetos
     public:
         ListaObjetos();
         /**
-        *   Função addCubo: Adiciona um cubo à lista de objetos na cena
-        *   Parâmetros: 'x','y','z', coordenadas do centro do cubo
-        *   Retorno: vazio
-        **/
-        void addCubo(float x, float y, float z);
-        /**
         *   Função addSphere: Adiciona uma esfera de ligacao à lista de objetos na cena
         *   Parâmetros: 'x','y','z', coordenadas do centro da esfera de ligacao
         *   Retorno: vazio
@@ -26,6 +20,12 @@ class ListaObjetos
         *   Retorno: vazio
         **/
         bool addBar(int tipoBar);
+        /**
+        *   Função addBase: Adiciona uma base na cena
+        *   Parâmetros: 'x','y','z', coordenadas do centro da semi-esfera da base
+        *   Retorno: vazio
+        **/
+        void addBase(float x, float y, float z);
         /**
         *   Função get: retorna uma referência para o primeiro no da lista
         *   Parâmetro: vazio
@@ -127,7 +127,7 @@ class ListaObjetos
         *   Parâmetros: (x,y,z) a quantidade que sera movido por eixo
         *   Retorno: 'vazio'
         **/
-        void moveSelect(float x, float y, float z);
+        bool moveSelect(float x, float y, float z);
         /**
         *   Função recalculaMBRSelect: recalcula o MBRSelect
         *   Parâmetros: 'Ponto*' a MBR que armazena a MBR de todos os objetos selecionados
@@ -159,18 +159,29 @@ class ListaObjetos
         *   Parâmetros: (x,y,z) a quantidade que sera movido por eixo e 'id' é o ID do objeto a ser movido
         *   Retorno: 'vazio'
         **/
-        void moveObj(int id, float x, float y, float z);
+        bool moveObj(int id, float x, float y, float z);
         /**
-        *   Função moveObjSelect: move todos os objetos selecionados
+        *   Função duplicaSelect: duplica objetos da cena
         *   Parâmetros: (x,y,z) a quantidade que sera movido por eixo
         *   Retorno: 'vazio'
         **/
-        void moveObjSelect(float x, float y, float z);
+        bool duplicaSelect();
         int getNumSelect(){return tamSelect;}
         ~ListaObjetos();
     private:
 
+        /**
+        *   Função duplicarOBJ: cria uma referência ao objeto original 'OBJ', usado nas listas de refazer e desfazer
+        *   Parâmetros: 'Objeto3D*', objeto original que será criado uma referencia
+        *   Retorno: 'Objeto3D*', referência ao objeto original
+        **/
         Objeto3D *duplicarObj(Objeto3D *obj);
+        /**
+        *   Função deletar: deleta o objeto 'p' que foi passado como parâmetro
+        *   Parâmetros: 'Objeto3D*', objeto que será deletado da lista
+        *   Retorno: 'void'
+        **/
+        void deletar(Objeto3D *p);
         Objeto3D *pri;
         int idDis; ///ID disponivel para a proxima inserção
         ListaAcao *desfazer;
