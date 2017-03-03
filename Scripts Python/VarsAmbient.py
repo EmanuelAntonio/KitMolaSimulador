@@ -26,8 +26,8 @@ except ImportError:
 
 class Vars(object):
 
-    version = "0.6.9"  # Variável de controle de versão
-    dateModificacao = "27/02/2017"  # Data da última atualização do programa
+    version = "0.7"  # Variável de controle de versão
+    dateModificacao = "02/02/2017"  # Data da última atualização do programa
     drawArea0 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
     drawArea1 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
     drawArea2 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
@@ -46,12 +46,6 @@ class Vars(object):
     status = None # Varável que armazena uma referência ao 'status bar', pode ser utilizado em usos futuros
     visionModes = ("Perspectiva", "Frente Ortho", "Atrás Ortho", "Direita Ortho", "Esquerda Ortho", "Cima Ortho")  # Variável que armazena os modos de visão(Perspectiva, direita, esquerda, frente, atrás, cima, baixo)
     visionItem = None  # Variável que armazena o label que mostra na janela qual o tipo de visão que estamos utilizando
-    #camZoom = 16  # Variável que armazena o raio da coordenada esférica correspondente ao zoom da câmera
-    #theta = math.pi / 4  # Variável que armazena em radianos o ângulo XY da câmera
-    #phi = math.pi / 3  # Variável que armazena em radianos o ângulo do eixo Z com o plano XY
-    #centro = (0,0,0) #Variável que armazena a posição do foco da cãmera
-    #orthoCenter = (0,0) #Tupla que armazena o ponto central da visão ortho
-    #orthoZoom = 5 #Variável que armazena a distancia do centro para visao ortho
     rightMouse = (0,0,0) #Variável que armazena a ultima posição do mouse ao clicar com o botao direito
     arquivoProjeto = "" #Variável que armazena o diretorio com o nome do projeto que está aberto atualmente
     shiftPress = False #Variável que armazena se o shift está sendo pressionado nesse exato momento
@@ -63,6 +57,7 @@ class Vars(object):
     KitLib = ctypes.CDLL('libs/kitmola.dll')  # Variável que armazena uma referência ao núcleo do programa em C
     KitLib.distObjsSelect.restype = KitLib.getEspacoGrid.restype = c_float
     KitLib.getObjById.restype = POINTER(CObjeto3D)
+    KitLib.getCentroMBRSelect.restype = POINTER(CPonto)
 
     # Constantes
     SPHERE = 1

@@ -52,7 +52,7 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
         self.lblCmY.SetExtraStyle(wx.TE_RIGHT)
         self.lblCmZ = wx.StaticText(self, wx.ID_ANY, "cm")
         self.lblCmZ.SetExtraStyle(wx.TE_RIGHT)
-        self.btnObj = wx.Button(self, wx.ID_ANY, "Mover Objeto")
+        #self.btnObj = wx.Button(self, wx.ID_ANY, "Mover Objeto")
         self.btnSelect = wx.Button(self, wx.ID_ANY, "Mover Seleção")
         self.sizerX.Add(self.lblX, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER, 5)
         self.sizerX.Add(self.txtFocusX, 0, wx.ALIGN_RIGHT, 5)
@@ -66,9 +66,9 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
         sizerFocus.Add(self.sizerX, 0, wx.ALIGN_CENTER, 5)
         sizerFocus.Add(self.sizerY, 0, wx.ALIGN_CENTER, 5)
         sizerFocus.Add(self.sizerZ, 0, wx.ALIGN_CENTER, 5)
-        sizerFocus.Add(self.btnObj, 0, wx.ALIGN_CENTER, 5)
+        #sizerFocus.Add(self.btnObj, 0, wx.ALIGN_CENTER, 5)
         sizerFocus.Add(self.btnSelect, 0, wx.ALIGN_CENTER, 5)
-        self.Bind(wx.EVT_BUTTON, self.OnMoveObj, self.btnObj)
+        #self.Bind(wx.EVT_BUTTON, self.OnMoveObj, self.btnObj)
         self.Bind(wx.EVT_BUTTON, self.OnMoveObjSelect, self.btnSelect)
 
         self.sizer.Add(wx.StaticText(self, wx.ID_ANY,"Informações Sobre Objetos"), 0, wx.ALIGN_CENTRE, 5)
@@ -122,13 +122,16 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
             self.lblTam.SetLabel(self.strTam + "---")
             self.lblRaio.SetLabel(self.strRaio + "---")
             self.lblCentro.SetLabel(self.strCentro + "(-,-,-)")
+            self.txtFocusX.SetValue(str(0))
+            self.txtFocusY.SetValue(str(0))
+            self.txtFocusZ.SetValue(str(0))
         else:
 
             self.idUltObj = id
             if obj == Vars.SPHERE:
                 self.lblTipo.SetLabel(self.strTipo + "Esfera de Ligação")
                 self.lblRaio.SetLabel(self.strRaio + str(Vars.SPHERE_RADIUS) + "cm")
-                self.lblCentro.SetLabel(self.strCentro + "(" + str(centro[0]) + "," +str(centro[1]) + "," + str(centro[2]) + ")")
+                self.lblCentro.SetLabel(self.strCentro + "(" + str(round(centro[0], 3)) + "," + str(round(centro[1], 3)) + "," + str(round(centro[2], 3)) + ")")
                 self.lblTam.SetLabel(self.strTam + "---")
             elif obj == Vars.BAR_SMALL:
                 self.lblTipo.SetLabel(self.strTipo + "Barra Pequena")
@@ -143,7 +146,15 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
             elif obj == Vars.BASE:
                 self.lblTipo.SetLabel(self.strTipo + "Base")
                 self.lblRaio.SetLabel(self.strRaio + str(Vars.BASE_RADIUS) + "cm")
-                self.lblCentro.SetLabel(self.strCentro + "(" + str(centro[0]) + "," +str(centro[1]) + "," + str(centro[2]) + ")")
+                self.lblCentro.SetLabel(self.strCentro + "(" + str(round(centro[0],3)) + "," +str(round(centro[1],3)) + "," + str(round(centro[2],3)) + ")")
                 self.lblTam.SetLabel(self.strTam + "---")
             self.lblId.SetLabel(self.strId + str(id))
+            self.alteraCentroMBR()
         self.parent.SetFocus()
+
+    def alteraCentroMBR(self):
+
+        MBRSelect = Vars.KitLib.getCentroMBRSelect()
+        self.txtFocusX.SetValue(str(round(MBRSelect.contents.x,3)))
+        self.txtFocusY.SetValue(str(round(MBRSelect.contents.y,3)))
+        self.txtFocusZ.SetValue(str(round(MBRSelect.contents.z,3)))

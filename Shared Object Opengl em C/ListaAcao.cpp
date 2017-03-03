@@ -51,9 +51,9 @@ void ListaAcao::clear(){
     Acao *aux = pri;
     while(pri != NULL){
 
-        delete aux;
         aux = pri;
         pri = pri->getProx();
+        delete aux;
 
     }
     pri = NULL;

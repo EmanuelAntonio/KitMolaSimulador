@@ -20,7 +20,11 @@ Objeto3D *ListaObjetos::duplicarObj(Objeto3D *obj){
     Objeto3D *objOut = new Objeto3D();
     objOut->setObjeto(obj->getObjeto());
     objOut->setCentro(obj->getCentro()->x,obj->getCentro()->y,obj->getCentro()->z);
-    objOut->setExtremidades(obj->getExtremidades()[0],obj->getExtremidades()[1]);
+    for(int i = 0; i < obj->getTamExtremidades(); i++){
+
+        objOut->addExtremidades(obj->getExtremidades()[i]);
+
+    }
     objOut->setMBR(obj->getMBR()[0].x,obj->getMBR()[0].y,obj->getMBR()[0].z,obj->getMBR()[1].x,obj->getMBR()[1].y,obj->getMBR()[1].z);
     objOut->setId(obj->getId());
     objOut->setProx(NULL);
@@ -37,7 +41,7 @@ int ListaObjetos::size(){
 
     return tam;
 }
-void ListaObjetos::salvar(char* arquivo, char visionAxis, int visionOption){
+void ListaObjetos::salvar(char* arquivo,int tamGrid, float meshQual, float espacoGrid){
 
     remove(arquivo);
     FILE *arq;
@@ -46,8 +50,9 @@ void ListaObjetos::salvar(char* arquivo, char visionAxis, int visionOption){
     Objeto obj;
     Objeto3D *aux = pri;
     c.numObj = size();
-    c.visionAxis = visionAxis;
-    c.visionOption = visionOption;
+    c.meshQual = meshQual;
+    c.tamGrid = tamGrid;
+    c.espacoGrid = espacoGrid;
     fwrite(&c,sizeof(cabecalhoKMP),1,arq);
     while(aux != NULL){
 
@@ -56,8 +61,12 @@ void ListaObjetos::salvar(char* arquivo, char visionAxis, int visionOption){
         obj.centro = *aux->getCentro();
         obj.MBR[0] = aux->getMBR()[0];
         obj.MBR[1] = aux->getMBR()[1];
-        obj.idExtremidades[0] = aux->getExtremidades()[0];
-        obj.idExtremidades[1] = aux->getExtremidades()[1];
+        obj.tamExtremidades = aux->getTamExtremidades();
+        for(int i = 0; i < aux->getTamExtremidades(); i++){
+
+            obj.idExtremidades[i] = aux->getExtremidades()[i];
+
+        }
         fwrite(&obj,sizeof(Objeto),1,arq);
         aux = aux->getProx();
     }
@@ -83,7 +92,11 @@ cabecalhoKMP* ListaObjetos::abrir(char* arquivo){
         pri = new Objeto3D();
         pri->setCentro(obj.centro.x,obj.centro.y,obj.centro.z);
         pri->setMBR(obj.MBR[0].x,obj.MBR[0].y,obj.MBR[0].z,obj.MBR[1].x,obj.MBR[1].y,obj.MBR[1].z);
-        pri->setExtremidades(obj.idExtremidades[0], obj.idExtremidades[1]);
+        for(int i = 0; i < obj.tamExtremidades; i++){
+
+            pri->addExtremidades(obj.idExtremidades[i]);
+
+        }
         pri->setObjeto(obj.obj);
         pri->setId(obj.id);
         ant = pri;
@@ -105,7 +118,11 @@ cabecalhoKMP* ListaObjetos::abrir(char* arquivo){
         ant = ant->getProx();
         ant->setCentro(obj.centro.x,obj.centro.y,obj.centro.z);
         ant->setMBR(obj.MBR[0].x,obj.MBR[0].y,obj.MBR[0].z,obj.MBR[1].x,obj.MBR[1].y,obj.MBR[1].z);
-        ant->setExtremidades(obj.idExtremidades[0], obj.idExtremidades[1]);
+        for(int i = 0; i < obj.tamExtremidades; i++){
+
+            ant->addExtremidades(obj.idExtremidades[i]);
+
+        }
         ant->setObjeto(obj.obj);
         ant->setId(obj.id);
         tam++;
@@ -345,7 +362,7 @@ int ListaObjetos::refazerSize(){
     return refazer->size();
 
 }
-void ListaObjetos::desfazerAcao(){
+void ListaObjetos::desfazerAcao(Ponto *MBRSelect){
 
     Acao *aux = NULL;
     if(desfazerSize() <= 0){
@@ -365,9 +382,23 @@ void ListaObjetos::desfazerAcao(){
         Objeto3D *obj = NULL;
         while(refObj != NULL){
 
+
             obj = indexId->busca(refObj->getId());
-            deletar(obj);
-            refObj = refObj->getProx();
+            if(obj != NULL){
+
+                if(obj->getSelecionado()){
+
+                    deletar(obj);
+                    refObj = refObj->getProx();
+                    recalculaMBRSelect(MBRSelect);
+                }else{
+
+                    deletar(obj);
+                    refObj = refObj->getProx();
+
+                }
+
+            }
 
         }
         refazer->insere(REMOCAO_OBJETOS, aux->getObjs());
@@ -398,7 +429,7 @@ void ListaObjetos::desfazerAcao(){
     }
 
 }
-void ListaObjetos::refazerAcao(){
+void ListaObjetos::refazerAcao(Ponto *MBRSelect){
 
     Acao *aux = refazer->get();
 
@@ -410,36 +441,18 @@ void ListaObjetos::refazerAcao(){
         while(refObj != NULL){
 
             obj = indexId->busca(refObj->getId());
-            indexId->remover(refObj->getId());
-            if(obj->getAnt() == NULL && obj->getProx() != NULL){
+            if(obj->getSelecionado()){
 
-                delete obj;
-                pri = pri->getProx();
-                if(pri != NULL){
-
-                    pri->setAnt(NULL);
-
-                }
-
-            }else if(obj->getProx() == NULL && obj->getAnt() != NULL){
-
-                obj->getAnt()->setProx(NULL);
-                delete obj;
-
-            }else if(obj->getProx() == NULL && obj->getAnt() == NULL){
-
-                pri = NULL;
-                delete obj;
+                indexId->remover(refObj->getId());
+                deletar(obj);
+                recalculaMBRSelect(MBRSelect);
 
             }else{
 
-                obj->getAnt()->setProx(obj->getProx());
-                obj->getProx()->setAnt(obj->getAnt());
-                delete obj;
+                indexId->remover(refObj->getId());
+                deletar(obj);
 
             }
-
-            tam--;
             refObj = refObj->getProx();
 
         }
@@ -521,6 +534,14 @@ bool ListaObjetos::moveSelect(float x, float y, float z){
 
                 aux->setCentro(aux->getCentro()->x + x,aux->getCentro()->y + y,aux->getCentro()->z + z);
                 aux->setMBR(aux->getMBR()[0].x + x,aux->getMBR()[0].y + y,aux->getMBR()[0].z + z,aux->getMBR()[1].x + x,aux->getMBR()[1].y + y,aux->getMBR()[1].z + z);
+
+            }else{
+
+                if(indexId->busca(aux->getExtremidades()[0])->getSelecionado() && indexId->busca(aux->getExtremidades()[1])->getSelecionado()){
+
+                    aux->setMBR(aux->getMBR()[0].x + x,aux->getMBR()[0].y + y,aux->getMBR()[0].z + z,aux->getMBR()[1].x + x,aux->getMBR()[1].y + y,aux->getMBR()[1].z + z);
+
+                }
 
             }
 
@@ -631,7 +652,7 @@ bool ListaObjetos::addBar(int tipoBar){
 
             if(aux->getSelecionado()){
 
-                if(aux->getObjeto() != SPHERE){
+                if(aux->getObjeto() != SPHERE && aux->getObjeto() != BASE){
 
                     return false;
 
@@ -686,19 +707,21 @@ bool ListaObjetos::addBar(int tipoBar){
 
         pri = new Objeto3D();
         pri->setObjeto(tipoBar);
-        pri->setExtremidades(id1,id2);
-
+        pri->addExtremidades(id1);
+        pri->addExtremidades(id2);
 
     }else{
 
         Objeto3D *aux = new Objeto3D();
         aux->setObjeto(tipoBar);
         aux->setProx(pri);
-        aux->setExtremidades(id1,id2);
+        aux->addExtremidades(id1);
+        aux->addExtremidades(id2);
         pri->setAnt(aux);
         pri = aux;
 
     }
+
     if(objId1->getCentro()->x < objId2->getCentro()->x){
 
         xMBR = objId1->getCentro()->x - BAR_RADIUS;
@@ -735,6 +758,8 @@ bool ListaObjetos::addBar(int tipoBar){
     pri->setMBR(xMBR, yMBR, zMBR, XMBR, YMBR, ZMBR);
     pri->setId(idDis);
     pri->setSelecionado(true);
+    objId1->addExtremidades(idDis);
+    objId2->addExtremidades(idDis);
     idDis++;
     indexId->insere(pri->getId(),pri);
     desfazer->insere(ADICAO_OBJETOS,duplicarObj(pri));
@@ -823,33 +848,57 @@ void ListaObjetos::deletar(Objeto3D *p){
 
     if(p != NULL){
 
-        indexId->remover(p->getId());
-        if(p->getAnt() == NULL){
+        if(p->getObjeto() == SPHERE){
 
-            pri = p->getProx();
-            if(pri != NULL){
+            if(p->getTamExtremidades() > 0){
 
-                pri->setAnt(NULL);
+                for(int i = 0; i < p->getTamExtremidades(); i++){
+
+                    deletar(indexId->busca(p->getExtremidades()[i]));///Como uma esfera nao se liga a outra esfera, a recursão não entrará em loop
+
+                }
 
             }
-
-        }else if(p->getProx() == NULL){
-
-            p->getAnt()->setProx(NULL);
-
-        }else{
-
-            p->getAnt()->setProx(p->getProx());
-            p->getProx()->setAnt(p->getAnt());
+            p->setObjeto(BAR_SMALL);///Usado apenas para que a chamada recursiva entre no primeiro if
+            deletar(p);
 
         }
-        if(p->getSelecionado()){
+        else{
 
-            tamSelect--;
+            indexId->remover(p->getId());
+            if(p->getAnt() == NULL){
+
+                pri = p->getProx();
+                if(pri != NULL){
+
+                    pri->setAnt(NULL);
+
+                }
+
+            }else if(p->getProx() == NULL){
+
+                p->getAnt()->setProx(NULL);
+
+            }else{
+
+                p->getAnt()->setProx(p->getProx());
+                p->getProx()->setAnt(p->getAnt());
+
+            }
+            if(p->getSelecionado()){
+
+                tamSelect--;
+
+            }
+            for(int i = 0; i < p->getTamExtremidades(); i++){
+
+                indexId->busca(p->getExtremidades()[i])->removeExtremidades(p->getId());
+
+            }
+            delete p;
+            tam--;
 
         }
-        delete p;
-        tam--;
 
     }
 
@@ -858,24 +907,119 @@ bool ListaObjetos::duplicaSelect(){
 
     Objeto3D *aux = pri;
     Objeto3D *prox = NULL;
-    if(tamSelect <= 0){
+    Objeto3D *refOut = NULL;
+    Objeto3D *refDesfazer = NULL;
+    refazer->clear();
 
-        return false;
-
-    }
     while(aux != NULL){
 
         if(aux->getSelecionado()){
 
-            prox = duplicarObj(aux);
-            prox->setProx(pri);
-            prox->setSelecionado(true);
-            pri->setAnt(prox);
-            pri = prox;
-            aux->setSelecionado(false);
+            if(aux->getObjeto() == SPHERE || aux->getObjeto() == BASE){
+
+                if(refOut == NULL){
+
+                    refOut = duplicarObj(aux);
+
+                }else{
+
+                    prox = duplicarObj(aux);
+                    refOut->setAnt(prox);
+                    prox->setProx(refOut);
+                    refOut = prox;
+
+                }
+
+
+            }else if(aux->getObjeto() == BAR_SMALL || aux->getObjeto() == BAR_LARGE){
+
+                if(indexId->busca(aux->getExtremidades()[0])->getSelecionado() && indexId->busca(aux->getExtremidades()[1])->getSelecionado()){
+
+                    if(refOut == NULL){
+
+                        refOut = duplicarObj(aux);
+
+                    }else{
+
+                        prox = duplicarObj(aux);
+                        refOut->setAnt(prox);
+                        prox->setProx(refOut);
+                        refOut = prox;
+
+                    }
+
+                }else{
+
+                    while(refOut != NULL){
+
+                        prox = refOut->getProx();
+                        delete refOut;
+                        refOut = prox;
+
+                    }
+                    return false;
+                }
+
+            }
+            refOut->setTamExtremidades(0);
+            for(int i = 0; i < aux->getTamExtremidades(); i++){
+
+                if(indexId->busca(aux->getExtremidades()[i])->getSelecionado()){
+
+                    refOut->addExtremidades(aux->getExtremidades()[i]);
+
+                }
+
+            }
 
         }
         aux = aux->getProx();
+    }
+    aux = refOut;
+    while(aux != NULL){
+
+        prox = refOut;
+        while(prox != NULL){
+
+            if(prox->buscaIdExtremidades(aux->getId())){
+
+                prox->removeExtremidades(aux->getId());
+                prox->addExtremidades(idDis);
+
+            }
+            prox = prox->getProx();
+        }
+        indexId->busca(aux->getId())->setSelecionado(false);
+        aux->setId(idDis);
+        idDis++;
+        tam++;
+        if(refDesfazer == NULL){
+
+            refDesfazer = duplicarObj(aux);
+
+        }else{
+
+            prox = duplicarObj(aux);
+            refDesfazer->setAnt(prox);
+            prox->setProx(refDesfazer);
+            refDesfazer = prox;
+
+        }
+        prox = duplicarObj(aux);
+        prox->setProx(pri);
+        pri->setAnt(prox);
+        pri = prox;
+        indexId->insere(pri->getId(), pri);
+        pri->setSelecionado(true);
+        aux = aux->getProx();
+    }
+    desfazer->insere(ADICAO_OBJETOS,refDesfazer);
+    while(refOut != NULL){
+
+        prox = refOut->getProx();
+        delete refOut;
+        refOut = prox;
+
     }
     return true;
 }

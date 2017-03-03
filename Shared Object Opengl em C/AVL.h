@@ -7,7 +7,7 @@ class AVL
 {
     public:
         AVL();
-        void insere(int p, Objeto3D *obj);
+        void insere(int id, Objeto3D *obj);
         Objeto3D *busca(int p);
         void remover(int p);
         ~AVL();

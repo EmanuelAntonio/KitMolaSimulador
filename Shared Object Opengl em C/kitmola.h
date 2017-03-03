@@ -115,7 +115,7 @@ extern "C"{
 	*	->Parâmetros: "char* arquivo" é o arquivo de destino
 	*	->Retorno: 'vazio'
 	**/
-    void save(char* arquivo,char visionAxis,int visionOption);
+    void save(char* arquivo);
     /**
 	*   ->Função open:
 	*		Abre um projeto em um arquivo .kmp
@@ -356,5 +356,6 @@ extern "C"{
 	*	->Retorno: 'vazio'
 	**/
     void addBase(float x, float y, float z);
+    Ponto* getCentroMBRSelect();
 
 }

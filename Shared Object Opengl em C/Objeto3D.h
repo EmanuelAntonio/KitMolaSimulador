@@ -7,6 +7,10 @@
 #define BAR_SMALL 2
 #define BAR_LARGE 3
 #define BASE 4
+#define LAJE 5
+#define DIAGONAL_SMALL 6
+#define DIAGONAL_LARGE 7
+#define LIGACAO_RIGIDA 8
 
 #define SPHERE_RADIUS 0.75 /// em centimetros
 #define BAR_RADIUS 0.3 /// em centimetros
@@ -19,8 +23,9 @@
 struct cabecalhoKMP{
 
     int numObj;
-    char visionAxis;
-    int visionOption;
+    int tamGrid;
+    float meshQual;
+    float espacoGrid;
 
 };
 /**Struct Ponto: armazena um ponto em R^3**/
@@ -38,7 +43,8 @@ typedef struct objeto{
     int id;
     Ponto centro;
     Ponto MBR[2];
-    int idExtremidades[2];
+    int idExtremidades[16];
+    int tamExtremidades;
 
 }Objeto;
 /** Classe Objeto3D: um nó da lista de objetos, armazena informacoes essenciais sobre um objeto da cena**/
@@ -51,6 +57,7 @@ class Objeto3D
             prox = NULL;
             ant = NULL;
             selecionado = false;
+            tamExtremidades = 0;
 
         }
         void setObjeto(int p){objeto = p;}
@@ -61,12 +68,6 @@ class Objeto3D
             centro.x = x;
             centro.y = y;
             centro.z = z;
-
-        }
-        void setExtremidades(int id1, int id2){
-
-            idExtremidades[0] = id1;
-            idExtremidades[1] = id2;
 
         }
         void setMBR(float x1, float y1, float z1, float x2, float y2, float z2){
@@ -84,11 +85,56 @@ class Objeto3D
         Ponto *getMBR(){return MBR;}
         Ponto *getCentro(){return &centro;}
         int *getExtremidades(){return idExtremidades;}
+        int getTamExtremidades(){return tamExtremidades;}
+        void setTamExtremidades(int tam){tamExtremidades = tam;}
         bool getSelecionado(){return selecionado;}
         int getId(){return id;}
         void setId(int i){id = i;}
         Objeto3D *getAnt(){return ant;}
         void setAnt(Objeto3D *o){ant = o;}
+        void addExtremidades(int id){
+
+            idExtremidades[tamExtremidades] = id;
+            tamExtremidades++;
+
+        }
+        void removeExtremidades(int id){
+
+            int idE = -1;
+            for(int i = 0; i < tamExtremidades; i++){
+
+                if(idExtremidades[i] == id){
+
+                    idE = i;
+                    break;
+
+                }
+
+            }
+            if(idE != -1){
+
+                for(int i = idE; i < tamExtremidades - 1; i++){
+
+                    idExtremidades[i] = idExtremidades[i+1];
+
+                }
+                tamExtremidades--;
+            }
+
+        }
+        bool buscaIdExtremidades(int id){
+
+            for(int i = 0; i < tamExtremidades; i++){
+
+                if(idExtremidades[i] == id){
+
+                    return true;
+
+                }
+
+            }
+            return false;
+        }
         ~Objeto3D(){}
     private:
         int objeto;/**Referência a qual objeto este nó da lista se refere
@@ -98,7 +144,8 @@ class Objeto3D
                         4 -> Barra Grande
                     **/
         Ponto centro;/**Parâmetro de desenho, para objetos que precisem**/
-        int idExtremidades[2];/**Parâmetro de desenho, para objetos que precisem**/
+        int idExtremidades[16];/**Parâmetro de desenho, para objetos que precisem**/
+        int tamExtremidades;
         int id;
         Ponto MBR[2];/**Menor paralelepipedo que engloba todo o objeto, menor ponto e maior ponto repectivamente**/
         bool selecionado;/**Variavel que armazena se este objeto está selecionado**/

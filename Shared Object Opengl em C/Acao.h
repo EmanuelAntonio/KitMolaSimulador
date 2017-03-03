@@ -28,8 +28,6 @@ class Acao
         int acao;/**
                     * 0 -> adicao de objetos
                     * 1 -> remocao de objetos
-                    * 2 -> selecao de objetos
-                    * 3 -> deselecao de objetos
                     **/
 };
 

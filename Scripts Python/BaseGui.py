@@ -321,6 +321,10 @@ class WindowClass(wx.Frame):
                 msg = wx.MessageDialog(None, "Arquivo Corrompido!", "Erro!", wx.OK)
                 msg.ShowModal()
                 msg.Destroy()
+            self.tabs.tabConfig.txtTamGrid.SetValue(str(Vars.KitLib.getTamGrid()))
+            espacoGrid = c_float(Vars.KitLib.getEspacoGrid()).value
+            self.tabs.tabConfig.cbxDistGrid.SetValue(str(int(espacoGrid)) + "cm")
+            self.tabs.tabConfig.sldQuality.SetValue(int(Vars.KitLib.getMeshQual()))
             Vars.drawArea0.Refresh()
             Vars.drawArea1.Refresh()
             Vars.drawArea2.Refresh()

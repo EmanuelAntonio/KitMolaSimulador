@@ -355,14 +355,17 @@ extern "C"{
         }
 
     }
-    void save(char* arquivo,char visionAxis,int visionOption){
+    void save(char* arquivo){
 
-        l->salvar(arquivo, visionAxis,visionOption);
+        l->salvar(arquivo, tamGrid, meshQual, espacoGrid);
 
     }
     void open(char* arquivo){
 
         cabecalhoKMP *c = l->abrir(arquivo);
+        meshQual = c->meshQual;
+        tamGrid = c->tamGrid;
+        espacoGrid = c->espacoGrid;
         delete c;
 
     }
@@ -443,12 +446,12 @@ extern "C"{
     }
     void desfazer(){
 
-        l->desfazerAcao();
+        l->desfazerAcao(MBRSelect);
 
     }
     void refazer(){
 
-        l->refazerAcao();
+        l->refazerAcao(MBRSelect);
 
     }
     int desfazerSize(){
@@ -858,6 +861,14 @@ extern "C"{
     }
     void drawBarZero(Ponto *p1, Ponto *p2,float radius,int subdivisions,GLUquadricObj *quadric,bool selecionado){
 
+        if(p1->z > p2->z){
+
+            Ponto *aux = p1;
+            p1 = p2;
+            p2 = aux;
+
+        }
+
         GLfloat object_difusa[] = {1.0,1.0,1.0,0.5};
         float vx = p2->x - p1->x;
         float vy = p2->y - p1->y;
@@ -1081,6 +1092,15 @@ extern "C"{
     void addBase(float x, float y, float z){
 
         l->addBase(x,y,z);
+
+    }
+    Ponto* getCentroMBRSelect(){
+
+        Ponto *c = new Ponto;
+        c->x = (MBRSelect[1].x + MBRSelect[0].x)/2.0;
+        c->y = (MBRSelect[1].y + MBRSelect[0].y)/2.0;
+        c->z = (MBRSelect[1].z + MBRSelect[0].z)/2.0;
+        return c;
 
     }
 }

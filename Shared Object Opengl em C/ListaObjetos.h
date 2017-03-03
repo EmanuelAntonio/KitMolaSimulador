@@ -37,7 +37,7 @@ class ListaObjetos
         *   Parâmetros: 'arquivo' string com o diretório do arquivo a ser salvo, 'visionAxis' qual o tipo de visao
         *   Retorno: vazio
         **/
-        void salvar(char* arquivo,char visionAxis, int visionOption);
+        void salvar(char* arquivo,int tamGrid, float meshQual, float espacoGrid);
         /**
         *   Função abrir: abre um projeto salvo em um arquivo binario .kmp
         *   Parâmetros: 'arquivo' string com o diretório do arquivo a ser aberto
@@ -91,13 +91,13 @@ class ListaObjetos
         *   Parâmetros: 'vazio'
         *   Retorno: 'vazio'
         **/
-        void desfazerAcao();
+        void desfazerAcao(Ponto *MBRSelect);
         /**
         *   Função refazerAcao: refaz uma ultima ação desfeita
         *   Parâmetros: 'vazio'
         *   Retorno: 'vazio'
         **/
-        void refazerAcao();
+        void refazerAcao(Ponto *MBRSelect);
         /**
         *   Função desfazerSize: retorna o tamanho da lista de desfazerAcao
         *   Parâmetros: 'vazio'

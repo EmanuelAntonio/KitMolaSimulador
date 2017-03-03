@@ -11,7 +11,7 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
     # ----------------------------------------------------------------------
     def __init__(self, parent):
 
-        self.blockInsert = True #Variavel que armazena se a opção de bloquear a posição da inserção está ativado
+        self.blockInsert = (True,1) #Variavel que armazena se a opção de bloquear a posição da inserção está ativado
 
         wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent=parent, size = (10,-1), id=wx.ID_ANY, style=wx.DOUBLE_BORDER)
         self.SetupScrolling(scroll_x=False)
@@ -29,12 +29,12 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
         # Configurações de espaçamento do grid
         sizerDistGrid = wx.BoxSizer(wx.VERTICAL)
         lblDistGrid = wx.StaticText(self, wx.ID_ANY, "Espaçamento do Grid:")
-        cbxDistGrid = wx.ComboBox(self, wx.ID_ANY, "1cm", style=wx.CB_READONLY)
-        cbxDistGrid.Append("1cm",1)
-        cbxDistGrid.Append("9cm",2)
-        cbxDistGrid.Append("18cm",3)
+        self.cbxDistGrid = wx.ComboBox(self, wx.ID_ANY, "1cm", style=wx.CB_READONLY)
+        self.cbxDistGrid.Append("1cm",1)
+        self.cbxDistGrid.Append("9cm",2)
+        self.cbxDistGrid.Append("18cm",3)
         #sizerDistGrid.Add(lblDistGrid, 0, wx.ALIGN_CENTRE, 5)
-        sizerDistGrid.Add(cbxDistGrid, 0, wx.ALIGN_CENTRE, 5)
+        sizerDistGrid.Add(self.cbxDistGrid, 0, wx.ALIGN_CENTRE, 5)
 
         # Configurações de foco da câmera
         self.sizerFocus = wx.BoxSizer(wx.VERTICAL)
@@ -79,17 +79,19 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
         # Configurações de qualidade da malha
         sizerQuality = wx.BoxSizer(wx.VERTICAL)
         lblQuality = wx.StaticText(self,wx.ID_ANY, "Qualidade da Malha:")
-        sldQuality = wx.Slider(self, value=100, minValue=5, maxValue=100,style=wx.SL_HORIZONTAL | wx.SL_LABELS)
-        sizerQuality.Add(sldQuality, 1, wx.ALIGN_CENTRE | wx.EXPAND, 5)
-        sldQuality.Bind(wx.EVT_SLIDER, self.OnSliderScroll)
+        self.sldQuality = wx.Slider(self, value=100, minValue=14, maxValue=100,style=wx.SL_HORIZONTAL | wx.SL_LABELS)
+        sizerQuality.Add(self.sldQuality, 1, wx.ALIGN_CENTRE | wx.EXPAND, 5)
+        self.sldQuality.Bind(wx.EVT_SLIDER, self.OnSliderScroll)
 
         # Configurações de bloqueio de inserção
         sizerBlock = wx.BoxSizer(wx.VERTICAL)
-        lblBlock = wx.StaticText(self,wx.ID_ANY, "Bloqueio de Inserção:")
-        chkBox = wx.CheckBox(self,wx.ID_ANY,'Multiplos do Grid')
-        chkBox.SetValue(self.blockInsert)
-        sizerBlock.Add(chkBox, 0, wx.ALIGN_CENTER,5)
-
+        lblBlock = wx.StaticText(self,wx.ID_ANY, "Bloqueio de Movimentação:")
+        self.cbxBlockInsert = wx.ComboBox(self, wx.ID_ANY, "1cm", style=wx.CB_READONLY)
+        self.cbxBlockInsert.Append("Livre", 1)
+        self.cbxBlockInsert.Append("1cm", 2)
+        self.cbxBlockInsert.Append("9cm", 3)
+        self.cbxBlockInsert.Append("18cm", 4)
+        sizerBlock.Add(self.cbxBlockInsert, 0, wx.ALIGN_CENTER,5)
 
         # Adição do sizer principal
         self.sizer.Add(lblTamGrid, 0, wx.ALIGN_CENTER,5)
@@ -123,14 +125,23 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
         self.Bind(wx.EVT_TEXT_ENTER, self.OnEnterFocus, self.txtFocusY)
         self.Bind(wx.EVT_TEXT_ENTER, self.OnEnterFocus, self.txtFocusZ)
         self.Bind(wx.EVT_BUTTON, self.OnEnterFocus, self.btnFocus)
-        cbxDistGrid.Bind(wx.EVT_COMBOBOX, self.OnGridCombox)
+        self.cbxDistGrid.Bind(wx.EVT_COMBOBOX, self.OnGridCombox)
+        self.cbxBlockInsert.Bind(wx.EVT_COMBOBOX, self.OnBlockInsert)
         self.Bind(wx.EVT_CHECKBOX, self.OnBlockInsert)
 
         self.SetSizer(self.sizer)
 
     def OnBlockInsert(self,e):
 
-        self.blockInsert = e.GetEventObject().GetValue()
+        if e.GetString() == "Livre":
+            self.blockInsert = (False, 0)
+        elif e.GetString() == "1cm":
+            self.blockInsert = (True,1)
+        elif e.GetString() == "9cm":
+            self.blockInsert = (True,9)
+        elif e.GetString() == "18cm":
+            self.blockInsert = (True,18)
+
 
     def OnSliderScroll(self, e):
         obj = e.GetEventObject()

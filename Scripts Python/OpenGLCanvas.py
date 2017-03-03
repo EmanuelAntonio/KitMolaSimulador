@@ -14,6 +14,9 @@ class CanvasBase(glcanvas.GLCanvas):
         self.context = glcanvas.GLContext(self)
         self.numJanela = ref # Variável para armazenar o id da janela
         self.dClickEvent = False #Variável referênte a se o usuário está durante o evento de duplo click do mouse, usado para não disparar o evento mouse_motion
+        self.dx = 0 # variável que controla o quanto de deslocamento nesse eixo ocorreu assim que começou o evento de mouseMotion
+        self.dy = 0
+        self.dz = 0
 
 
         if ref == 0:
@@ -219,11 +222,40 @@ class CanvasBase(glcanvas.GLCanvas):
     def OnMouseUp(self, evt):
 
         try:
+            self.dx = 0
+            self.dy = 0
+            self.dz = 0
             self.ReleaseMouse()
-
         except:
             pass
 
+    def moveSelectX(self,xDes, spaceGrid):
+
+        self.dx += xDes * spaceGrid
+        if self.dx >= self.parent.tabs.tabConfig.blockInsert[1]:
+            Vars.KitLib.moveSelect(c_float(self.parent.tabs.tabConfig.blockInsert[1]), c_float(0.0), c_float(0.0))
+            self.dx = 0
+        elif self.dx <= -self.parent.tabs.tabConfig.blockInsert[1]:
+            Vars.KitLib.moveSelect(c_float(-self.parent.tabs.tabConfig.blockInsert[1]), c_float(0.0), c_float(0.0))
+            self.dx = 0
+
+    def moveSelectY(self,yDes, spaceGrid):
+        self.dy += yDes * spaceGrid
+        if self.dy >= self.parent.tabs.tabConfig.blockInsert[1]:
+            Vars.KitLib.moveSelect(c_float(0.0), c_float(self.parent.tabs.tabConfig.blockInsert[1]), c_float(0.0))
+            self.dy = 0
+        elif self.dy <= -self.parent.tabs.tabConfig.blockInsert[1]:
+            Vars.KitLib.moveSelect(c_float(0.0), c_float(-self.parent.tabs.tabConfig.blockInsert[1]), c_float(0.0))
+            self.dy = 0
+
+    def moveSelectZ(self,zDes, spaceGrid):
+        self.dz += zDes * spaceGrid
+        if self.dz >= self.parent.tabs.tabConfig.blockInsert[1]:
+            Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(self.parent.tabs.tabConfig.blockInsert[1]))
+            self.dz = 0
+        elif self.dz <= -self.parent.tabs.tabConfig.blockInsert[1]:
+            Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(-self.parent.tabs.tabConfig.blockInsert[1]))
+            self.dz = 0
     """
         -> Função OnMouseMotion:
             Função para manipular a localização da camera assim que o botão esquerdo do mouse for pressionado e o mouse for arrastado
@@ -246,9 +278,9 @@ class CanvasBase(glcanvas.GLCanvas):
                         -math.sin(self.theta) * math.cos(self.phi),
                         math.sin(self.phi))
 
-                xCentro = self.centro[0] + (dTheta[0] * ((self.lastx - self.x)/50) * c_float(Vars.KitLib.getEspacoGrid()).value) + (dPhi[0] * (((self.y - self.lasty)/50) * c_float(Vars.KitLib.getEspacoGrid()).value))
-                yCentro = self.centro[1] + (dTheta[1] * ((self.lastx - self.x)/50) * c_float(Vars.KitLib.getEspacoGrid()).value) + (dPhi[1] * (((self.y - self.lasty)/50) * c_float(Vars.KitLib.getEspacoGrid()).value))
-                zCentro = self.centro[2] - dPhi[2] * (((self.lasty - self.y)/50) * c_float(Vars.KitLib.getEspacoGrid()).value)
+                xCentro = self.centro[0] + (dTheta[0] * ((self.lastx - self.x)/100) * c_float(Vars.KitLib.getEspacoGrid()).value) + (dPhi[0] * (((self.y - self.lasty)/100) * c_float(Vars.KitLib.getEspacoGrid()).value))
+                yCentro = self.centro[1] + (dTheta[1] * ((self.lastx - self.x)/100) * c_float(Vars.KitLib.getEspacoGrid()).value) + (dPhi[1] * (((self.y - self.lasty)/100) * c_float(Vars.KitLib.getEspacoGrid()).value))
+                zCentro = self.centro[2] - dPhi[2] * (((self.lasty - self.y)/100) * c_float(Vars.KitLib.getEspacoGrid()).value)
 
                 self.centro = (xCentro, yCentro, zCentro)
                 if Vars.drawPrincipal != -1:
@@ -258,7 +290,7 @@ class CanvasBase(glcanvas.GLCanvas):
 
             else: #já que o control nao está pressionado, fará uma das opções de movimento abaixo
 
-                if(Vars.moveObjetos):#Se o usuário selecionou a opção de movimentar objetos..
+                if(Vars.moveObjetos):#Se o usuário selecionou a opção de movimentar objetos.
 
                     if Vars.moveObjetosEixo == -1: #Porém nenhum eixo de movimento foi clicado anteriormente e nem em um objeto selecionado
                         if self.visionOption == 0: #Logo se está no modo perspectiva, apenas altera os parâmetros das coordenadas esféricas
@@ -292,13 +324,23 @@ class CanvasBase(glcanvas.GLCanvas):
                                 spaceGrid *= 0.4
 
                             if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:#se o eixo dos X está selecionado
-                               Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(0.0), c_float(0.0))
+                                if self.parent.tabs.tabConfig.blockInsert[0]:
+                                    self.moveSelectX(-xDes,spaceGrid)
+                                else:
+                                    Vars.KitLib.moveSelect(c_float(-xDes * spaceGrid), c_float(0.0), c_float(0.0))
+
                             elif Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:#se o eixo dos y está selecionado
-                                Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes*spaceGrid), c_float(0.0))
+                                if self.parent.tabs.tabConfig.blockInsert[0]:
+                                    self.moveSelectY(-yDes, spaceGrid)
+                                else:
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes*spaceGrid), c_float(0.0))
                             elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:#se o eixo dos Z está selecionado
-                                Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(-zDes*spaceGrid))
+                                if self.parent.tabs.tabConfig.blockInsert[0]:
+                                    self.moveSelectZ(-zDes, spaceGrid)
+                                else:
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(-zDes*spaceGrid))
                             else:#Porém se nenhuma seta foi selecionada, caiu na opção de ter clicado em um objeto selecionado, logo a movimentação desses objetos é livre em XYZ
-                                Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(-yDes*spaceGrid), c_float(-zDes*spaceGrid))
+                                    Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(-yDes*spaceGrid), c_float(-zDes*spaceGrid))
 
                         elif self.visionOption == 5:# agora, se está na visao de cima, move os o objetos na direção correspondente
                             xDes = (self.lastx - self.x)/100
@@ -312,13 +354,19 @@ class CanvasBase(glcanvas.GLCanvas):
                                 spaceGrid *= 0.4
 
                             if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:
-                               Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(0.0), c_float(0.0))
+                                if self.parent.tabs.tabConfig.blockInsert[0]:
+                                    self.moveSelectX(-xDes, spaceGrid)
+                                else:
+                                    Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(0.0), c_float(0.0))
                             elif Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:
-                                Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes*spaceGrid), c_float(0.0))
+                                if self.parent.tabs.tabConfig.blockInsert[0]:
+                                    self.moveSelectY(yDes, spaceGrid)
+                                else:
+                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes*spaceGrid), c_float(0.0))
                             elif Vars.moveObjetosEixo == -2:
                                 Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(yDes*spaceGrid), c_float(0.0))
 
-                        elif self.visionOption == 1 or self.visionOption == 2:# agora, se está na visao de frente ou de trás, move os o objetos na direção correspondente
+                        elif self.visionOption == 1 or self.visionOption == 2:# agora, se está na visão de frente ou de trás, move os o objetos na direção correspondente
                             yDes = (self.lastx - self.x) / 100
                             zDes = (self.lasty - self.y) / 100
 
@@ -331,16 +379,28 @@ class CanvasBase(glcanvas.GLCanvas):
 
                             if self.visionOption == 1:
                                 if Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes*spaceGrid), c_float(0.0))
+                                    if self.parent.tabs.tabConfig.blockInsert[0]:
+                                        self.moveSelectY(-yDes, spaceGrid)
+                                    else:
+                                        Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes * spaceGrid), c_float(0.0))
                                 elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
+                                    if self.parent.tabs.tabConfig.blockInsert[0]:
+                                        self.moveSelectZ(zDes, spaceGrid)
+                                    else:
+                                        Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
                                 elif Vars.moveObjetosEixo == -2:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes*spaceGrid), c_float(zDes*spaceGrid))
+                                        Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes*spaceGrid), c_float(zDes*spaceGrid))
                             else:
                                 if Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes*spaceGrid), c_float(0.0))
+                                    if self.parent.tabs.tabConfig.blockInsert[0]:
+                                        self.moveSelectY(yDes, spaceGrid)
+                                    else:
+                                        Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes*spaceGrid), c_float(0.0))
                                 elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
+                                    if self.parent.tabs.tabConfig.blockInsert[0]:
+                                        self.moveSelectZ(zDes, spaceGrid)
+                                    else:
+                                        Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
                                 elif Vars.moveObjetosEixo == -2:
                                     Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes*spaceGrid), c_float(zDes*spaceGrid))
 
@@ -358,19 +418,31 @@ class CanvasBase(glcanvas.GLCanvas):
 
                             if self.visionOption == 3:
                                 if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:
-                                    Vars.KitLib.moveSelect(c_float(xDes*spaceGrid), c_float(0.0), c_float(0.0))
+                                    if self.parent.tabs.tabConfig.blockInsert[0]:
+                                        self.moveSelectX(xDes, spaceGrid)
+                                    else:
+                                        Vars.KitLib.moveSelect(c_float(xDes*spaceGrid), c_float(0.0), c_float(0.0))
                                 elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
+                                    if self.parent.tabs.tabConfig.blockInsert[0]:
+                                        self.moveSelectZ(zDes, spaceGrid)
+                                    else:
+                                        Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
                                 elif Vars.moveObjetosEixo == -2:
                                     Vars.KitLib.moveSelect(c_float(xDes*spaceGrid), c_float(0.0), c_float(zDes*spaceGrid))
                             else:
                                 if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:
-                                    Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(0.0), c_float(0.0))
+                                    if self.parent.tabs.tabConfig.blockInsert[0]:
+                                        self.moveSelectX(-xDes, spaceGrid)
+                                    else:
+                                        Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(0.0), c_float(0.0))
                                 elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
+                                    if self.parent.tabs.tabConfig.blockInsert[0]:
+                                        self.moveSelectZ(zDes, spaceGrid)
+                                    else:
+                                        Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
                                 elif Vars.moveObjetosEixo == -2:
                                     Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(0.0), c_float(zDes*spaceGrid))
-
+                    self.parent.tabs.tabInfo.alteraCentroMBR()
                 else: #se a opção de movimentar objetos não foi selecionado pelo usuário
                     if self.visionOption == 0: #e está na visao perspectiva, apenas altera os parâmetros da coordenada esférica
                         self.theta = self.theta + (self.lastx - self.x) / 100
@@ -531,4 +603,3 @@ class CanvasBase(glcanvas.GLCanvas):
             Vars.KitLib.drawMoveAxis(self.visionAxis)
 
         self.SwapBuffers()
-

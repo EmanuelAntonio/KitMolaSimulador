@@ -14,21 +14,24 @@ class RightMenu(wx.Menu):
         self.parent = parent
 
         #Submenu adicionar
+
+        addMenu = wx.Menu()
+        addSphere = wx.MenuItem(self, wx.NewId(), 'Esfera')
+        addSBar = wx.MenuItem(self, wx.NewId(), 'Barra Pequena')
+        addLBar = wx.MenuItem(self, wx.NewId(), 'Barra Grande')
+        addBase = wx.MenuItem(self, wx.NewId(), 'Base')
         if self.parent.visionOption != 0:
-            addMenu = wx.Menu()
-            addSphere = wx.MenuItem(self, wx.NewId(),'Esfera')
-            addSBar = wx.MenuItem(self, wx.NewId(), 'Barra Pequena')
-            addLBar = wx.MenuItem(self, wx.NewId(), 'Barra Grande')
-            addBase = wx.MenuItem(self, wx.NewId(), 'Base')
             addMenu.Append(addSphere)
-            addMenu.Append(addSBar)
-            addMenu.Append(addLBar)
             addMenu.Append(addBase)
-            self.AppendSubMenu(addMenu, 'Adicionar')
+        addMenu.Append(addSBar)
+        addMenu.Append(addLBar)
+        self.AppendSubMenu(addMenu, 'Adicionar')
+        if self.parent.visionOption != 0:
             self.Bind(wx.EVT_MENU, self.OnAddSphere, addSphere)
-            self.Bind(wx.EVT_MENU, self.OnAddSmallBar, addSBar)
-            self.Bind(wx.EVT_MENU, self.OnAddLargeBar, addLBar)
             self.Bind(wx.EVT_MENU, self.OnAddBase, addBase)
+        self.Bind(wx.EVT_MENU, self.OnAddSmallBar, addSBar)
+        self.Bind(wx.EVT_MENU, self.OnAddLargeBar, addLBar)
+
 
         #Submenu camera
         camMenu = wx.Menu()
@@ -82,6 +85,11 @@ class RightMenu(wx.Menu):
         self.Append(focusItem)
         self.Bind(wx.EVT_MENU, self.OnSetFocusAll, focusItem)
 
+        #ItemMenu DuplicarSelect
+        duplicaItem = wx.MenuItem(self, wx.NewId(), 'Duplicar')
+        self.Append(duplicaItem)
+        self.Bind(wx.EVT_MENU, self.OnDuplicaSelect, duplicaItem)
+
         self.AppendSeparator()
 
         #ItemMenu fechar
@@ -98,7 +106,15 @@ class RightMenu(wx.Menu):
         -> Retorno: vazio
     """
     def OnClose(self, e):
-        self.parent.Close()
+        self.parent.parent.Close()
+
+    def OnDuplicaSelect(self, e):
+        if Vars.KitLib.duplicaSelect():
+            Vars.moveObjetos = True
+        Vars.drawArea0.Refresh()
+        Vars.drawArea1.Refresh()
+        Vars.drawArea2.Refresh()
+        Vars.drawArea3.Refresh()
 
     def OnAddSphere(self, e):
 
@@ -112,8 +128,8 @@ class RightMenu(wx.Menu):
             if self.parent.visionAxis == Vars.ASCII_Z:  # 122 Codigo ASCII para 'z'
                 x = ponto[0]
                 y = ponto[1]
-                if self.parent.parent.tabs.tabConfig.blockInsert:
-                    space = c_float(Vars.KitLib.getEspacoGrid()).value
+                if self.parent.parent.tabs.tabConfig.blockInsert[0]:
+                    space = self.parent.parent.tabs.tabConfig.blockInsert[1]
                     x = x / space
                     dx = x - int(x)
                     dx = math.fabs(dx)
@@ -139,8 +155,8 @@ class RightMenu(wx.Menu):
 
                 x = ponto[0]
                 y = ponto[1]
-                if self.parent.parent.tabs.tabConfig.blockInsert:
-                    space = c_float(Vars.KitLib.getEspacoGrid()).value
+                if self.parent.parent.tabs.tabConfig.blockInsert[0]:
+                    space = self.parent.parent.tabs.tabConfig.blockInsert[1]
                     x = x / space
                     dx = x - int(x)
                     dx = math.fabs(dx)
@@ -168,8 +184,8 @@ class RightMenu(wx.Menu):
             elif self.parent.visionAxis == Vars.ASCII_Y:  # 121 Codigo ASCII para 'y'
                 x = ponto[0]
                 y = ponto[1]
-                if self.parent.parent.tabs.tabConfig.blockInsert:
-                    space = c_float(Vars.KitLib.getEspacoGrid()).value
+                if self.parent.parent.tabs.tabConfig.blockInsert[0]:
+                    space = self.parent.parent.tabs.tabConfig.blockInsert[1]
                     x = x / space
                     dx = x - int(x)
                     dx = math.fabs(dx)
@@ -197,6 +213,8 @@ class RightMenu(wx.Menu):
         Vars.drawArea1.Refresh(False)
         Vars.drawArea2.Refresh(False)
         Vars.drawArea3.Refresh(False)
+        self.parent.parent.toolbar.EnableTool(wx.ID_UNDO, True)
+        self.parent.parent.toolbar.EnableTool(wx.ID_REDO, False)
 
     """
         -> Função OnPerspectiva:
@@ -307,9 +325,9 @@ class RightMenu(wx.Menu):
     def OnDelAll(self, evt):
         Vars.KitLib.removeAll()
         if Vars.KitLib.desfazerSize() > 0:
-            Vars.toolBar.EnableTool(wx.ID_UNDO, True)
+            self.parent.parent.toolbar.EnableTool(wx.ID_UNDO, True)
         if Vars.KitLib.refazerSize() > 0:
-            Vars.toolBar.EnableTool(wx.ID_REDO, True)
+            self.parent.parent.toolbar.EnableTool(wx.ID_REDO, True)
 
     """
         -> Função OnClear:
@@ -388,13 +406,15 @@ class RightMenu(wx.Menu):
         Vars.drawArea2.Refresh()
         Vars.drawArea3.Refresh()
         self.parent.Refresh()
+        self.parent.parent.toolbar.EnableTool(wx.ID_UNDO, True)
+        self.parent.parent.toolbar.EnableTool(wx.ID_REDO, False)
 
     def OnAddLargeBar(self,e):
 
         BAR_LARGE = 3
         add = Vars.KitLib.addBar(BAR_LARGE)
         if not(add):
-            msg = "Para adicionar uma barra grande certifique-se que tenha duas esferas selecionadas e que a distância entre elas seja de 16.3 cm."
+            msg = "Para adicionar uma barra grande certifique-se que tenha duas esferas selecionadas e que a distância entre elas seja de 16.5 cm."
             msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
             msgCx.ShowModal()
             msgCx.Destroy()
@@ -404,6 +424,8 @@ class RightMenu(wx.Menu):
         Vars.drawArea2.Refresh()
         Vars.drawArea3.Refresh()
         self.parent.Refresh()
+        self.parent.parent.toolbar.EnableTool(wx.ID_UNDO, True)
+        self.parent.parent.toolbar.EnableTool(wx.ID_REDO, False)
 
     def OnAddBase(self,e):
 
@@ -503,3 +525,5 @@ class RightMenu(wx.Menu):
         Vars.drawArea2.Refresh()
         Vars.drawArea3.Refresh()
         self.parent.Refresh()
+        self.parent.parent.toolbar.EnableTool(wx.ID_UNDO, True)
+        self.parent.parent.toolbar.EnableTool(wx.ID_REDO, False)
