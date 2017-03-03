@@ -5,7 +5,7 @@ ListaAcao::ListaAcao()
     pri = NULL;
     tam = 0;
 }
-void ListaAcao::insere(int acao, Objeto3D *objs){
+void ListaAcao::insere(int acao, Objeto3D *objs, Ponto *vetDes){
 
     if(pri == NULL){
 
@@ -20,6 +20,12 @@ void ListaAcao::insere(int acao, Objeto3D *objs){
         aux->setObjs(objs);
         aux->setProx(pri);
         pri = aux;
+
+    }
+    if(vetDes != NULL){
+
+
+        pri->setVetDes(vetDes->x, vetDes->y, vetDes->z);
 
     }
     tam++;

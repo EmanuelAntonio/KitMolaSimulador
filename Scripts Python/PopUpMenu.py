@@ -20,18 +20,22 @@ class RightMenu(wx.Menu):
         addSBar = wx.MenuItem(self, wx.NewId(), 'Barra Pequena')
         addLBar = wx.MenuItem(self, wx.NewId(), 'Barra Grande')
         addBase = wx.MenuItem(self, wx.NewId(), 'Base')
+        addLaje = wx.MenuItem(self, wx.NewId(), 'Laje')
         if self.parent.visionOption != 0:
             addMenu.Append(addSphere)
             addMenu.Append(addBase)
         addMenu.Append(addSBar)
         addMenu.Append(addLBar)
+        addMenu.Append(addLaje)
         self.AppendSubMenu(addMenu, 'Adicionar')
         if self.parent.visionOption != 0:
             self.Bind(wx.EVT_MENU, self.OnAddSphere, addSphere)
             self.Bind(wx.EVT_MENU, self.OnAddBase, addBase)
         self.Bind(wx.EVT_MENU, self.OnAddSmallBar, addSBar)
         self.Bind(wx.EVT_MENU, self.OnAddLargeBar, addLBar)
+        self.Bind(wx.EVT_MENU, self.OnAddLaje, addLaje)
 
+        self.AppendSeparator()
 
         #Submenu camera
         camMenu = wx.Menu()
@@ -54,6 +58,14 @@ class RightMenu(wx.Menu):
         self.Bind(wx.EVT_MENU, self.OnBack, atras)
         self.Bind(wx.EVT_MENU, self.OnRight, direita)
         self.Bind(wx.EVT_MENU, self.OnLeft, esquerda)
+
+        #submenu zoomIn zoomOut
+        zoomInItem = wx.MenuItem(self, wx.NewId(), 'Zoom In')
+        zoomOutItem = wx.MenuItem(self, wx.NewId(), 'Zoom Out')
+        self.Append(zoomInItem)
+        self.Append(zoomOutItem)
+        self.Bind(wx.EVT_MENU, self.OnZoomIn, zoomInItem)
+        self.Bind(wx.EVT_MENU, self.OnZoomOut, zoomOutItem)
 
         self.AppendSeparator()
 
@@ -107,6 +119,19 @@ class RightMenu(wx.Menu):
     """
     def OnClose(self, e):
         self.parent.parent.Close()
+
+    def OnAddLaje(self, e):
+        if not(Vars.KitLib.addLaje()):
+            msg = "Para adicionar uma laje, certifique-se de selecionar quatro esferas, e estas sejam os vertices de um retângulo 9cm X 18cm(contando do centro da esfera)."
+            msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
+            msgCx.ShowModal()
+            msgCx.Destroy()
+
+    def OnZoomIn(self, e):
+        self.parent.OnZoomIn()
+
+    def OnZoomOut(self, e):
+        self.parent.OnZoomOut()
 
     def OnDuplicaSelect(self, e):
         if Vars.KitLib.duplicaSelect():

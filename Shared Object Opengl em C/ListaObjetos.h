@@ -154,6 +154,7 @@ class ListaObjetos
         *	->Retorno: 'Objeto3D' objeto que "*ponto" pertence
         **/
         Objeto3D* getObj(double *ponto);
+        bool addLaje();
         /**
         *   Função moveObj: move todos os objetos selecionados
         *   Parâmetros: (x,y,z) a quantidade que sera movido por eixo e 'id' é o ID do objeto a ser movido
@@ -181,7 +182,8 @@ class ListaObjetos
         *   Parâmetros: 'Objeto3D*', objeto que será deletado da lista
         *   Retorno: 'void'
         **/
-        void deletar(Objeto3D *p);
+        void deletar(Objeto3D *p, bool completo);
+        float distancia(Ponto *p, Ponto *n);
         Objeto3D *pri;
         int idDis; ///ID disponivel para a proxima inserção
         ListaAcao *desfazer;

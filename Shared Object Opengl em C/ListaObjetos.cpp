@@ -282,8 +282,8 @@ bool ListaObjetos::remover(float x, float y, float z){
 
             if((aux->getMBR()[1].x + 0.05>= x) && (aux->getMBR()[1].y + 0.05 >= y) && (aux->getMBR()[1].z + 0.05 >= z)){
 
-                desfazer->insere(REMOCAO_OBJETOS,duplicarObj(aux));
-                deletar(aux);
+                desfazer->insere(REMOCAO_OBJETOS,duplicarObj(aux),NULL);
+                deletar(aux,true);
                 return true;
 
             }
@@ -318,7 +318,7 @@ void ListaObjetos::removeAll(){
 
             }
             prox = aux->getProx();
-            deletar(aux);
+            deletar(aux,true);
             aux = prox;
         }else{
 
@@ -326,7 +326,7 @@ void ListaObjetos::removeAll(){
 
         }
     }
-    desfazer->insere(REMOCAO_OBJETOS,refOut);
+    desfazer->insere(REMOCAO_OBJETOS,refOut,NULL);
     tamSelect = 0;
 
 }
@@ -388,12 +388,12 @@ void ListaObjetos::desfazerAcao(Ponto *MBRSelect){
 
                 if(obj->getSelecionado()){
 
-                    deletar(obj);
+                    deletar(obj,false);
                     refObj = refObj->getProx();
                     recalculaMBRSelect(MBRSelect);
                 }else{
 
-                    deletar(obj);
+                    deletar(obj,false);
                     refObj = refObj->getProx();
 
                 }
@@ -401,7 +401,8 @@ void ListaObjetos::desfazerAcao(Ponto *MBRSelect){
             }
 
         }
-        refazer->insere(REMOCAO_OBJETOS, aux->getObjs());
+        refazer->insere(REMOCAO_OBJETOS, aux->getObjs(),NULL);
+        delete aux;
 
     }else if(aux->getAcao() == REMOCAO_OBJETOS){
 
@@ -424,8 +425,42 @@ void ListaObjetos::desfazerAcao(Ponto *MBRSelect){
             refObj = refObj->getProx();
 
         }
-        refazer->insere(ADICAO_OBJETOS,aux->getObjs());
+        refazer->insere(ADICAO_OBJETOS,aux->getObjs(),NULL);
+        delete aux;
 
+    }else if(aux->getAcao() == MOVIMENTACAO_OBJETOS){
+
+        /**Trata para desfazer a acao de mover objetos selecionados, ou seja, os move no sentido oposto**/
+        Objeto3D *refObj = aux->getObjs();
+        float x,y,z;
+        x = -aux->getVetDes()->x;
+        y = -aux->getVetDes()->y;
+        z = -aux->getVetDes()->z;
+        Objeto3D *obj = NULL;
+        while(refObj != NULL){
+
+            obj = indexId->busca(refObj->getId());
+            if(obj->getObjeto() == SPHERE || obj->getObjeto() == BASE){
+
+                obj->setCentro(obj->getCentro()->x + x,obj->getCentro()->y + y,obj->getCentro()->z + z);
+                obj->setMBR(obj->getMBR()[0].x + x,obj->getMBR()[0].y + y,obj->getMBR()[0].z + z,obj->getMBR()[1].x + x,obj->getMBR()[1].y + y,obj->getMBR()[1].z + z);
+
+
+            }else{
+
+                if(indexId->busca(obj->getExtremidades()[0])->getSelecionado() && indexId->busca(obj->getExtremidades()[1])->getSelecionado()){
+
+                    obj->setMBR(obj->getMBR()[0].x + x,obj->getMBR()[0].y + y,obj->getMBR()[0].z + z,obj->getMBR()[1].x + x,obj->getMBR()[1].y + y,obj->getMBR()[1].z + z);
+
+                }
+
+            }
+
+            refObj = refObj->getProx();
+
+        }
+        refazer->insere(MOVIMENTACAO_OBJETOS,aux->getObjs(),aux->getVetDes());
+        delete aux;
     }
 
 }
@@ -444,19 +479,20 @@ void ListaObjetos::refazerAcao(Ponto *MBRSelect){
             if(obj->getSelecionado()){
 
                 indexId->remover(refObj->getId());
-                deletar(obj);
+                deletar(obj,false);
                 recalculaMBRSelect(MBRSelect);
 
             }else{
 
                 indexId->remover(refObj->getId());
-                deletar(obj);
+                deletar(obj,false);
 
             }
             refObj = refObj->getProx();
 
         }
-        desfazer->insere(REMOCAO_OBJETOS, aux->getObjs());
+        desfazer->insere(REMOCAO_OBJETOS, aux->getObjs(),NULL);
+        delete aux;
 
     }else if(aux->getAcao() == REMOCAO_OBJETOS){
 
@@ -478,8 +514,42 @@ void ListaObjetos::refazerAcao(Ponto *MBRSelect){
 
             refObj = refObj->getProx();
         }
-        desfazer->insere(ADICAO_OBJETOS, aux->getObjs());
+        desfazer->insere(ADICAO_OBJETOS, aux->getObjs(),NULL);
+        delete aux;
 
+    }else if(aux->getAcao() == MOVIMENTACAO_OBJETOS){
+
+        /**Trata para refazer a acao de mover objetos selecionados, ou seja, os move novamente**/
+        Objeto3D *refObj = aux->getObjs();
+        float x,y,z;
+        x = aux->getVetDes()->x;
+        y = aux->getVetDes()->y;
+        z = aux->getVetDes()->z;
+        Objeto3D *obj = NULL;
+        while(refObj != NULL){
+
+            obj = indexId->busca(refObj->getId());
+            if(obj->getObjeto() == SPHERE || obj->getObjeto() == BASE){
+
+                obj->setCentro(obj->getCentro()->x + x,obj->getCentro()->y + y,obj->getCentro()->z + z);
+                obj->setMBR(obj->getMBR()[0].x + x,obj->getMBR()[0].y + y,obj->getMBR()[0].z + z,obj->getMBR()[1].x + x,obj->getMBR()[1].y + y,obj->getMBR()[1].z + z);
+
+
+            }else{
+
+                if(indexId->busca(obj->getExtremidades()[0])->getSelecionado() && indexId->busca(obj->getExtremidades()[1])->getSelecionado()){
+
+                    obj->setMBR(obj->getMBR()[0].x + x,obj->getMBR()[0].y + y,obj->getMBR()[0].z + z,obj->getMBR()[1].x + x,obj->getMBR()[1].y + y,obj->getMBR()[1].z + z);
+
+                }
+
+            }
+
+            refObj = refObj->getProx();
+
+        }
+        desfazer->insere(MOVIMENTACAO_OBJETOS,aux->getObjs(),aux->getVetDes());
+        delete aux;
     }
 
 }
@@ -521,6 +591,8 @@ Ponto* ListaObjetos::setFocusToSelect(){
 bool ListaObjetos::moveSelect(float x, float y, float z){
 
     Objeto3D *aux = pri;
+    Objeto3D *refOut = NULL;
+    Objeto3D *prox = NULL;
     if(tamSelect <= 0){
 
         return false;
@@ -534,12 +606,36 @@ bool ListaObjetos::moveSelect(float x, float y, float z){
 
                 aux->setCentro(aux->getCentro()->x + x,aux->getCentro()->y + y,aux->getCentro()->z + z);
                 aux->setMBR(aux->getMBR()[0].x + x,aux->getMBR()[0].y + y,aux->getMBR()[0].z + z,aux->getMBR()[1].x + x,aux->getMBR()[1].y + y,aux->getMBR()[1].z + z);
+                if(refOut == NULL){
+
+                    refOut = duplicarObj(aux);
+
+                }else{
+
+                    prox = duplicarObj(aux);
+                    refOut->setAnt(prox);
+                    prox->setProx(refOut);
+                    refOut = prox;
+
+                }
 
             }else{
 
                 if(indexId->busca(aux->getExtremidades()[0])->getSelecionado() && indexId->busca(aux->getExtremidades()[1])->getSelecionado()){
 
                     aux->setMBR(aux->getMBR()[0].x + x,aux->getMBR()[0].y + y,aux->getMBR()[0].z + z,aux->getMBR()[1].x + x,aux->getMBR()[1].y + y,aux->getMBR()[1].z + z);
+                    if(refOut == NULL){
+
+                        refOut = duplicarObj(aux);
+
+                    }else{
+
+                        prox = duplicarObj(aux);
+                        refOut->setAnt(prox);
+                        prox->setProx(refOut);
+                        refOut = prox;
+
+                    }
 
                 }
 
@@ -548,6 +644,11 @@ bool ListaObjetos::moveSelect(float x, float y, float z){
         }
         aux = aux->getProx();
     }
+    Ponto vetDes;
+    vetDes.x = x;
+    vetDes.y = y;
+    vetDes.z = z;
+    desfazer->insere(MOVIMENTACAO_OBJETOS, refOut, &vetDes);
     return true;
 }
 void ListaObjetos::recalculaMBRSelect(Ponto* MBRSelect){
@@ -630,7 +731,7 @@ void ListaObjetos::addSphere(float x, float y, float z){
     pri->setId(idDis);
     idDis++;
     indexId->insere(pri->getId(),pri);
-    desfazer->insere(ADICAO_OBJETOS,duplicarObj(pri));
+    desfazer->insere(ADICAO_OBJETOS,duplicarObj(pri),NULL);
     refazer->clear();
     tam++;
 
@@ -762,7 +863,7 @@ bool ListaObjetos::addBar(int tipoBar){
     objId2->addExtremidades(idDis);
     idDis++;
     indexId->insere(pri->getId(),pri);
-    desfazer->insere(ADICAO_OBJETOS,duplicarObj(pri));
+    desfazer->insere(ADICAO_OBJETOS,duplicarObj(pri),NULL);
     refazer->clear();
     tam++;
     return true;
@@ -844,23 +945,23 @@ bool ListaObjetos::moveObj(int id, float x, float y, float z){
     }
     return true;
 }
-void ListaObjetos::deletar(Objeto3D *p){
+void ListaObjetos::deletar(Objeto3D *p, bool completo){
 
     if(p != NULL){
 
-        if(p->getObjeto() == SPHERE){
+        if(p->getObjeto() == SPHERE && completo){
 
             if(p->getTamExtremidades() > 0){
 
                 for(int i = 0; i < p->getTamExtremidades(); i++){
 
-                    deletar(indexId->busca(p->getExtremidades()[i]));///Como uma esfera nao se liga a outra esfera, a recursão não entrará em loop
+                    deletar(indexId->busca(p->getExtremidades()[i]),completo);///Como uma esfera nao se liga a outra esfera, a recursão não entrará em loop
 
                 }
 
             }
-            p->setObjeto(BAR_SMALL);///Usado apenas para que a chamada recursiva entre no primeiro if
-            deletar(p);
+            p->setObjeto(BAR_SMALL);///Usado apenas para que a chamada recursiva entre no else do primeiro if
+            deletar(p, completo);
 
         }
         else{
@@ -1013,7 +1114,7 @@ bool ListaObjetos::duplicaSelect(){
         pri->setSelecionado(true);
         aux = aux->getProx();
     }
-    desfazer->insere(ADICAO_OBJETOS,refDesfazer);
+    desfazer->insere(ADICAO_OBJETOS,refDesfazer,NULL);
     while(refOut != NULL){
 
         prox = refOut->getProx();
@@ -1049,8 +1150,137 @@ void ListaObjetos::addBase(float x, float y, float z){
     pri->setId(idDis);
     idDis++;
     indexId->insere(pri->getId(),pri);
-    desfazer->insere(ADICAO_OBJETOS,duplicarObj(pri));
+    desfazer->insere(ADICAO_OBJETOS,duplicarObj(pri),NULL);
     refazer->clear();
     tam++;
+
+}
+bool ListaObjetos::addLaje(){
+
+    if(tamSelect != 4){
+
+        return false;
+
+    }
+    Objeto3D *obj0 = NULL;
+    Objeto3D *obj1 = NULL;
+    Objeto3D *obj2 = NULL;
+    Objeto3D *obj3 = NULL;
+    Objeto3D *sph0 = NULL;
+    Objeto3D *sph1 = NULL;
+    Objeto3D *sph2 = NULL;
+    Objeto3D *sph3 = NULL;
+    Objeto3D *aux = pri;
+
+    while(aux != NULL){
+
+        if(aux->getSelecionado()){
+
+            if(obj0 == NULL && aux->getObjeto() == SPHERE){
+
+                obj0 = aux;
+
+            }else if(obj1 == NULL && aux->getObjeto() == SPHERE){
+
+                obj1 = aux;
+
+            }else if(obj2 == NULL && aux->getObjeto() == SPHERE){
+
+                obj2 = aux;
+
+            }else if(obj3 == NULL && aux->getObjeto() == SPHERE){
+
+                obj3 = aux;
+                break;
+
+            }else{
+
+                return false;
+
+            }
+
+        }
+        aux = aux->getProx();
+    }
+    sph0 = obj0;
+    ///Definir a posicao o segundo vertice nos
+    if(distancia(obj0->getCentro(),obj1->getCentro()) >= (BAR_LENGTH_SMALL + 2*SPHERE_RADIUS - 0.01) && distancia(obj0->getCentro(),obj1->getCentro()) <= (BAR_LENGTH_SMALL + 2*SPHERE_RADIUS + 0.01)){
+
+        sph1 = obj1;
+
+    }else if(distancia(obj0->getCentro(),obj2->getCentro()) >= (BAR_LENGTH_SMALL + 2*SPHERE_RADIUS - 0.01) && distancia(obj0->getCentro(),obj2->getCentro()) <= (BAR_LENGTH_SMALL + 2*SPHERE_RADIUS + 0.01)){
+
+
+        sph1 = obj2;
+
+    }
+    else if(distancia(obj0->getCentro(),obj3->getCentro()) >= (BAR_LENGTH_SMALL + 2*SPHERE_RADIUS - 0.01) && distancia(obj0->getCentro(),obj3->getCentro()) <= (BAR_LENGTH_SMALL + 2*SPHERE_RADIUS + 0.01)){
+
+        sph1 = obj3;
+
+    }else{
+
+        return false;
+
+    }
+    ///Definindo o terceiro ponto
+    if(distancia(sph1->getCentro(),obj1->getCentro()) >= (BAR_LENGTH_LARGE + 2*SPHERE_RADIUS - 0.01) && distancia(sph1->getCentro(),obj1->getCentro()) <= (BAR_LENGTH_LARGE + 2*SPHERE_RADIUS + 0.01)){
+
+        sph2 = obj1;
+
+    }else if(distancia(sph1->getCentro(),obj2->getCentro()) >= (BAR_LENGTH_LARGE + 2*SPHERE_RADIUS - 0.01) && distancia(sph1->getCentro(),obj2->getCentro()) <= (BAR_LENGTH_LARGE + 2*SPHERE_RADIUS + 0.01)){
+
+        sph2 = obj2;
+
+    }else if(distancia(sph1->getCentro(),obj3->getCentro()) >= (BAR_LENGTH_LARGE + 2*SPHERE_RADIUS - 0.01) && distancia(sph1->getCentro(),obj3->getCentro()) <= (BAR_LENGTH_LARGE + 2*SPHERE_RADIUS + 0.01)){
+
+        sph2 = obj3;
+
+    }else{
+
+        return false;
+
+    }
+    ///Definindo o quarto ponto
+    if(distancia(sph2->getCentro(),obj1->getCentro()) >= (BAR_LENGTH_SMALL + 2*SPHERE_RADIUS - 0.01) && distancia(sph2->getCentro(),obj1->getCentro()) <= (BAR_LENGTH_SMALL + 2*SPHERE_RADIUS + 0.01)){
+
+        sph3 = obj1;
+
+    }else if(distancia(sph2->getCentro(),obj2->getCentro()) >= (BAR_LENGTH_SMALL + 2*SPHERE_RADIUS - 0.01) && distancia(sph2->getCentro(),obj2->getCentro()) <= (BAR_LENGTH_SMALL + 2*SPHERE_RADIUS + 0.01)){
+
+        sph3 = obj2;
+
+    }else if(distancia(sph2->getCentro(),obj3->getCentro()) >= (BAR_LENGTH_SMALL + 2*SPHERE_RADIUS - 0.01) && distancia(sph2->getCentro(),obj3->getCentro()) <= (BAR_LENGTH_SMALL + 2*SPHERE_RADIUS + 0.01)){
+
+        sph3 = obj3;
+
+    }else{
+
+        return false;
+
+    }
+    if(distancia(sph3->getCentro(),sph0->getCentro()) < (BAR_LENGTH_LARGE + 2*SPHERE_RADIUS - 0.01) || distancia(sph3->getCentro(),sph0->getCentro()) > (BAR_LENGTH_LARGE + 2*SPHERE_RADIUS + 0.01)){
+
+        return false;
+
+    }
+    aux = new Objeto3D();
+    aux->setProx(pri);
+    pri->setAnt(aux);
+    aux->setObjeto(LAJE);
+    aux->addExtremidades(sph0->getId());
+    aux->addExtremidades(sph1->getId());
+    aux->addExtremidades(sph2->getId());
+    aux->addExtremidades(sph3->getId());
+    pri = aux;
+    pri->setId(idDis);
+    idDis++;
+    tam++;
+    desfazer->insere(ADICAO_OBJETOS, duplicarObj(pri),NULL);
+    return true;
+}
+float ListaObjetos::distancia(Ponto *p, Ponto *n){
+
+    return sqrt(pow(p->x - n->x,2) + pow(p->y - n->y,2) + pow(p->z - n->z,2));
 
 }

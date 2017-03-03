@@ -356,6 +356,26 @@ extern "C"{
 	*	->Retorno: 'vazio'
 	**/
     void addBase(float x, float y, float z);
+    /**
+	*   ->Função getCentroMBRSelect:
+	*		Retorna o centro do MBRSelect
+	*	->Parâmetros: 'vazio'
+	*	->Retorno: 'Ponto*' centro do MBRSelect
+	**/
     Ponto* getCentroMBRSelect();
+    /**
+	*   ->Função addBase:
+	*		Adiciona uma laje na lista de objetos
+	*	->Parâmetros: 'vazio'
+	*	->Retorno: 'bool' se o objeto foi adicionado na lista de objetos
+	**/
+    bool addLaje();
+    /**
+	*   ->Função drawLaje:
+	*		Desenha uma laje entre p1 até p4, onde esses pontos são centros das esferas que ligam essa laje
+	*	->Parâmetros: 'p1','p2,'p3','p4', pontos dos "vertices" na laje
+	*	->Retorno: 'vazio'
+	**/
+    void drawLaje(Ponto *p1, Ponto *p2, Ponto *p3, Ponto *p4, bool selected);
 
 }

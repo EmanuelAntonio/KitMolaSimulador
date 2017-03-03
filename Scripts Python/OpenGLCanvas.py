@@ -462,6 +462,36 @@ class CanvasBase(glcanvas.GLCanvas):
         if self.dClickEvent:
             self.dClickEvent = False
 
+    def OnZoomIn(self):
+        if self.visionOption == Vars.VISION_Z_PERSP:
+            zoom = 0.5
+            self.camZoom -= zoom
+            if self.camZoom <= 0:
+                self.camZoom = 0.2
+        else:
+            zoom = 0.5
+            self.orthoZoom -= zoom
+            if self.orthoZoom <= 0:
+                self.orthoZoom = 0.2
+
+
+        self.parent.Refresh(False)
+
+    def OnZoomOut(self):
+        if self.visionOption == Vars.VISION_Z_PERSP:
+
+            zoom = 0.5
+
+            self.camZoom += zoom
+
+        else:
+            zoom = 0.5
+            self.orthoZoom += zoom
+
+
+
+        self.Refresh(False)
+
     """
         -> Função OnMouseScroll:
             Função para manipular o zoom da câmera assim que o scrool do mouse for ativado

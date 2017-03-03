@@ -122,12 +122,18 @@ class WindowClass(wx.Frame):
         duplicaId = wx.NewId()
         self.Bind(wx.EVT_MENU, self.OnDuplica, id = duplicaId)
 
+        #SHIFT + = zoom out
+        zoomOutId = wx.NewId()
+        self.Bind(wx.EVT_MENU, self.OnZoomOut, id = zoomOutId)
+
+
         accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord('Z'), undoId),
                                          (wx.ACCEL_CTRL | wx.ACCEL_SHIFT, ord('Z'), redoId),
                                          (wx.ACCEL_CTRL, ord('S'), saveId),
                                          (wx.ACCEL_CTRL, ord('O'), openId),
                                          (wx.ACCEL_CTRL, ord('A'), selectId),
-                                         (wx.ACCEL_SHIFT, ord('D'), duplicaId)
+                                         (wx.ACCEL_SHIFT, ord('D'), duplicaId),
+                                         (wx.ACCEL_SHIFT, ord('='), zoomOutId)
                                         ])
         self.SetAcceleratorTable(accel_tbl)
 
@@ -406,39 +412,51 @@ class WindowClass(wx.Frame):
 
         elif(e.GetKeyCode() == Vars.W_PRESS and Vars.moveObjetos):
 
+            delta = 0.1
+            if self.tabs.tabConfig.blockInsert[0]:
+                delta = self.tabs.tabConfig.blockInsert[1]
             if(Vars.ultimoDrawSelected.visionOption == 5):
-                Vars.KitLib.moveSelect(c_float(0.0), c_float(0.1), c_float(0.0))
+                Vars.KitLib.moveSelect(c_float(0.0), c_float(delta), c_float(0.0))
             elif(Vars.ultimoDrawSelected.visionOption != 0):
-                Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(0.1))
+                Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(delta))
 
         elif (e.GetKeyCode() == Vars.S_PRESS and Vars.moveObjetos):
 
+            delta = 0.1
+            if self.tabs.tabConfig.blockInsert[0]:
+                delta = self.tabs.tabConfig.blockInsert[1]
             if (Vars.ultimoDrawSelected.visionOption == 5):
-                Vars.KitLib.moveSelect(c_float(0.0), c_float(-0.1), c_float(0.0))
+                Vars.KitLib.moveSelect(c_float(0.0), c_float(-delta), c_float(0.0))
             elif(Vars.ultimoDrawSelected.visionOption != 0):
-                Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(-0.1))
+                Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(-delta))
 
         elif (e.GetKeyCode() == Vars.A_PRESS and Vars.moveObjetos):
+            delta = 0.1
+            if self.tabs.tabConfig.blockInsert[0]:
+                delta = self.tabs.tabConfig.blockInsert[1]
             if (Vars.ultimoDrawSelected.visionOption == 5):
-                Vars.KitLib.moveSelect(c_float(-0.1), c_float(0.0), c_float(0.0))
+                Vars.KitLib.moveSelect(c_float(-delta), c_float(0.0), c_float(0.0))
             elif(Vars.ultimoDrawSelected.visionOption == 1):
-                Vars.KitLib.moveSelect(c_float(0.0), c_float(-0.1), c_float(0.0))
+                Vars.KitLib.moveSelect(c_float(0.0), c_float(-delta), c_float(0.0))
             elif(Vars.ultimoDrawSelected.visionOption == 2):
-                Vars.KitLib.moveSelect(c_float(0.0), c_float(0.1), c_float(0.0))
+                Vars.KitLib.moveSelect(c_float(0.0), c_float(delta), c_float(0.0))
             elif(Vars.ultimoDrawSelected.visionOption == 3):
-                Vars.KitLib.moveSelect(c_float(0.1), c_float(0.0), c_float(0.0))
+                Vars.KitLib.moveSelect(c_float(delta), c_float(0.0), c_float(0.0))
             elif(Vars.ultimoDrawSelected.visionOption == 4):
-                Vars.KitLib.moveSelect(c_float(-0.1), c_float(0.0), c_float(0.0))
+                Vars.KitLib.moveSelect(c_float(-delta), c_float(0.0), c_float(0.0))
 
         elif (e.GetKeyCode() == Vars.D_PRESS and Vars.moveObjetos):
+            delta = 0.1
+            if self.tabs.tabConfig.blockInsert[0]:
+                delta = self.tabs.tabConfig.blockInsert[1]
             if (Vars.ultimoDrawSelected.visionOption == 5):
-                Vars.KitLib.moveSelect(c_float(0.1), c_float(0.0), c_float(0.0))
+                Vars.KitLib.moveSelect(c_float(delta), c_float(0.0), c_float(0.0))
             elif(Vars.ultimoDrawSelected.visionOption == 1):
-                Vars.KitLib.moveSelect(c_float(0.0), c_float(0.1), c_float(0.0))
+                Vars.KitLib.moveSelect(c_float(0.0), c_float(delta), c_float(0.0))
             elif(Vars.ultimoDrawSelected.visionOption == 2):
-                Vars.KitLib.moveSelect(c_float(0.0), c_float(-0.1), c_float(0.0))
+                Vars.KitLib.moveSelect(c_float(0.0), c_float(-delta), c_float(0.0))
             elif(Vars.ultimoDrawSelected.visionOption == 3):
-                Vars.KitLib.moveSelect(c_float(-0.1), c_float(0.0), c_float(0.0))
+                Vars.KitLib.moveSelect(c_float(-delta), c_float(0.0), c_float(0.0))
             elif(Vars.ultimoDrawSelected.visionOption == 4):
                 Vars.KitLib.moveSelect(c_float(0.1), c_float(0.0), c_float(0.0))
 
@@ -496,6 +514,10 @@ class WindowClass(wx.Frame):
                 self.tabs.Show(True)
                 self.boxMain.Layout()
                 self.tabs.SetFocus()
+        elif (e.GetKeyCode() == e.GetKeyCode() == Vars.NUM_PLUS):
+            Vars.ultimoDrawSelected.OnZoomOut()
+        elif (e.GetKeyCode() == e.GetKeyCode() == Vars.NUM_LESS or e.GetKeyCode() == e.GetKeyCode() == Vars.LESS_PRESS):
+            Vars.ultimoDrawSelected.OnZoomIn()
         else:
             print(e.GetKeyCode())
 
@@ -565,3 +587,7 @@ class WindowClass(wx.Frame):
         Vars.drawArea1.Refresh()
         Vars.drawArea2.Refresh()
         Vars.drawArea3.Refresh()
+
+    def OnZoomOut(self, e):
+        if(Vars.ultimoDrawSelected != None):
+            Vars.ultimoDrawSelected.OnZoomOut()

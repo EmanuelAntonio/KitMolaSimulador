@@ -26,8 +26,8 @@ except ImportError:
 
 class Vars(object):
 
-    version = "0.7"  # Variável de controle de versão
-    dateModificacao = "02/02/2017"  # Data da última atualização do programa
+    version = "0.7.1"  # Variável de controle de versão
+    dateModificacao = "03/02/2017"  # Data da última atualização do programa
     drawArea0 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
     drawArea1 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
     drawArea2 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
@@ -55,9 +55,9 @@ class Vars(object):
 
     ctypes.WinDLL('libs/freeglut.dll') #Importa a dll freeglut.dll, usado apenas no windows, a versão para linux não terá esta linha
     KitLib = ctypes.CDLL('libs/kitmola.dll')  # Variável que armazena uma referência ao núcleo do programa em C
-    KitLib.distObjsSelect.restype = KitLib.getEspacoGrid.restype = c_float
-    KitLib.getObjById.restype = POINTER(CObjeto3D)
-    KitLib.getCentroMBRSelect.restype = POINTER(CPonto)
+    KitLib.distObjsSelect.restype = KitLib.getEspacoGrid.restype = c_float # define o tipo de retorno da funcao
+    KitLib.getObjById.restype = POINTER(CObjeto3D) # define o tipo de retorno da funcao
+    KitLib.getCentroMBRSelect.restype = POINTER(CPonto) # define o tipo de retorno da funcao
 
     # Constantes
     SPHERE = 1
@@ -98,5 +98,8 @@ class Vars(object):
     N_4_PRESS = 52
     N_5_PRESS = 53
     ESC_PRESS = 27
+    NUM_PLUS = 388
+    NUM_LESS = 390
+    LESS_PRESS = 45
 
 

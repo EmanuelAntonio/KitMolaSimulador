@@ -349,6 +349,14 @@ extern "C"{
 
                 drawBase(aux->getCentro()->x, aux->getCentro()->y, aux->getCentro()->z, aux->getSelecionado(),visionAxis);
 
+            }else if(aux->getObjeto() == LAJE){
+
+                drawLaje(l->getbyId(aux->getExtremidades()[0])->getCentro(),
+                          l->getbyId(aux->getExtremidades()[1])->getCentro(),
+                          l->getbyId(aux->getExtremidades()[2])->getCentro(),
+                         l->getbyId(aux->getExtremidades()[3])->getCentro(),
+                          aux->getSelecionado());
+
             }
             aux = aux->getProx();
 
@@ -1101,6 +1109,39 @@ extern "C"{
         c->y = (MBRSelect[1].y + MBRSelect[0].y)/2.0;
         c->z = (MBRSelect[1].z + MBRSelect[0].z)/2.0;
         return c;
+
+    }
+    bool addLaje(){
+
+        return l->addLaje();
+
+    }
+    void drawLaje(Ponto *p1, Ponto *p2, Ponto *p3, Ponto *p4, bool selected){
+
+        GLfloat object_difusa[] = {1.0,1.0,1.0,0.5};
+        if(selected){
+
+            object_difusa[0] = 1.0;
+            object_difusa[1] = 0.3;
+            object_difusa[2] = 0.3;
+
+        }
+        glPushMatrix();
+
+            glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
+            glMaterialfv(GL_FRONT,GL_AMBIENT, object_ambient);
+            glMaterialfv(GL_FRONT, GL_SHININESS, object_brilho);
+            glMaterialfv(GL_FRONT, GL_SPECULAR, object_especular);
+            glBegin(GL_QUADS);
+
+                glVertex3f(p1->x,p1->y,p1->z);
+                glVertex3f(p2->x,p2->y,p1->z);
+                glVertex3f(p3->x,p3->y,p1->z);
+                glVertex3f(p4->x,p4->y,p1->z);
+
+            glEnd();
+
+        glPopMatrix();
 
     }
 }

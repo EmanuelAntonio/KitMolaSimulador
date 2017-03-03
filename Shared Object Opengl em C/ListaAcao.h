@@ -9,10 +9,10 @@ class ListaAcao
         ListaAcao();
         /**
         *   Função insere: insere uma acao na lista em forma de pilha
-        *   Parâmetros: 'acao', inteiro referente a qual acao ocorreu,'objs' lista de objetos que estao associados a esta acao
+        *   Parâmetros: 'acao', inteiro referente a qual acao ocorreu,'objs' lista de objetos que estao associados a esta acao, vetDes é o vetor deslocamento que é usado para movimentar um grupo de objetos
         *   Retorno: 'vazio'
         **/
-        void insere(int acao, Objeto3D *objs);
+        void insere(int acao, Objeto3D *objs, Ponto *vetDes);
         /**
         *   Função get: retorna a primeira posicao da pilha
         *   Parâmetros: 'vazio'
