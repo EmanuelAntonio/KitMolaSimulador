@@ -14,6 +14,7 @@ extern "C"{
     GLfloat object_ambient[] = {0.5,0.5,0.5,1.0};
     GLfloat object_brilho[]    = { 128.0 };
     GLfloat object_especular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat object_select[] = {0.0, 0.5, 1.0};
     float meshQual; /// Qualidade da malha
     bool wireframe; /// Variavel que armazena se será exibido em modo wireframe
 
@@ -25,6 +26,8 @@ extern "C"{
 	*	->Retorno: vazio
 	**/
     void init();
+
+    void initGL();
 	/**
 	*	->Função drawAxis:
 	*		Desenha os eixos cartesianos no centro do espaco R^3
@@ -59,7 +62,7 @@ extern "C"{
 	*	->Parâmetros: 'bool', se a esfera está selecionada, se estiver desenha de uma outra cor
 	*	->Retorno: vazio
 	**/
-    void drawSphereZero(bool selected);
+    void drawSphereZero(bool selected, GLfloat *object_difusa);
     /**
 	*   ->Função drawBar:
 	*		Desenha uma barra entre duas esferas de id1 e id2
@@ -73,7 +76,7 @@ extern "C"{
 	*	->Parâmetros: 'tamBar' tamanho da barra a ser desenhada
     *	->Retorno: 'vazio'
 	**/
-    void drawBarZero(Ponto *p1, Ponto *p2,float radius,int subdivisions,GLUquadricObj *quadric, bool selecionado);
+    void drawBarZero(Ponto *p1, Ponto *p2,float radius,int subdivisions,GLUquadricObj *quadric, bool selecionado, GLfloat *object_difusa);
     /**
 	*   ->Função drawSphere:
 	*		Desenha uma base em uma posicao do espaco
@@ -223,19 +226,19 @@ extern "C"{
     *   Parâmetros: 'vazio'
     *   Retorno: 'vazio'
     **/
-    void drawMoveAxis(char visionAxis);
+    void drawMoveAxis(char visionAxis, int visionOption, float zoom);
     /**
     *   Função drawMoveAxisZero: desenha os eixos de movimento dos objetos na cena na origem, eh usado em na funcao drawMoveAxis
     *   Parâmetros: 'vazio'
     *   Retorno: 'vazio'
     **/
-    void drawMoveAxisZero();
+    void drawMoveAxisZero(int visionOption, float zoom);
     /**
     *   Função drawSetaMove: desenha uma parte
     *   Parâmetros: 'vazio'
     *   Retorno: 'vazio'
     **/
-    void drawSetaMove();
+    void drawSetaMove(float zoom);
     /**
     *   Função resetMBRSelect: inicializa todos os parametros de MBRSelect com os valores maximos e minimos
     *   Parâmetros: 'vazio'
@@ -323,7 +326,7 @@ extern "C"{
 	*	->Parâmetros: 'vazio'
 	*	->Retorno: 'float' valor da variável
 	**/
-    float getMeshQual();
+    int getMeshQual();
     /**
 	*   ->Função getObjById:
 	*		Retorna um struct do tipo objeto com o 'id' passado como parâmetro

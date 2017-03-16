@@ -163,11 +163,12 @@ void ListaObjetos::clear(){
 int ListaObjetos::select(float x, float y, float z, Ponto* MBRSelect){
 
     Objeto3D *aux = pri;
+    float erro = 0.3;
     while(aux != NULL){
 
-        if((aux->getMBR()[0].x - 0.05 <= x) && (aux->getMBR()[0].y - 0.05 <= y) && (aux->getMBR()[0].z - 0.05 <= z)){
+        if((aux->getMBR()[0].x - erro <= x) && (aux->getMBR()[0].y - erro <= y) && (aux->getMBR()[0].z - erro <= z)){
 
-            if((aux->getMBR()[1].x + 0.05>= x) && (aux->getMBR()[1].y + 0.05 >= y) && (aux->getMBR()[1].z + 0.05 >= z)){
+            if((aux->getMBR()[1].x + erro>= x) && (aux->getMBR()[1].y + erro >= y) && (aux->getMBR()[1].z + erro >= z)){
 
                 aux->setSelecionado(!aux->getSelecionado());
                 if(aux->getSelecionado()){
@@ -377,7 +378,6 @@ void ListaObjetos::desfazerAcao(Ponto *MBRSelect){
     if(aux->getAcao() == ADICAO_OBJETOS){
 
         /**Trata para desfazer a acao de adicionar objetos, ou seja, os remove**/
-
         Objeto3D *refObj = aux->getObjs();
         Objeto3D *obj = NULL;
         while(refObj != NULL){
@@ -402,6 +402,7 @@ void ListaObjetos::desfazerAcao(Ponto *MBRSelect){
 
         }
         refazer->insere(REMOCAO_OBJETOS, aux->getObjs(),NULL);
+        recalculaMBRSelect(MBRSelect);
         delete aux;
 
     }else if(aux->getAcao() == REMOCAO_OBJETOS){
@@ -426,6 +427,7 @@ void ListaObjetos::desfazerAcao(Ponto *MBRSelect){
 
         }
         refazer->insere(ADICAO_OBJETOS,aux->getObjs(),NULL);
+        recalculaMBRSelect(MBRSelect);
         delete aux;
 
     }else if(aux->getAcao() == MOVIMENTACAO_OBJETOS){
@@ -459,6 +461,7 @@ void ListaObjetos::desfazerAcao(Ponto *MBRSelect){
             refObj = refObj->getProx();
 
         }
+        recalculaMBRSelect(MBRSelect);
         refazer->insere(MOVIMENTACAO_OBJETOS,aux->getObjs(),aux->getVetDes());
         delete aux;
     }
@@ -492,6 +495,7 @@ void ListaObjetos::refazerAcao(Ponto *MBRSelect){
 
         }
         desfazer->insere(REMOCAO_OBJETOS, aux->getObjs(),NULL);
+        recalculaMBRSelect(MBRSelect);
         delete aux;
 
     }else if(aux->getAcao() == REMOCAO_OBJETOS){
@@ -515,6 +519,7 @@ void ListaObjetos::refazerAcao(Ponto *MBRSelect){
             refObj = refObj->getProx();
         }
         desfazer->insere(ADICAO_OBJETOS, aux->getObjs(),NULL);
+        recalculaMBRSelect(MBRSelect);
         delete aux;
 
     }else if(aux->getAcao() == MOVIMENTACAO_OBJETOS){
@@ -549,6 +554,7 @@ void ListaObjetos::refazerAcao(Ponto *MBRSelect){
 
         }
         desfazer->insere(MOVIMENTACAO_OBJETOS,aux->getObjs(),aux->getVetDes());
+        recalculaMBRSelect(MBRSelect);
         delete aux;
     }
 
@@ -1274,6 +1280,7 @@ bool ListaObjetos::addLaje(){
     aux->addExtremidades(sph3->getId());
     pri = aux;
     pri->setId(idDis);
+    indexId->insere(idDis, pri);
     idDis++;
     tam++;
     desfazer->insere(ADICAO_OBJETOS, duplicarObj(pri),NULL);

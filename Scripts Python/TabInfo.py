@@ -94,10 +94,10 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
             Vars.KitLib.moveObjSelect(c_int(self.idUltObj), c_float(float(self.txtFocusX.GetValue())),
                                       c_float(float(self.txtFocusY.GetValue())),
                                       c_float(float(self.txtFocusZ.GetValue())))
-            Vars.drawArea0.Refresh()
-            Vars.drawArea1.Refresh()
-            Vars.drawArea2.Refresh()
-            Vars.drawArea3.Refresh()
+            self.parent.parent.drawArea0.Refresh()
+            self.parent.parent.drawArea1.Refresh()
+            self.parent.parent.drawArea2.Refresh()
+            self.parent.parent.drawArea3.Refresh()
         else:
             msg = "Selecione um objeto primeiro!\n"
             msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
@@ -108,10 +108,10 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
 
     def OnMoveObjSelect(self,e):
         Vars.KitLib.moveObjSelect(c_float(float(self.txtFocusX.GetValue())),c_float(float(self.txtFocusY.GetValue())),c_float(float(self.txtFocusZ.GetValue())))
-        Vars.drawArea0.Refresh()
-        Vars.drawArea1.Refresh()
-        Vars.drawArea2.Refresh()
-        Vars.drawArea3.Refresh()
+        self.parent.parent.drawArea0.Refresh()
+        self.parent.parent.drawArea1.Refresh()
+        self.parent.parent.drawArea2.Refresh()
+        self.parent.parent.drawArea3.Refresh()
         self.parent.SetFocus()
 
     def AlteraLayoutInfo(self, id, obj, centro, extId1, extId2):

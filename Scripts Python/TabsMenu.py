@@ -1,7 +1,6 @@
 # -*- coding: UTF-8 -*-
 
 from TabConfig import *
-from TabCam import *
 from TabTools import *
 from TabInfo import *
 
@@ -49,37 +48,3 @@ class Tabs(wx.Notebook):
         self.SetPageImage(0, imgObj)
         self.SetPageImage(1, imgTool)
         self.SetPageImage(2, imgConfig)
-
-################################################################################################################################################################################################
-
-"""
-    -> Classe CamOp:
-        Classe responsável pela manipulação de troca dos tipos de visão
-
-"""
-
-class CamOp(wx.Notebook):
-    """
-    Notebook class
-    """
-
-    # ----------------------------------------------------------------------
-    def __init__(self, parent):
-        wx.Notebook.__init__(self, parent, id=wx.ID_ANY, style=
-        #wx.BK_DEFAULT
-                             # wx.BK_TOP
-                             # wx.BK_BOTTOM
-                              wx.BK_LEFT
-                             # wx.BK_RIGHT
-                             )
-
-        # Create the first tab and add it to the notebook
-        self.tabCam = CamPanel(self)
-        #tabOne.SetBackgroundColour("Gray")
-        self.AddPage(self.tabCam, "Câmera")
-        imL = wx.ImageList(32,32)
-        # Adiciona os icones nas tabs
-        imgObj = imL.Add(wx.Bitmap('icones/cam.ico'))
-        self.AssignImageList(imL)
-        self.SetPageImage(0, imgObj)
-

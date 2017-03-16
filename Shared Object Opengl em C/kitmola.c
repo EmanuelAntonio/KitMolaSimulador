@@ -11,6 +11,33 @@ extern "C"{
         wireframe = false;
 
     }
+    void initGL(){
+
+        GLfloat object_difusa[] = {0.5,0.5,0.5,1.0};
+        GLfloat posLuz[] = {0.0,0.0,0.0,1.0};
+        glClearColor(0.5, 0.5, 0.5, 1.0);
+
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_NORMALIZE);
+        glEnable(GL_LIGHTING);
+
+        glShadeModel(GL_SMOOTH);
+
+        /*glEnable( GL_LINE_SMOOTH );
+        glEnable(GL_BLEND);
+        glEnable( GL_POLYGON_SMOOTH );
+        glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+        glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST );
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
+
+        glLightfv(GL_LIGHT0, GL_AMBIENT, object_ambient);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, object_difusa);
+        glLightfv(GL_LIGHT0, GL_POSITION, posLuz);
+
+        glEnable(GL_LIGHT0);
+
+    }
     void drawAxisZero(){
 
         glDisable(GL_LIGHTING);
@@ -256,15 +283,14 @@ extern "C"{
         return l->size();
 
     }
-    void drawSphereZero(bool selected){
+    void drawSphereZero(bool selected, GLfloat *object_difusa){
 
-        GLfloat object_difusa[] = {1.0,1.0,1.0,0.5};
         float resolucao = meshQual * 32;
         if(selected){
 
-            object_difusa[0] = 1.0;
-            object_difusa[1] = 0.3;
-            object_difusa[2] = 0.3;
+            object_difusa[0] = object_select[0];
+            object_difusa[1] = object_select[1];
+            object_difusa[2] = object_select[2];
 
         }
         if(wireframe){
@@ -279,30 +305,32 @@ extern "C"{
             glPushMatrix();
                 glPolygonMode(GL_FRONT,GL_LINE);
                 glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
-                glMaterialfv(GL_FRONT,GL_AMBIENT, object_ambient);
+                glMaterialfv(GL_FRONT, GL_AMBIENT,object_ambient);
                 glMaterialfv(GL_FRONT, GL_SHININESS, object_brilho);
                 glMaterialfv(GL_FRONT, GL_SPECULAR, object_especular);
                 GLUquadricObj *quadric;
                 quadric = gluNewQuadric();
+                gluQuadricOrientation(quadric, GLU_OUTSIDE);
                 gluSphere( quadric , SPHERE_RADIUS + 0.015, 16, 16);
                 gluDeleteQuadric(quadric);
                 glPolygonMode(GL_FRONT, GL_FILL);
             glPopMatrix();
 
-            object_difusa[0] = 1.0;
-            object_difusa[1] = 0.3;
-            object_difusa[2] = 0.3;
+            object_difusa[0] = object_select[0];
+            object_difusa[1] = object_select[1];
+            object_difusa[2] = object_select[2];
 
         }
         if(!wireframe){
 
             glPushMatrix();
                 glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
-                glMaterialfv(GL_FRONT,GL_AMBIENT, object_ambient);
+                glMaterialfv(GL_FRONT, GL_AMBIENT,object_ambient);
                 glMaterialfv(GL_FRONT, GL_SHININESS, object_brilho);
                 glMaterialfv(GL_FRONT, GL_SPECULAR, object_especular);
                 GLUquadricObj *quadric;
                 quadric = gluNewQuadric();
+                gluQuadricOrientation(quadric, GLU_OUTSIDE);
                 gluSphere( quadric , SPHERE_RADIUS , resolucao, resolucao);
                 gluDeleteQuadric(quadric);
             glPopMatrix();
@@ -327,7 +355,8 @@ extern "C"{
                 glTranslatef(x,z,y);
 
             }
-            drawSphereZero(selected);
+            GLfloat object_difusa[] = {1.0,0.397,0.397,1.0};
+            drawSphereZero(selected, object_difusa);
 
         glPopMatrix();
 
@@ -518,27 +547,28 @@ extern "C"{
         MBRSelect[1].z = -FLT_MAX;
 
     }
-    void drawMoveAxis(char visionAxis){
+    void drawMoveAxis(char visionAxis, int visionOption, float zoom){
 
         Ponto centro;
         centro.x = (MBRSelect[1].x + MBRSelect[0].x)/2.0;
         centro.y = (MBRSelect[1].y + MBRSelect[0].y)/2.0;
         centro.z = (MBRSelect[1].z + MBRSelect[0].z)/2.0;
 
-        float dx = 1.25;
-        float dy = 0.5;
-        float dz = 0.5;
+        float dx = 0.06*zoom*espacoGrid;
+        float dy = 0.02*zoom*espacoGrid;
+        float dz = 0.02*zoom*espacoGrid;
+        float dc = 0.2*zoom*espacoGrid;
 
         ///MBR para X
         MBRMoveX[0].x = MBRSelect[1].x + dx;
         MBRMoveX[0].y = centro.y - dy ;
         MBRMoveX[0].z = centro.z - dz;
 
-        MBRMoveX[1].x = MBRSelect[1].x + 5.0;
+        MBRMoveX[1].x = MBRSelect[1].x + dc;
         MBRMoveX[1].y = centro.y + dy;
         MBRMoveX[1].z = centro.z + dz;
 
-        MBRMoveX[2].x = MBRSelect[0].x - 5.0;
+        MBRMoveX[2].x = MBRSelect[0].x - dc;
         MBRMoveX[2].y = centro.y - dy;
         MBRMoveX[2].z = centro.z - dz;
 
@@ -547,19 +577,19 @@ extern "C"{
         MBRMoveX[3].z = centro.z + dz;
 
         ///MBR para Y
-        dx = 0.5;
-        dy = 1.25;
+        dx = 0.02*zoom*espacoGrid;
+        dy = 0.05*zoom*espacoGrid;
 
         MBRMoveY[0].x = centro.x - dx;
         MBRMoveY[0].y = MBRSelect[1].y + dy ;
         MBRMoveY[0].z = centro.z - dz;
 
         MBRMoveY[1].x = centro.x + dx;
-        MBRMoveY[1].y = MBRSelect[1].y + 5.0;
+        MBRMoveY[1].y = MBRSelect[1].y + dc;
         MBRMoveY[1].z = centro.z + dz;
 
         MBRMoveY[2].x = centro.x - dx;
-        MBRMoveY[2].y = MBRSelect[0].y - 5.0;
+        MBRMoveY[2].y = MBRSelect[0].y - dc;
         MBRMoveY[2].z = centro.z - dz;
 
         MBRMoveY[3].x = centro.x + dx;
@@ -567,8 +597,8 @@ extern "C"{
         MBRMoveY[3].z = centro.z + dz;
 
         ///MBR para Z
-        dy = 0.5;
-        dz = 1.25;
+        dy = 0.02*zoom*espacoGrid;
+        dz = 0.06*zoom*espacoGrid;
 
         MBRMoveZ[0].x = centro.x - dx;
         MBRMoveZ[0].y = centro.y - dy ;
@@ -576,12 +606,12 @@ extern "C"{
 
         MBRMoveZ[1].x = centro.x + dx;
         MBRMoveZ[1].y = centro.y + dy;
-        MBRMoveZ[1].z = MBRSelect[1].z + 5.0;
+        MBRMoveZ[1].z = MBRSelect[1].z + dc;
 
 
         MBRMoveZ[2].x = centro.x - dx;
         MBRMoveZ[2].y = centro.y - dy;
-        MBRMoveZ[2].z = MBRSelect[0].z - 5.0;
+        MBRMoveZ[2].z = MBRSelect[0].z - dc;
 
         MBRMoveZ[3].x = centro.x + dx;
         MBRMoveZ[3].y = centro.y + dy;
@@ -606,10 +636,10 @@ extern "C"{
             glRotatef(180,0.0,0.0,1.0);
 
         }
-        drawMoveAxisZero();
+        drawMoveAxisZero(visionOption, zoom*espacoGrid);
         glPopMatrix();
     }
-    void drawMoveAxisZero(){
+    void drawMoveAxisZero(int visionOption, float zoom){
 
         Ponto centro;
         centro.x = (MBRSelect[1].x - MBRSelect[0].x)/2.0;
@@ -619,64 +649,77 @@ extern "C"{
         glDisable(GL_LIGHTING);
 
         ///X
-        glPushMatrix();
+        if(visionOption != 1 && visionOption != 2){
 
-            glTranslatef(centro.x,0,0);
-            drawSetaMove();
+            glPushMatrix();
 
-            glTranslatef(-2*centro.x,0,0);
-            glRotatef(180.0,0.0,1.0,0.0);
-            drawSetaMove();
+                glTranslatef(centro.x,0,0);
+                drawSetaMove(zoom);
 
-        glPopMatrix();
+                glTranslatef(-2*centro.x,0,0);
+                glRotatef(180.0,0.0,1.0,0.0);
+                drawSetaMove(zoom);
+
+            glPopMatrix();
+
+        }
 
         ///Y
-        glPushMatrix();
+        if(visionOption != 3 && visionOption != 4){
 
-            glTranslatef(0,centro.y,0);
-            glRotatef(90.0,0.0,0.0,1.0);
-            drawSetaMove();
+            glPushMatrix();
 
-        glPopMatrix();
+                glTranslatef(0,centro.y,0);
+                glRotatef(90.0,0.0,0.0,1.0);
+                drawSetaMove(zoom);
 
-        glPushMatrix();
+            glPopMatrix();
 
-            glTranslatef(0,-centro.y,0);
-            glRotatef(-90.0,0.0,0.0,1.0);
-            drawSetaMove();
+            glPushMatrix();
 
-        glPopMatrix();
+                glTranslatef(0,-centro.y,0);
+                glRotatef(-90.0,0.0,0.0,1.0);
+                drawSetaMove(zoom);
 
-        ///Z
-        glPushMatrix();
+            glPopMatrix();
 
-            glTranslatef(0,0,centro.z);
-            glRotatef(-90.0,0.0,1.0,0.0);
-            drawSetaMove();
+        }
+        if(visionOption != 5){
 
-        glPopMatrix();
+            ///Z
+            glPushMatrix();
 
-        glPushMatrix();
+                glTranslatef(0,0,centro.z);
+                glRotatef(-90.0,0.0,1.0,0.0);
+                drawSetaMove(zoom);
 
-            glTranslatef(0,0,-centro.z);
-            glRotatef(90.0,0.0,1.0,0.0);
-            drawSetaMove();
+            glPopMatrix();
 
-        glPopMatrix();
+            glPushMatrix();
+
+                glTranslatef(0,0,-centro.z);
+                glRotatef(90.0,0.0,1.0,0.0);
+                drawSetaMove(zoom);
+
+            glPopMatrix();
+
+
+        }
 
         glEnable(GL_LIGHTING);
 
     }
-    void drawSetaMove(){
+    void drawSetaMove(float zoom){
 
-        float dx = 1.25;
-        float dy = 0.5;
-        float dz = 0.5;
+        float dx = 0.06*zoom;
+        float dy = 0.02*zoom;
+        float dz = 0.02*zoom;
+        float dc = 0.2*zoom;
         ///X
         glColor3f(0.69,0.933333,0.933333);
         glBegin(GL_TRIANGLE_FAN);
 
-            glVertex3f(5.0, 0, 0);
+            glVertex3f(dc, 0, 0);
             glVertex3f(dx, dy, dz);
             glVertex3f(dx,-dy, dz);
             glVertex3f(dx,-dy,-dz);
@@ -697,15 +740,15 @@ extern "C"{
         glColor3f(1.0,0.0,0.0);
         glBegin(GL_LINES);
 
-            glVertex3f(5, 0, 0);
+            glVertex3f(dc, 0, 0);
             glVertex3f(dx, dy, dz);
-            glVertex3f(5, 0, 0);
+            glVertex3f(dc, 0, 0);
             glVertex3f(dx,-dy, dz);
-            glVertex3f(5, 0, 0);
+            glVertex3f(dc, 0, 0);
             glVertex3f(dx,-dy,-dz);
-            glVertex3f(5, 0, 0);
+            glVertex3f(dc, 0, 0);
             glVertex3f(dx, dy,-dz);
-            glVertex3f(5, 0, 0);
+            glVertex3f(dc, 0, 0);
             glVertex3f(dx, dy, dz);
 
             glVertex3f(dx, dy, dz);
@@ -721,11 +764,14 @@ extern "C"{
             glVertex3f(dx, dy, dz);
 
         glEnd();
+        glBegin(GL_LINES);
+        glEnd();
 
     }
     int selectMoveSeta(double *ponto, char visionAxis){
 
         double x,y,z;
+        float erro = 0.2;
         if(visionAxis == 'z'){
 
             x = ponto[0];
@@ -746,49 +792,49 @@ extern "C"{
 
         }
 
-        if((x >= MBRMoveX[0].x) && (y >= MBRMoveX[0].y) && (z >= MBRMoveX[0].z)){
+        if((x >= MBRMoveX[0].x - erro) && (y >= MBRMoveX[0].y - erro) && (z >= MBRMoveX[0].z - erro)){
 
-            if((x <= MBRMoveX[1].x) && (y <= MBRMoveX[1].y) && (z <= MBRMoveX[1].z)){
+            if((x <= MBRMoveX[1].x + erro) && (y <= MBRMoveX[1].y + erro) && (z <= MBRMoveX[1].z + erro)){
 
                 return 0;
 
             }
 
-        }else if((x >= MBRMoveX[2].x) && (y >= MBRMoveX[2].y) && (z >= MBRMoveX[2].z)){
+        }else if((x >= MBRMoveX[2].x - erro) && (y >= MBRMoveX[2].y - erro) && (z >= MBRMoveX[2].z - erro)){
 
-            if((x <= MBRMoveX[3].x) && (y <= MBRMoveX[3].y) && (z <= MBRMoveX[3].z)){
+            if((x <= MBRMoveX[3].x + erro) && (y <= MBRMoveX[3].y + erro) && (z <= MBRMoveX[3].z + erro)){
 
                 return 1;
 
             }
 
-        }if((x >= MBRMoveY[0].x) && (y >= MBRMoveY[0].y) && (z >= MBRMoveY[0].z)){
+        }if((x >= MBRMoveY[0].x - erro ) && (y >= MBRMoveY[0].y - erro) && (z >= MBRMoveY[0].z - erro)){
 
-            if((x <= MBRMoveY[1].x) && (y <= MBRMoveY[1].y) && (z <= MBRMoveY[1].z)){
+            if((x <= MBRMoveY[1].x + erro) && (y <= MBRMoveY[1].y + erro) && (z <= MBRMoveY[1].z + erro)){
 
                 return 2;
 
             }
 
-        }else if((x >= MBRMoveY[2].x) && (y >= MBRMoveY[2].y) && (z >= MBRMoveY[2].z)){
+        }else if((x >= MBRMoveY[2].x - erro) && (y >= MBRMoveY[2].y - erro) && (z >= MBRMoveY[2].z) - erro){
 
-            if((x <= MBRMoveY[3].x) && (y <= MBRMoveY[3].y) && (z <= MBRMoveY[3].z)){
+            if((x <= MBRMoveY[3].x + erro) && (y <= MBRMoveY[3].y + erro) && (z <= MBRMoveY[3].z + erro)){
 
                 return 3;
 
             }
 
-        }if((x >= MBRMoveZ[0].x) && (y >= MBRMoveZ[0].y) && (z >= MBRMoveZ[0].z)){
+        }if((x >= MBRMoveZ[0].x - erro) && (y >= MBRMoveZ[0].y - erro) && (z >= MBRMoveZ[0].z) - erro){
 
-            if((x <= MBRMoveZ[1].x) && (y <= MBRMoveZ[1].y) && (z <= MBRMoveZ[1].z)){
+            if((x <= MBRMoveZ[1].x + erro) && (y <= MBRMoveZ[1].y + erro) && (z <= MBRMoveZ[1].z + erro)){
 
                 return 4;
 
             }
 
-        }else if((x >= MBRMoveZ[2].x) && (y >= MBRMoveZ[2].y) && (z >= MBRMoveZ[2].z)){
+        }else if((x >= MBRMoveZ[2].x - erro ) && (y >= MBRMoveZ[2].y - erro) && (z >= MBRMoveZ[2].z - erro)){
 
-            if((x <= MBRMoveZ[3].x) && (y <= MBRMoveZ[3].y) && (z <= MBRMoveZ[3].z)){
+            if((x <= MBRMoveZ[3].x + erro) && (y <= MBRMoveZ[3].y + erro) && (z <= MBRMoveZ[3].z + erro)){
 
                 return 5;
 
@@ -861,13 +907,27 @@ extern "C"{
             p2.z = objId2->getCentro()->y;
 
         }
+        float t = (SPHERE_RADIUS - 0.1)/l->distancia(&p1,&p2);
+        Ponto vetDir;
+        vetDir.x = p2.x - p1.x;
+        vetDir.y = p2.y - p1.y;
+        vetDir.z = p2.z - p1.z;
+        Ponto pReta = p1;
+        p1.x = pReta.x + vetDir.x*t;
+        p1.y = pReta.y + vetDir.y*t;
+        p1.z = pReta.z + vetDir.z*t;
+        t = 1.0 - t;
+        p2.x = pReta.x + vetDir.x*t;
+        p2.y = pReta.y + vetDir.y*t;
+        p2.z = pReta.z + vetDir.z*t;
         GLUquadricObj *quadric=gluNewQuadric();
         gluQuadricNormals(quadric, GLU_SMOOTH);
-        drawBarZero(&p1,&p2, BAR_RADIUS, resolucao, quadric, selecionado);
+        GLfloat object_difusa[] = {1.0,1.0,0.941176,1.0};
+        drawBarZero(&p1,&p2, BAR_RADIUS, resolucao, quadric, selecionado, object_difusa);
         gluDeleteQuadric(quadric);
 
     }
-    void drawBarZero(Ponto *p1, Ponto *p2,float radius,int subdivisions,GLUquadricObj *quadric,bool selecionado){
+    void drawBarZero(Ponto *p1, Ponto *p2,float radius,int subdivisions,GLUquadricObj *quadric,bool selecionado, GLfloat *object_difusa){
 
         if(p1->z > p2->z){
 
@@ -877,7 +937,6 @@ extern "C"{
 
         }
 
-        GLfloat object_difusa[] = {1.0,1.0,1.0,0.5};
         float vx = p2->x - p1->x;
         float vy = p2->y - p1->y;
         float vz = p2->z - p1->z;
@@ -894,9 +953,9 @@ extern "C"{
         float ry = vx*vz;
         if(selecionado){
 
-            object_difusa[0] = 1.0;
-            object_difusa[1] = 0.3;
-            object_difusa[2] = 0.3;
+            object_difusa[0] = object_select[0];
+            object_difusa[1] = object_select[1];
+            object_difusa[2] = object_select[2];
 
         }
         if(wireframe){
@@ -911,7 +970,7 @@ extern "C"{
 
                 glPolygonMode(GL_FRONT,GL_LINE);
                 glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
-                glMaterialfv(GL_FRONT,GL_AMBIENT, object_ambient);
+                glMaterialfv(GL_FRONT, GL_AMBIENT,object_ambient);
                 glMaterialfv(GL_FRONT, GL_SHININESS, object_brilho);
                 glMaterialfv(GL_FRONT, GL_SPECULAR, object_especular);
                 //draw the cylinder body
@@ -923,16 +982,16 @@ extern "C"{
                 glPolygonMode(GL_FRONT,GL_FILL);
 
             glPopMatrix();
-            object_difusa[0] = 1.0;
-            object_difusa[1] = 0.3;
-            object_difusa[2] = 0.3;
+            object_difusa[0] = object_select[0];
+            object_difusa[1] = object_select[1];
+            object_difusa[2] = object_select[2];
 
         }
         if(!wireframe){
             glPushMatrix();
 
                 glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
-                glMaterialfv(GL_FRONT,GL_AMBIENT, object_ambient);
+                glMaterialfv(GL_FRONT, GL_AMBIENT,object_ambient);
                 glMaterialfv(GL_FRONT, GL_SHININESS, object_brilho);
                 glMaterialfv(GL_FRONT, GL_SPECULAR, object_especular);
                 //draw the cylinder body
@@ -985,9 +1044,9 @@ extern "C"{
         meshQual = p;
 
     }
-    float getMeshQual(){
+    int getMeshQual(){
 
-        return meshQual;
+        return meshQual*100;
 
     }
     Objeto *getObjById(int id){
@@ -1078,22 +1137,40 @@ extern "C"{
             p1.z = y;
 
         }
-        GLdouble eq[] = {0.0,0.0,1.0,z};
+        GLdouble eq[] = {0.0,0.0,1.0,-z};
         if(visionAxis == 'y' || visionAxis == 'x'){
 
             eq[1] = 1.0;
             eq[2] = 0.0;
 
         }
+        GLfloat object_difusa[] = {0.528,0.8,0.514,1.0};
         glClipPlane(GL_CLIP_PLANE0,eq);
         glEnable(GL_CLIP_PLANE0);
-        drawSphere(x,y,z,selected,visionAxis);
+        glPushMatrix();
+
+            if(visionAxis == 'z'){
+
+                glTranslatef(x,y,z);
+
+            }else if(visionAxis == 'x'){
+
+                glTranslatef(y,z,x);
+
+            }else{
+
+                glTranslatef(x,z,y);
+
+            }
+            drawSphereZero(selected, object_difusa);
+
+        glPopMatrix();
         glDisable(GL_CLIP_PLANE0);
 
         GLUquadricObj *quadric=gluNewQuadric();
-        gluQuadricOrientation(quadric,GLU_INSIDE);
+        gluQuadricOrientation(quadric,GLU_OUTSIDE);
         gluQuadricNormals(quadric, GLU_SMOOTH);
-        drawBarZero(&p1,&p2,BASE_RADIUS,resolucao,quadric,selected);
+        drawBarZero(&p1,&p2,BASE_RADIUS,resolucao,quadric,selected, object_difusa);
         gluDeleteQuadric(quadric);
 
     }
@@ -1118,7 +1195,7 @@ extern "C"{
     }
     void drawLaje(Ponto *p1, Ponto *p2, Ponto *p3, Ponto *p4, bool selected){
 
-        GLfloat object_difusa[] = {1.0,1.0,1.0,0.5};
+        GLfloat object_difusa[] = {0.9296875,0.90625,0.6640625,1.0};
         if(selected){
 
             object_difusa[0] = 1.0;
@@ -1129,19 +1206,25 @@ extern "C"{
         glPushMatrix();
 
             glMaterialfv(GL_FRONT, GL_DIFFUSE,object_difusa);
-            glMaterialfv(GL_FRONT,GL_AMBIENT, object_ambient);
+            glMaterialfv(GL_FRONT, GL_AMBIENT,object_ambient);
             glMaterialfv(GL_FRONT, GL_SHININESS, object_brilho);
             glMaterialfv(GL_FRONT, GL_SPECULAR, object_especular);
             glBegin(GL_QUADS);
 
+                glNormal3f(0.0,0.0,-1.0);
                 glVertex3f(p1->x,p1->y,p1->z);
                 glVertex3f(p2->x,p2->y,p1->z);
                 glVertex3f(p3->x,p3->y,p1->z);
                 glVertex3f(p4->x,p4->y,p1->z);
 
+                glNormal3f(0.0,0.0,1.0);
+
+                glVertex3f(p4->x,p4->y,p1->z);
+                glVertex3f(p3->x,p3->y,p1->z);
+                glVertex3f(p2->x,p2->y,p1->z);
+                glVertex3f(p1->x,p1->y,p1->z);
             glEnd();
 
         glPopMatrix();
-
     }
 }

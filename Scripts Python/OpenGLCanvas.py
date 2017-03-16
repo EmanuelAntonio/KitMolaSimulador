@@ -52,16 +52,23 @@ class CanvasBase(glcanvas.GLCanvas):
         self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
         self.Bind(wx.EVT_MIDDLE_DOWN, self.OnScrollClick)
         self.Bind(wx.EVT_LEFT_DCLICK, self.OnDClick)
+        self.Bind(wx.EVT_MIDDLE_UP, self.OnScrollMotion)
 
+
+    def OnScrollMotion(self, e):
+        try:
+            self.ReleaseMouse()
+        except:
+            pass
     def OnDClick(self, e):
 
         self.dClickEvent = True
         if Vars.drawPrincipal == -1:
             Vars.drawPrincipal = self.numJanela
             if self.numJanela == 0:
-                Vars.drawArea1.Hide()
-                Vars.drawArea2.Hide()
-                Vars.drawArea3.Hide()
+                self.parent.drawArea1.Hide()
+                self.parent.drawArea2.Hide()
+                self.parent.drawArea3.Hide()
                 Vars.lineDown.Hide()
                 Vars.lineUp.Hide()
                 Vars.lineBox.Hide()
@@ -70,9 +77,9 @@ class CanvasBase(glcanvas.GLCanvas):
                 Vars.boxDraw.Layout()
 
             elif self.numJanela == 1:
-                Vars.drawArea0.Hide()
-                Vars.drawArea2.Hide()
-                Vars.drawArea3.Hide()
+                self.parent.drawArea0.Hide()
+                self.parent.drawArea2.Hide()
+                self.parent.drawArea3.Hide()
                 Vars.lineDown.Hide()
                 Vars.lineUp.Hide()
                 Vars.lineBox.Hide()
@@ -82,9 +89,9 @@ class CanvasBase(glcanvas.GLCanvas):
 
             elif self.numJanela == 2:
 
-                Vars.drawArea0.Hide()
-                Vars.drawArea1.Hide()
-                Vars.drawArea3.Hide()
+                self.parent.drawArea0.Hide()
+                self.parent.drawArea1.Hide()
+                self.parent.drawArea3.Hide()
                 Vars.lineDown.Hide()
                 Vars.lineUp.Hide()
                 Vars.lineBox.Hide()
@@ -94,9 +101,9 @@ class CanvasBase(glcanvas.GLCanvas):
 
             else:
 
-                Vars.drawArea0.Hide()
-                Vars.drawArea1.Hide()
-                Vars.drawArea2.Hide()
+                self.parent.drawArea0.Hide()
+                self.parent.drawArea1.Hide()
+                self.parent.drawArea2.Hide()
                 Vars.lineDown.Hide()
                 Vars.lineUp.Hide()
                 Vars.lineBox.Hide()
@@ -106,10 +113,10 @@ class CanvasBase(glcanvas.GLCanvas):
 
         else:
             Vars.drawPrincipal = -1
-            Vars.drawArea0.Show()
-            Vars.drawArea1.Show()
-            Vars.drawArea2.Show()
-            Vars.drawArea3.Show()
+            self.parent.drawArea0.Show()
+            self.parent.drawArea1.Show()
+            self.parent.drawArea2.Show()
+            self.parent.drawArea3.Show()
             Vars.lineDown.Show()
             Vars.lineUp.Show()
             Vars.lineBox.Show()
@@ -119,16 +126,11 @@ class CanvasBase(glcanvas.GLCanvas):
             Vars.boxUp.Layout()
             Vars.boxDraw.Layout()
 
-        Vars.drawArea0.Refresh()
-        Vars.drawArea1.Refresh()
-        Vars.drawArea2.Refresh()
-        Vars.drawArea3.Refresh()
+        self.parent.drawArea0.Refresh()
+        self.parent.drawArea1.Refresh()
+        self.parent.drawArea2.Refresh()
+        self.parent.drawArea3.Refresh()
         self.Refresh(True)
-        """if self.parent.IsFullScreen():
-            self.parent.ShowFullScreen(False)
-            self.parent.Maximize(True)
-        else:
-            self.parent.ShowFullScreen(True)"""
 
     """
         -> Função OnSize:
@@ -153,15 +155,21 @@ class CanvasBase(glcanvas.GLCanvas):
             self.init = True
         self.OnDraw()
 
-    def OnScrollClick(self,e):
+    def OnMouseDown(self,e):
+
+        if self.parent.botaoSelecionado == Vars.MOVETELA_SELECIONADO:
+            myCursor = wx.Cursor(r"icones/cursorMoveTelaClick.cur",
+                                 wx.BITMAP_TYPE_CUR)
+
+            self.SetCursor(myCursor)
         self.Refresh(False)
-        Vars.ultimoDrawSelected = self
+        self.parent.ultimoDrawSelected = self
         self.atualizaCentroFocus()
         self.x, self.y = e.GetPosition()
         ponto = Vars.KitLib.getPonto3D(c_int(self.x), c_int(self.y))
         if not(Vars.shiftPress):
             Vars.KitLib.deSelectAll()
-            Vars.moveObjetos = False
+            self.parent.moveObjetos = False
         idObj = Vars.KitLib.select(ponto, self.visionAxis)
         if idObj != 0:
             obj = Vars.KitLib.getObjById(idObj)
@@ -170,10 +178,10 @@ class CanvasBase(glcanvas.GLCanvas):
         else:
             self.parent.tabs.tabInfo.AlteraLayoutInfo(0, 0, None,None,None)
 
-        Vars.drawArea0.Refresh()
-        Vars.drawArea1.Refresh()
-        Vars.drawArea2.Refresh()
-        Vars.drawArea3.Refresh()
+        self.parent.drawArea0.Refresh()
+        self.parent.drawArea1.Refresh()
+        self.parent.drawArea2.Refresh()
+        self.parent.drawArea3.Refresh()
 
     def atualizaCentroFocus(self):
 
@@ -203,20 +211,20 @@ class CanvasBase(glcanvas.GLCanvas):
             self.parent.tabs.tabConfig.txtFocusZ.SetValue("0")
 
 
-    def OnMouseDown(self, evt):
-        Vars.ultimoDrawSelected = self
+    def OnScrollClick(self, evt):
+        self.parent.ultimoDrawSelected = self
         self.atualizaCentroFocus()
 
         Vars.toolBox.SetFocus()
         self.CaptureMouse()
         self.x, self.y = self.lastx, self.lasty = evt.GetPosition()
         Vars.centroAux = self.centro
-        if(Vars.moveObjetos):
+        if(self.parent.moveObjetos):
             ponto = Vars.KitLib.getPonto3D(c_int(self.x), c_int(self.y))
-            Vars.moveObjetosEixo = Vars.KitLib.selectMoveSeta(ponto, self.visionAxis)
-            if(Vars.moveObjetosEixo == -1):
+            self.parent.moveObjetosEixo = Vars.KitLib.selectMoveSeta(ponto, self.visionAxis)
+            if(self.parent.moveObjetosEixo == -1):
                 if(Vars.KitLib.MBRSelectPonto(ponto)):
-                    Vars.moveObjetosEixo = -2
+                    self.parent.moveObjetosEixo = -2
 
 
     def OnMouseUp(self, evt):
@@ -225,6 +233,11 @@ class CanvasBase(glcanvas.GLCanvas):
             self.dx = 0
             self.dy = 0
             self.dz = 0
+            if self.parent.botaoSelecionado == Vars.MOVETELA_SELECIONADO:
+                myCursor = wx.Cursor(r"icones/cursorMoveTela.cur",
+                                     wx.BITMAP_TYPE_CUR)
+
+                self.SetCursor(myCursor)
             self.ReleaseMouse()
         except:
             pass
@@ -264,7 +277,7 @@ class CanvasBase(glcanvas.GLCanvas):
     """
     def OnMouseMotion(self, evt):
 
-        if evt.Dragging() and evt.LeftIsDown() and not(self.dClickEvent):
+        if evt.Dragging() and evt.MiddleIsDown() and not(self.dClickEvent):
 
             self.lastx, self.lasty = self.x, self.y
             self.x, self.y = evt.GetPosition()
@@ -290,9 +303,9 @@ class CanvasBase(glcanvas.GLCanvas):
 
             else: #já que o control nao está pressionado, fará uma das opções de movimento abaixo
 
-                if(Vars.moveObjetos):#Se o usuário selecionou a opção de movimentar objetos.
+                if(self.parent.moveObjetos):#Se o usuário selecionou a opção de movimentar objetos.
 
-                    if Vars.moveObjetosEixo == -1: #Porém nenhum eixo de movimento foi clicado anteriormente e nem em um objeto selecionado
+                    if self.parent.moveObjetosEixo == -1: #Porém nenhum eixo de movimento foi clicado anteriormente e nem em um objeto selecionado
                         if self.visionOption == 0: #Logo se está no modo perspectiva, apenas altera os parâmetros das coordenadas esféricas
                             self.theta = self.theta + (self.lastx - self.x) / 100
                             self.phi = self.phi + (self.lasty - self.y) / 100
@@ -323,18 +336,18 @@ class CanvasBase(glcanvas.GLCanvas):
                             elif spaceGrid == 18.0:
                                 spaceGrid *= 0.4
 
-                            if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:#se o eixo dos X está selecionado
+                            if self.parent.moveObjetosEixo == 0 or self.parent.moveObjetosEixo == 1:#se o eixo dos X está selecionado
                                 if self.parent.tabs.tabConfig.blockInsert[0]:
                                     self.moveSelectX(-xDes,spaceGrid)
                                 else:
                                     Vars.KitLib.moveSelect(c_float(-xDes * spaceGrid), c_float(0.0), c_float(0.0))
 
-                            elif Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:#se o eixo dos y está selecionado
+                            elif self.parent.moveObjetosEixo == 2 or self.parent.moveObjetosEixo == 3:#se o eixo dos y está selecionado
                                 if self.parent.tabs.tabConfig.blockInsert[0]:
                                     self.moveSelectY(-yDes, spaceGrid)
                                 else:
                                     Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes*spaceGrid), c_float(0.0))
-                            elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:#se o eixo dos Z está selecionado
+                            elif self.parent.moveObjetosEixo == 4 or self.parent.moveObjetosEixo == 5:#se o eixo dos Z está selecionado
                                 if self.parent.tabs.tabConfig.blockInsert[0]:
                                     self.moveSelectZ(-zDes, spaceGrid)
                                 else:
@@ -353,17 +366,17 @@ class CanvasBase(glcanvas.GLCanvas):
                             elif spaceGrid == 18.0:
                                 spaceGrid *= 0.4
 
-                            if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:
+                            if self.parent.moveObjetosEixo == 0 or self.parent.moveObjetosEixo == 1:
                                 if self.parent.tabs.tabConfig.blockInsert[0]:
                                     self.moveSelectX(-xDes, spaceGrid)
                                 else:
                                     Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(0.0), c_float(0.0))
-                            elif Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:
+                            elif self.parent.moveObjetosEixo == 2 or self.parent.moveObjetosEixo == 3:
                                 if self.parent.tabs.tabConfig.blockInsert[0]:
                                     self.moveSelectY(yDes, spaceGrid)
                                 else:
                                     Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes*spaceGrid), c_float(0.0))
-                            elif Vars.moveObjetosEixo == -2:
+                            elif self.parent.moveObjetosEixo == -2:
                                 Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(yDes*spaceGrid), c_float(0.0))
 
                         elif self.visionOption == 1 or self.visionOption == 2:# agora, se está na visão de frente ou de trás, move os o objetos na direção correspondente
@@ -378,30 +391,30 @@ class CanvasBase(glcanvas.GLCanvas):
                                 spaceGrid *= 0.4
 
                             if self.visionOption == 1:
-                                if Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:
+                                if self.parent.moveObjetosEixo == 2 or self.parent.moveObjetosEixo == 3:
                                     if self.parent.tabs.tabConfig.blockInsert[0]:
                                         self.moveSelectY(-yDes, spaceGrid)
                                     else:
                                         Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes * spaceGrid), c_float(0.0))
-                                elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
+                                elif self.parent.moveObjetosEixo == 4 or self.parent.moveObjetosEixo == 5:
                                     if self.parent.tabs.tabConfig.blockInsert[0]:
                                         self.moveSelectZ(zDes, spaceGrid)
                                     else:
                                         Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
-                                elif Vars.moveObjetosEixo == -2:
+                                elif self.parent.moveObjetosEixo == -2:
                                         Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes*spaceGrid), c_float(zDes*spaceGrid))
                             else:
-                                if Vars.moveObjetosEixo == 2 or Vars.moveObjetosEixo == 3:
+                                if self.parent.moveObjetosEixo == 2 or self.parent.moveObjetosEixo == 3:
                                     if self.parent.tabs.tabConfig.blockInsert[0]:
                                         self.moveSelectY(yDes, spaceGrid)
                                     else:
                                         Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes*spaceGrid), c_float(0.0))
-                                elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
+                                elif self.parent.moveObjetosEixo == 4 or self.parent.moveObjetosEixo == 5:
                                     if self.parent.tabs.tabConfig.blockInsert[0]:
                                         self.moveSelectZ(zDes, spaceGrid)
                                     else:
                                         Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
-                                elif Vars.moveObjetosEixo == -2:
+                                elif self.parent.moveObjetosEixo == -2:
                                     Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes*spaceGrid), c_float(zDes*spaceGrid))
 
 
@@ -417,32 +430,33 @@ class CanvasBase(glcanvas.GLCanvas):
                                 spaceGrid *= 0.4
 
                             if self.visionOption == 3:
-                                if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:
+                                if self.parent.moveObjetosEixo == 0 or self.parent.moveObjetosEixo == 1:
                                     if self.parent.tabs.tabConfig.blockInsert[0]:
                                         self.moveSelectX(xDes, spaceGrid)
                                     else:
                                         Vars.KitLib.moveSelect(c_float(xDes*spaceGrid), c_float(0.0), c_float(0.0))
-                                elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
+                                elif self.parent.moveObjetosEixo == 4 or self.parent.moveObjetosEixo == 5:
                                     if self.parent.tabs.tabConfig.blockInsert[0]:
                                         self.moveSelectZ(zDes, spaceGrid)
                                     else:
                                         Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
-                                elif Vars.moveObjetosEixo == -2:
+                                elif self.parent.moveObjetosEixo == -2:
                                     Vars.KitLib.moveSelect(c_float(xDes*spaceGrid), c_float(0.0), c_float(zDes*spaceGrid))
                             else:
-                                if Vars.moveObjetosEixo == 0 or Vars.moveObjetosEixo == 1:
+                                if self.parent.moveObjetosEixo == 0 or self.parent.moveObjetosEixo == 1:
                                     if self.parent.tabs.tabConfig.blockInsert[0]:
                                         self.moveSelectX(-xDes, spaceGrid)
                                     else:
                                         Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(0.0), c_float(0.0))
-                                elif Vars.moveObjetosEixo == 4 or Vars.moveObjetosEixo == 5:
+                                elif self.parent.moveObjetosEixo == 4 or self.parent.moveObjetosEixo == 5:
                                     if self.parent.tabs.tabConfig.blockInsert[0]:
                                         self.moveSelectZ(zDes, spaceGrid)
                                     else:
                                         Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
-                                elif Vars.moveObjetosEixo == -2:
+                                elif self.parent.moveObjetosEixo == -2:
                                     Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(0.0), c_float(zDes*spaceGrid))
                     self.parent.tabs.tabInfo.alteraCentroMBR()
+                    self.parent.atualizaPrecisaSalvar(True)
                 else: #se a opção de movimentar objetos não foi selecionado pelo usuário
                     if self.visionOption == 0: #e está na visao perspectiva, apenas altera os parâmetros da coordenada esférica
                         self.theta = self.theta + (self.lastx - self.x) / 100
@@ -453,8 +467,8 @@ class CanvasBase(glcanvas.GLCanvas):
                            self.phi = 0.001
                     else: #se não, apenas altera os parametros da visão ortogonal
                         self.orthoCenter = (
-                            ((self.lasty - self.y) / 100) * c_float(Vars.KitLib.getEspacoGrid()).value + self.orthoCenter[0],
-                            ((self.lastx - self.x) / 100) * c_float(Vars.KitLib.getEspacoGrid()).value + self.orthoCenter[1])
+                            ((self.lasty - self.y) * self.orthoZoom * 0.5 / 200) * c_float(Vars.KitLib.getEspacoGrid()).value + self.orthoCenter[0],
+                            ((self.lastx - self.x) * self.orthoZoom * 0.5 / 200) * c_float(Vars.KitLib.getEspacoGrid()).value + self.orthoCenter[1])
 
             self.atualizaCentroFocus()
             self.Refresh(True)
@@ -499,11 +513,10 @@ class CanvasBase(glcanvas.GLCanvas):
         -> Retorno: vazio
     """
     def OnMouseScroll(self, evt):
-
         if self.visionOption == Vars.VISION_Z_PERSP:
 
             zoom = 0.5
-            if evt.GetWheelRotation() > 0:
+            if evt.GetWheelRotation() < 0:
 
                 self.camZoom += zoom
 
@@ -514,7 +527,7 @@ class CanvasBase(glcanvas.GLCanvas):
                     self.camZoom = 0.2
         else:
             zoom = 0.5
-            if evt.GetWheelRotation() > 0:
+            if evt.GetWheelRotation() < 0:
 
                 self.orthoZoom += zoom
 
@@ -548,7 +561,8 @@ class CanvasBase(glcanvas.GLCanvas):
         self.Refresh(True)
     def InitGL(self):
 
-        luzAmbiente = (0.2, 0.2, 0.2, 1.0)
+        Vars.KitLib.initGL()
+        """luzAmbiente = (0.2, 0.2, 0.2, 1.0)
         luzDifusa = (0.7, 0.7, 0.7, 1.0)
         glClearColor(0.5, 0.5, 0.5, 0.0)
 
@@ -558,19 +572,19 @@ class CanvasBase(glcanvas.GLCanvas):
         glEnable(GL_LIGHTING)
 
         glShadeModel(GL_SMOOTH)
-        """glEnable( GL_LINE_SMOOTH )
+        glEnable( GL_LINE_SMOOTH )
         glEnable(GL_BLEND)
         glEnable( GL_POLYGON_SMOOTH )
         glHint( GL_LINE_SMOOTH_HINT, GL_NICEST )
         glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST )
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)"""
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
 
         glLightfv(GL_LIGHT0, GL_AMBIENT, luzAmbiente)
         glLightfv(GL_LIGHT0, GL_DIFFUSE, luzDifusa)
         glLightfv(GL_LIGHT0, GL_POSITION, Vars.posLuz)
 
-        glEnable(GL_LIGHT0)
+        glEnable(GL_LIGHT0)"""
 
     def OnDraw(self):
 
@@ -591,7 +605,8 @@ class CanvasBase(glcanvas.GLCanvas):
             glViewport(0, 0, self.GetClientSize()[0], self.GetClientSize()[1])
             glMatrixMode(GL_PROJECTION)
             glLoadIdentity()
-            gluPerspective(60.0, self.GetClientSize()[0] / self.GetClientSize()[1], 0.01, 500*c_float(Vars.KitLib.getEspacoGrid()).value)
+            #gluPerspective(60.0, self.GetClientSize()[0] / self.GetClientSize()[1], 0.01, 500*c_float(Vars.KitLib.getEspacoGrid()).value)
+            gluPerspective(60.0, self.GetClientSize()[0] / self.GetClientSize()[1], 0.1,500*c_float(Vars.KitLib.getEspacoGrid()).value)
             glMatrixMode(GL_MODELVIEW)
             glLoadIdentity()
             gluLookAt(eye[0], eye[1], eye[2], self.centro[0], self.centro[1], self.centro[2], up[0], up[1], up[2])
@@ -629,7 +644,10 @@ class CanvasBase(glcanvas.GLCanvas):
         Vars.KitLib.drawAxis(self.visionAxis)
         Vars.KitLib.drawGrid(self.visionAxis)
 
-        if Vars.moveObjetos:
-            Vars.KitLib.drawMoveAxis(self.visionAxis)
+        if self.parent.moveObjetos and self.visionOption == 0:
+            Vars.KitLib.drawMoveAxis(self.visionAxis, self.visionOption, c_float(self.camZoom))
+        elif self.parent.moveObjetos:
+            Vars.KitLib.drawMoveAxis(self.visionAxis, self.visionOption, c_float(self.orthoZoom))
 
         self.SwapBuffers()
+

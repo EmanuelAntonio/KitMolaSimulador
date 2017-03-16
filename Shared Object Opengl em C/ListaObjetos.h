@@ -167,6 +167,7 @@ class ListaObjetos
         *   Retorno: 'vazio'
         **/
         bool duplicaSelect();
+        float distancia(Ponto *p, Ponto *n);
         int getNumSelect(){return tamSelect;}
         ~ListaObjetos();
     private:
@@ -183,7 +184,6 @@ class ListaObjetos
         *   Retorno: 'void'
         **/
         void deletar(Objeto3D *p, bool completo);
-        float distancia(Ponto *p, Ponto *n);
         Objeto3D *pri;
         int idDis; ///ID disponivel para a proxima inserção
         ListaAcao *desfazer;

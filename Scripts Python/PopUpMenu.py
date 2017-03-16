@@ -126,6 +126,7 @@ class RightMenu(wx.Menu):
             msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
             msgCx.ShowModal()
             msgCx.Destroy()
+            self.parent.parent.atualizaPrecisaSalvar(True)
 
     def OnZoomIn(self, e):
         self.parent.OnZoomIn()
@@ -135,11 +136,12 @@ class RightMenu(wx.Menu):
 
     def OnDuplicaSelect(self, e):
         if Vars.KitLib.duplicaSelect():
-            Vars.moveObjetos = True
-        Vars.drawArea0.Refresh()
-        Vars.drawArea1.Refresh()
-        Vars.drawArea2.Refresh()
-        Vars.drawArea3.Refresh()
+            self.parent.parent.moveObjetos = True
+        self.parent.parent.drawArea0.Refresh()
+        self.parent.parent.drawArea1.Refresh()
+        self.parent.parent.drawArea2.Refresh()
+        self.parent.parent.drawArea3.Refresh()
+        self.parent.parent.atualizaPrecisaSalvar(True)
 
     def OnAddSphere(self, e):
 
@@ -234,12 +236,13 @@ class RightMenu(wx.Menu):
 
                 Vars.KitLib.addSphere(ctypes.c_float(x), 0, ctypes.c_float(y))
 
-        Vars.drawArea0.Refresh(False)
-        Vars.drawArea1.Refresh(False)
-        Vars.drawArea2.Refresh(False)
-        Vars.drawArea3.Refresh(False)
+        self.parent.parent.drawArea0.Refresh(False)
+        self.parent.parent.drawArea1.Refresh(False)
+        self.parent.parent.drawArea2.Refresh(False)
+        self.parent.parent.drawArea3.Refresh(False)
         self.parent.parent.toolbar.EnableTool(wx.ID_UNDO, True)
         self.parent.parent.toolbar.EnableTool(wx.ID_REDO, False)
+        self.parent.parent.atualizaPrecisaSalvar(True)
 
     """
         -> Função OnPerspectiva:
@@ -252,7 +255,7 @@ class RightMenu(wx.Menu):
         self.parent.visionOption = 0
         Vars.visionItem.SetLabelText(Vars.visionModes[0])
         self.parent.visionAxis = Vars.ASCII_Z  # 122 Codigo ASCII para 'z'
-        self.parent.Refresh()
+        self.parent.Refresh(True)
 
     """
         -> Função OnTop:
@@ -264,8 +267,8 @@ class RightMenu(wx.Menu):
     def OnTop(self, evt):
         self.parent.visionOption = 5
         Vars.visionItem.SetLabelText(Vars.visionModes[5])
-        Vars.KitLib.setVisionAxis = Vars.ASCII_Z  # 122 Codigo ASCII para 'z'
-        self.parent.Refresh()
+        self.parent.visionAxis = Vars.ASCII_Z  # 122 Codigo ASCII para 'z'
+        self.parent.Refresh(True)
 
     """
         -> Função OnFront:
@@ -278,7 +281,7 @@ class RightMenu(wx.Menu):
         self.parent.visionOption = 1
         Vars.visionItem.SetLabelText(Vars.visionModes[1])
         self.parent.visionAxis = Vars.ASCII_X  # 120 Codigo ASCII para 'x'
-        self.parent.Refresh()
+        self.parent.Refresh(True)
 
     """
         -> Função OnBack:
@@ -290,8 +293,8 @@ class RightMenu(wx.Menu):
     def OnBack(self, evt):
         self.parent.visionOption = 2
         Vars.visionItem.SetLabelText(Vars.visionModes[2])
-        Vars.KitLib.setVisionAxis = Vars.ASCII_X  # 120 Codigo ASCII para 'x'
-        self.parent.Refresh()
+        self.parent.visionAxis = Vars.ASCII_X  # 120 Codigo ASCII para 'x'
+        self.parent.Refresh(True)
 
     """
         -> Função OnRight:
@@ -303,8 +306,8 @@ class RightMenu(wx.Menu):
     def OnRight(self, evt):
         self.parent.visionOption = 3
         Vars.visionItem.SetLabelText(Vars.visionModes[3])
-        Vars.KitLib.setVisionAxis = Vars.ASCII_Y  # 121 Codigo ASCII para 'y'
-        self.parent.Refresh()
+        self.parent.visionAxis = Vars.ASCII_Y  # 121 Codigo ASCII para 'y'
+        self.parent.Refresh(True)
 
     """
         -> Função OnLeft:
@@ -316,7 +319,7 @@ class RightMenu(wx.Menu):
     def OnLeft(self, evt):
         self.parent.visionOption = 4
         Vars.visionItem.SetLabelText(Vars.visionModes[4])
-        Vars.KitLib.setVisionAxis = Vars.ASCII_Y  # 121 Codigo ASCII para 'y'
+        self.parent.visionAxis = Vars.ASCII_Y  # 121 Codigo ASCII para 'y'
         self.parent.Refresh()
 
     """
@@ -381,7 +384,7 @@ class RightMenu(wx.Menu):
             Vars.toolBox.tabConfig.txtFocusX.SetValue(str(round(centro[0],3)))
             Vars.toolBox.tabConfig.txtFocusY.SetValue(str(round(centro[1],3)))
             Vars.toolBox.tabConfig.txtFocusZ.SetValue(str(round(centro[2],3)))
-        Vars.drawArea.Refresh()
+        self.parent.parent.ultimoDrawSelected.Refresh()
 
 
     """
@@ -405,10 +408,10 @@ class RightMenu(wx.Menu):
                 Vars.toolBox.tabConfig.txtFocusX.SetValue(str(round(-centro[0], 3)))
             Vars.toolBox.tabConfig.txtFocusY.SetValue(str(round(centro[1], 3)))
             Vars.toolBox.tabConfig.txtFocusZ.SetValue(str(round(centro[2], 3)))
-        Vars.drawArea0.Refresh()
-        Vars.drawArea1.Refresh()
-        Vars.drawArea2.Refresh()
-        Vars.drawArea3.Refresh()
+        self.parent.parent.drawArea0.Refresh()
+        self.parent.parent.drawArea1.Refresh()
+        self.parent.parent.drawArea2.Refresh()
+        self.parent.parent.drawArea3.Refresh()
 
     """
         -> Função OnAddBar:
@@ -426,13 +429,14 @@ class RightMenu(wx.Menu):
             msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
             msgCx.ShowModal()
             msgCx.Destroy()
-        Vars.drawArea0.Refresh()
-        Vars.drawArea1.Refresh()
-        Vars.drawArea2.Refresh()
-        Vars.drawArea3.Refresh()
+        self.parent.parent.drawArea0.Refresh()
+        self.parent.parent.drawArea1.Refresh()
+        self.parent.parent.drawArea2.Refresh()
+        self.parent.parent.drawArea3.Refresh()
         self.parent.Refresh()
         self.parent.parent.toolbar.EnableTool(wx.ID_UNDO, True)
         self.parent.parent.toolbar.EnableTool(wx.ID_REDO, False)
+        self.parent.parent.atualizaPrecisaSalvar(True)
 
     def OnAddLargeBar(self,e):
 
@@ -444,13 +448,14 @@ class RightMenu(wx.Menu):
             msgCx.ShowModal()
             msgCx.Destroy()
 
-        Vars.drawArea0.Refresh()
-        Vars.drawArea1.Refresh()
-        Vars.drawArea2.Refresh()
-        Vars.drawArea3.Refresh()
+        self.parent.parent.drawArea0.Refresh()
+        self.parent.parent.drawArea1.Refresh()
+        self.parent.parent.drawArea2.Refresh()
+        self.parent.parent.drawArea3.Refresh()
         self.parent.Refresh()
         self.parent.parent.toolbar.EnableTool(wx.ID_UNDO, True)
         self.parent.parent.toolbar.EnableTool(wx.ID_REDO, False)
+        self.parent.parent.atualizaPrecisaSalvar(True)
 
     def OnAddBase(self,e):
 
@@ -545,10 +550,11 @@ class RightMenu(wx.Menu):
 
                 Vars.KitLib.addBase(ctypes.c_float(x), 0, ctypes.c_float(y))
 
-        Vars.drawArea0.Refresh()
-        Vars.drawArea1.Refresh()
-        Vars.drawArea2.Refresh()
-        Vars.drawArea3.Refresh()
+        self.parent.parent.drawArea0.Refresh()
+        self.parent.parent.drawArea1.Refresh()
+        self.parent.parent.drawArea2.Refresh()
+        self.parent.parent.drawArea3.Refresh()
         self.parent.Refresh()
         self.parent.parent.toolbar.EnableTool(wx.ID_UNDO, True)
         self.parent.parent.toolbar.EnableTool(wx.ID_REDO, False)
+        self.parent.parent.atualizaPrecisaSalvar(True)
