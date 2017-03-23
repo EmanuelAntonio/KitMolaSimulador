@@ -606,7 +606,7 @@ class CanvasBase(glcanvas.GLCanvas):
             glMatrixMode(GL_PROJECTION)
             glLoadIdentity()
             #gluPerspective(60.0, self.GetClientSize()[0] / self.GetClientSize()[1], 0.01, 500*c_float(Vars.KitLib.getEspacoGrid()).value)
-            gluPerspective(60.0, self.GetClientSize()[0] / self.GetClientSize()[1], 0.1,500*c_float(Vars.KitLib.getEspacoGrid()).value)
+            gluPerspective(60.0, self.GetClientSize()[0] / self.GetClientSize()[1], 0.3,500*c_float(Vars.KitLib.getEspacoGrid()).value)
             glMatrixMode(GL_MODELVIEW)
             glLoadIdentity()
             gluLookAt(eye[0], eye[1], eye[2], self.centro[0], self.centro[1], self.centro[2], up[0], up[1], up[2])

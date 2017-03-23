@@ -253,7 +253,7 @@ class RightMenu(wx.Menu):
     """
     def OnPerspectiva(self, evt):
         self.parent.visionOption = 0
-        Vars.visionItem.SetLabelText(Vars.visionModes[0])
+        #Vars.visionItem.SetLabelText(Vars.visionModes[0])
         self.parent.visionAxis = Vars.ASCII_Z  # 122 Codigo ASCII para 'z'
         self.parent.Refresh(True)
 
@@ -266,7 +266,7 @@ class RightMenu(wx.Menu):
     """
     def OnTop(self, evt):
         self.parent.visionOption = 5
-        Vars.visionItem.SetLabelText(Vars.visionModes[5])
+        #Vars.visionItem.SetLabelText(Vars.visionModes[5])
         self.parent.visionAxis = Vars.ASCII_Z  # 122 Codigo ASCII para 'z'
         self.parent.Refresh(True)
 
@@ -279,7 +279,7 @@ class RightMenu(wx.Menu):
     """
     def OnFront(self, evt):
         self.parent.visionOption = 1
-        Vars.visionItem.SetLabelText(Vars.visionModes[1])
+        #Vars.visionItem.SetLabelText(Vars.visionModes[1])
         self.parent.visionAxis = Vars.ASCII_X  # 120 Codigo ASCII para 'x'
         self.parent.Refresh(True)
 
@@ -292,7 +292,7 @@ class RightMenu(wx.Menu):
     """
     def OnBack(self, evt):
         self.parent.visionOption = 2
-        Vars.visionItem.SetLabelText(Vars.visionModes[2])
+        #Vars.visionItem.SetLabelText(Vars.visionModes[2])
         self.parent.visionAxis = Vars.ASCII_X  # 120 Codigo ASCII para 'x'
         self.parent.Refresh(True)
 
@@ -305,7 +305,7 @@ class RightMenu(wx.Menu):
     """
     def OnRight(self, evt):
         self.parent.visionOption = 3
-        Vars.visionItem.SetLabelText(Vars.visionModes[3])
+        #Vars.visionItem.SetLabelText(Vars.visionModes[3])
         self.parent.visionAxis = Vars.ASCII_Y  # 121 Codigo ASCII para 'y'
         self.parent.Refresh(True)
 
@@ -318,7 +318,7 @@ class RightMenu(wx.Menu):
     """
     def OnLeft(self, evt):
         self.parent.visionOption = 4
-        Vars.visionItem.SetLabelText(Vars.visionModes[4])
+        #Vars.visionItem.SetLabelText(Vars.visionModes[4])
         self.parent.visionAxis = Vars.ASCII_Y  # 121 Codigo ASCII para 'y'
         self.parent.Refresh()
 
