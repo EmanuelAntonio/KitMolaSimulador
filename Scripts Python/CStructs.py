@@ -13,4 +13,4 @@ class CObjeto3D(Structure):
                 ("idExtremidades", POINTER(c_int * 16))]
 
 
-CObjeto3D.Extremidades = POINTER(c_int)
+CObjeto3D.Extremidades = POINTER(c_int*16)

@@ -94,10 +94,8 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
             Vars.KitLib.moveObjSelect(c_int(self.idUltObj), c_float(float(self.txtFocusX.GetValue())),
                                       c_float(float(self.txtFocusY.GetValue())),
                                       c_float(float(self.txtFocusZ.GetValue())))
-            Vars.drawArea0.Refresh()
-            Vars.drawArea1.Refresh()
-            Vars.drawArea2.Refresh()
-            Vars.drawArea3.Refresh()
+            self.parent.parent.OnRefreshAll()
+            Vars.KitLib.terminaMovimentacao()
         else:
             msg = "Selecione um objeto primeiro!\n"
             msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
@@ -108,10 +106,7 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
 
     def OnMoveObjSelect(self,e):
         Vars.KitLib.moveObjSelect(c_float(float(self.txtFocusX.GetValue())),c_float(float(self.txtFocusY.GetValue())),c_float(float(self.txtFocusZ.GetValue())))
-        Vars.drawArea0.Refresh()
-        Vars.drawArea1.Refresh()
-        Vars.drawArea2.Refresh()
-        Vars.drawArea3.Refresh()
+        self.parent.parent.OnRefreshAll()
         self.parent.SetFocus()
 
     def AlteraLayoutInfo(self, id, obj, centro, extId1, extId2):
@@ -148,6 +143,11 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
                 self.lblRaio.SetLabel(self.strRaio + str(Vars.BASE_RADIUS) + "cm")
                 self.lblCentro.SetLabel(self.strCentro + "(" + str(round(centro[0],3)) + "," +str(round(centro[1],3)) + "," + str(round(centro[2],3)) + ")")
                 self.lblTam.SetLabel(self.strTam + "---")
+            elif obj == Vars.LAJE:
+                self.lblTipo.SetLabel(self.strTipo + "Laje")
+                self.lblRaio.SetLabel(self.strRaio + str(Vars.BAR_RADIUS) + "cm")
+                self.lblTam.SetLabel(self.strTam + str(Vars.BAR_LENGTH_LARGE) + "cm")
+                self.lblCentro.SetLabel(self.strCentro + "(-,-,-)")
             self.lblId.SetLabel(self.strId + str(id))
             self.alteraCentroMBR()
         self.parent.SetFocus()

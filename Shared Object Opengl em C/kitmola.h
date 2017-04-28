@@ -1,12 +1,11 @@
 #include "include/GL/glut.h"
 #include "ListaObjetos.cpp"
 
-
 extern "C"{
 
     int tamGrid; ///Define o tamanho do grid a ser exibido na tela
     Ponto MBRSelect[2]; ///MBR que engloba todos os objetos que estao selecionados
-    ListaObjetos *l;
+    ListaObjetos *listObj;
     Ponto MBRMoveX[4]; ///MBR que engloba as setas de movimento no eixo X(posicoes 0 e 1 para positivo, 2 e 3 para negativo)
     Ponto MBRMoveY[4]; ///MBR que engloba as setas de movimento no eixo Y(posicoes 0 e 1 para positivo, 2 e 3 para negativo)
     Ponto MBRMoveZ[4]; ///MBR que engloba as setas de movimento no eixo Z(posicoes 0 e 1 para positivo, 2 e 3 para negativo)
@@ -14,8 +13,11 @@ extern "C"{
     GLfloat object_ambient[] = {0.5,0.5,0.5,1.0};
     GLfloat object_brilho[]    = { 128.0 };
     GLfloat object_especular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat object_select[] = {0.0, 0.5, 1.0};
     float meshQual; /// Qualidade da malha
     bool wireframe; /// Variavel que armazena se será exibido em modo wireframe
+    bool MBRAtivo; /// Variável que armazena se o programa irá mostrar as MBRs dos objetos
+    Ponto vetDeslocamento; ///Variável que armazena o deslocamento dos objetos, subistitui
 
 
     /**
@@ -25,6 +27,8 @@ extern "C"{
 	*	->Retorno: vazio
 	**/
     void init();
+
+    void initGL();
 	/**
 	*	->Função drawAxis:
 	*		Desenha os eixos cartesianos no centro do espaco R^3
@@ -52,35 +56,35 @@ extern "C"{
 	*	->Parâmetros: 'x','y','z' é a posição do centro da esfera e 'selected' se esta selecionada
 	*	->Retorno: vazio
 	**/
-    void drawSphere(float x, float y, float z, bool selected,char visionAxis);
+    void drawSphere(float x, float y, float z, bool selected,char visionAxis,int visionOption);
     /**
 	*   ->Função drawSphereZero:
 	*		Desenha uma esfera de ligacao na origem
 	*	->Parâmetros: 'bool', se a esfera está selecionada, se estiver desenha de uma outra cor
 	*	->Retorno: vazio
 	**/
-    void drawSphereZero(bool selected);
+    void drawSphereZero(bool selected, GLfloat *object_difusa);
     /**
 	*   ->Função drawBar:
 	*		Desenha uma barra entre duas esferas de id1 e id2
 	*	->Parâmetros: 'id1' 'id2', ids das esferas que ligam as  duas pontas da barra
 	*	->Retorno: 'vazio'
 	**/
-    void drawBar(int id1, int id2, bool selecionado,char visionAxis);
+    void drawBar(int id1, int id2, bool selecionado,char visionAxis,int visionOption);
     /**
 	*   ->Função drawBarZero:
 	*		Desenha uma barra na origem
 	*	->Parâmetros: 'tamBar' tamanho da barra a ser desenhada
     *	->Retorno: 'vazio'
 	**/
-    void drawBarZero(Ponto *p1, Ponto *p2,float radius,int subdivisions,GLUquadricObj *quadric, bool selecionado);
+    void drawBarZero(Ponto *p1, Ponto *p2,float radius,int subdivisions,GLUquadricObj *quadric, bool selecionado, GLfloat *object_difusa);
     /**
 	*   ->Função drawSphere:
 	*		Desenha uma base em uma posicao do espaco
 	*	->Parâmetros: 'x','y','z' é a posição do centro da semi-esfera e 'selected' se esta selecionada
 	*	->Retorno: vazio
 	**/
-    void drawBase(float x, float y, float z, bool selected,char visionAxis);
+    void drawBase(float x, float y, float z, bool selected,char visionAxis,int visionOption);
     /**
 	*   ->Função setTamGrid:
 	*		Altera a variável tamGrid
@@ -143,7 +147,7 @@ extern "C"{
 	*	->Parâmetros: 'double*' um ponto em R^3
 	*	->Retorno: 'bool' se o select encontrou algum objeto que corresponde ao ponto passado
 	**/
-    int select(double *ponto, char visionAxis);
+    int select(double *ponto, char visionAxis, int visionOption);
     /**
 	*   ->Função deSelectAll:
 	*       Desseleciona todos os objetos da cena
@@ -223,19 +227,19 @@ extern "C"{
     *   Parâmetros: 'vazio'
     *   Retorno: 'vazio'
     **/
-    void drawMoveAxis(char visionAxis);
+    void drawMoveAxis(char visionAxis, int visionOption, float zoom);
     /**
     *   Função drawMoveAxisZero: desenha os eixos de movimento dos objetos na cena na origem, eh usado em na funcao drawMoveAxis
     *   Parâmetros: 'vazio'
     *   Retorno: 'vazio'
     **/
-    void drawMoveAxisZero();
+    void drawMoveAxisZero(int visionOption, float zoom);
     /**
     *   Função drawSetaMove: desenha uma parte
     *   Parâmetros: 'vazio'
     *   Retorno: 'vazio'
     **/
-    void drawSetaMove();
+    void drawSetaMove(float zoom);
     /**
     *   Função resetMBRSelect: inicializa todos os parametros de MBRSelect com os valores maximos e minimos
     *   Parâmetros: 'vazio'
@@ -323,7 +327,7 @@ extern "C"{
 	*	->Parâmetros: 'vazio'
 	*	->Retorno: 'float' valor da variável
 	**/
-    float getMeshQual();
+    int getMeshQual();
     /**
 	*   ->Função getObjById:
 	*		Retorna um struct do tipo objeto com o 'id' passado como parâmetro
@@ -372,10 +376,50 @@ extern "C"{
     bool addLaje();
     /**
 	*   ->Função drawLaje:
+	*		Desenha uma laje entre p1 até p4, corrigindo a posição da laje de acordo com o visionAxis
+	*	->Parâmetros: 'visionAxis', de acordo com o eixo de visão selecionado pelo usuário esta função desenha a laje na rotação correta para cada eixo
+	*	->Retorno: 'vazio'
+	**/
+    void drawLaje(Ponto *p1, Ponto *p2, Ponto *p3, Ponto *p4, bool selected, char visionAxis,int visionOption);
+    /**
+	*   ->Função drawLajeZero:
 	*		Desenha uma laje entre p1 até p4, onde esses pontos são centros das esferas que ligam essa laje
 	*	->Parâmetros: 'p1','p2,'p3','p4', pontos dos "vertices" na laje
 	*	->Retorno: 'vazio'
 	**/
-    void drawLaje(Ponto *p1, Ponto *p2, Ponto *p3, Ponto *p4, bool selected);
+    void drawLajeZero(Ponto *p1, Ponto *p2, Ponto *p3, Ponto *p4);
+    /**
+	*   ->Função drawMBR:
+	*		Desenha uma boundbox com os pontos p1 e p2
+	*	->Parâmetros: 'p1','p2' pontos que compoem a MBR
+	*	->Retorno: 'vazio'
+	**/
+    void drawMBR(Ponto p1, Ponto p2);
+    /**
+    *   Função terminaMovimentacao: termina a ação de movimentar objetos, ou seja, adiciona a ação na lista de desfazer
+    *   Parâmetros: 'vazio'
+    *   Retorno: 'vazio'
+    **/
+    void terminaMovimentacao();
+    /**
+    *   Função cancelaMovimentacao: cancela a ação de movimentar objetos, ou seja, volta com os objetos as suas posições originais
+    *   Parâmetros: 'vazio'
+    *   Retorno: 'vazio'
+    **/
+    void cancelarMovimentacao();
+    /**
+	*   ->Função addDiag:
+	*		Adiciona uma diagonal na lista de objetos ligando duas eferas, ou uma esfera e uma base com ids 'id1' e 'id2'
+	*	->Parâmetros: 'tipoDiag' qual diagonal ira ser inserida
+	*	->Retorno: 'bool' se a adição foi realizada
+	**/
+    bool addDiag(int tipoDiag);
+    /**
+	*   ->Função drawDiag:
+	*		Desenha uma diagonal entre duas esferas de id1 e id2
+	*	->Parâmetros: 'id1' 'id2', ids das esferas que ligam as  duas pontas da diagonal
+	*	->Retorno: 'vazio'
+	**/
+    void drawDiag(int id1, int id2, bool selecionado,char visionAxis,int visionOption);
 
 }

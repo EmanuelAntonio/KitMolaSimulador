@@ -2,7 +2,12 @@
 #define LISTAOBJETOS_H
 #include "ListaAcao.cpp"
 #include "AVL.cpp"
-#include <math.h>
+#include "ManipularVetor.h"
+#include "Sphere.cpp"
+#include "Bar.cpp"
+#include "Base.cpp"
+#include "Laje.cpp"
+#include "Tirante.cpp"
 
 class ListaObjetos
 {
@@ -167,6 +172,18 @@ class ListaObjetos
         *   Retorno: 'vazio'
         **/
         bool duplicaSelect();
+        /**
+        *   Função terminaMovimentacao: termina a ação de movimentar objetos, ou seja, adiciona a ação na lista de desfazer
+        *   Parâmetros: 'Ponto' vetor deslocamento de toda a movimentação feita até o momento
+        *   Retorno: 'vazio'
+        **/
+        void terminaMovimentacao(Ponto vetDes);
+        /**
+        *   Função addDiagonal: Adiciona uma diagonal na lista de objetos da cena
+        *   Parâmetros: 'tipoDiag' constante referente ao tipo da barra que irá ser inserida, DIAGONAL_SMALL ou DIAGONAL_LARGE
+        *   Retorno: 'bool' se a diagonal foi adicionada a lista
+        **/
+        bool addDiagonal(int tipoDiag);
         int getNumSelect(){return tamSelect;}
         ~ListaObjetos();
     private:
@@ -183,7 +200,6 @@ class ListaObjetos
         *   Retorno: 'void'
         **/
         void deletar(Objeto3D *p, bool completo);
-        float distancia(Ponto *p, Ponto *n);
         Objeto3D *pri;
         int idDis; ///ID disponivel para a proxima inserção
         ListaAcao *desfazer;

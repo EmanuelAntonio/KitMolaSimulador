@@ -2,37 +2,20 @@
 
 import math
 from CStructs import *
-try:
-    import wx
-    from wx import glcanvas
-    import wx.lib.scrolledpanel
+import wx
+from wx import glcanvas
+import wx.lib.scrolledpanel
+from OpenGL.GLUT import *
+from OpenGL.GLU import *
+from OpenGL.GL import *
 
-    haveGLCanvas = True
-except ImportError:
-    haveGLCanvas = False
-
-try:
-    # The Python OpenGL package can be found at
-    # http://PyOpenGL.sourceforge.net/
-    from OpenGL.GLUT import *
-    from OpenGL.GLU import *
-    from OpenGL.GL import *
-
-    haveOpenGL = True
-except ImportError:
-    haveOpenGL = False
+import warnings
+warnings.filterwarnings("ignore")
 
 #Arquivo para armazenar todas as variáveis de ambiente utilizadas no programa
 
 class Vars(object):
 
-    version = "0.7.1"  # Variável de controle de versão
-    dateModificacao = "03/02/2017"  # Data da última atualização do programa
-    drawArea0 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
-    drawArea1 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
-    drawArea2 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
-    drawArea3 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
-    ultimoDrawSelected = None #Variável que armazena uma referência para qual drawArea foi interagido por último
     lineUp = None # Variável que armazena uma referência para a linha que separa a drawArea0 e a drawArea1
     lineDown = None  # Variável que armazena uma referência para a linha que separa a drawArea2 e a drawArea3
     boxUp = None # Variável que armazena o sizer que engloba drawArea0 e drawArea1
@@ -47,11 +30,8 @@ class Vars(object):
     visionModes = ("Perspectiva", "Frente Ortho", "Atrás Ortho", "Direita Ortho", "Esquerda Ortho", "Cima Ortho")  # Variável que armazena os modos de visão(Perspectiva, direita, esquerda, frente, atrás, cima, baixo)
     visionItem = None  # Variável que armazena o label que mostra na janela qual o tipo de visão que estamos utilizando
     rightMouse = (0,0,0) #Variável que armazena a ultima posição do mouse ao clicar com o botao direito
-    arquivoProjeto = "" #Variável que armazena o diretorio com o nome do projeto que está aberto atualmente
     shiftPress = False #Variável que armazena se o shift está sendo pressionado nesse exato momento
     ctrlPress = False #Variável que armazena se o control está sendo pressionado nesse exato momento
-    moveObjetos = False #Variável que armazena se a opção de mover objetos está ativa
-    moveObjetosEixo = -1 #Variável que armazena qual eixo a seleção irá se mover, apenas usado quando clica-se em cima da seta de movimento
 
     ctypes.WinDLL('libs/freeglut.dll') #Importa a dll freeglut.dll, usado apenas no windows, a versão para linux não terá esta linha
     KitLib = ctypes.CDLL('libs/kitmola.dll')  # Variável que armazena uma referência ao núcleo do programa em C
@@ -64,11 +44,20 @@ class Vars(object):
     BAR_SMALL = 2
     BAR_LARGE = 3
     BASE = 4
+    LAJE = 5
+    DIAGONAL_SMALL = 6
+    DIAGONAL_LARGE = 7
     SPHERE_RADIUS = 0.75 # em centimetros
     BASE_RADIUS = 2.2 # em centimetros
     BAR_RADIUS = 0.3 # em centimetros
     BAR_LENGTH_SMALL = 7.5 # em Centrimetros
     BAR_LENGTH_LARGE = 16.5 # em centrimetros
+    LAJE_LENGTH = 17.3 # em centimetros
+    LAJE_WIDTH = 8.3 # em centimetros
+    LAJE_THICKNESS = 0.6 # em centimetros
+    LAJE_LEG = 0.0 # em centimetros - catetos que formam o tringulo faltante nas bordas da laje
+    DIAGONAL_LENGTH_SMALL = 11.22 # em centimetros
+    DIAGONAL_LENGTH_LARGE = 18.625 # em centimetros
     ASCII_X = 120
     ASCII_Y = 121
     ASCII_Z = 122
@@ -101,5 +90,13 @@ class Vars(object):
     NUM_PLUS = 388
     NUM_LESS = 390
     LESS_PRESS = 45
+    SPHERE_SELECIONADO = 0
+    BAR9_SELECIONADO = 1
+    BAR18_SELECIONADO = 2
+    BASE_SELECIONADO = 3
+    LAJE_SELECIONADO = 4
+    MOVETELA_SELECIONADO = 5
+    LIVRE_SELECIONADO = -1
+    ENTER_PRESS = 13
 
 

@@ -148,10 +148,7 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
         val = obj.GetValue()
         Vars.KitLib.setMeshQual(c_float(val/100))
         self.parent.SetFocus()
-        Vars.drawArea0.Refresh()
-        Vars.drawArea1.Refresh()
-        Vars.drawArea2.Refresh()
-        Vars.drawArea3.Refresh()
+        self.parent.parent.OnRefreshAll()
 
     def OnGridCombox(self,e):
 
@@ -161,11 +158,9 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
             Vars.KitLib.setEspacoGrid(c_float(9.0))
         else:
             Vars.KitLib.setEspacoGrid(c_float(18.0))
-        self.parent.SetFocus()
-        Vars.drawArea0.Refresh()
-        Vars.drawArea1.Refresh()
-        Vars.drawArea2.Refresh()
-        Vars.drawArea3.Refresh()
+        self.parent.parent.atualizaPrecisaSalvar(True)
+        self.parent.parent.SetFocus()
+        self.parent.parent.OnRefreshAll()
 
     """
         -> Função OnTamGrid:
@@ -182,10 +177,7 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
             Vars.KitLib.setTamGrid(c_int(int(self.txtTamGrid.GetValue())+1))
             self.txtTamGrid.SetValue(str(int(self.txtTamGrid.GetValue())+1))
         self.Parent.SetFocus()
-        Vars.drawArea0.Refresh()
-        Vars.drawArea1.Refresh()
-        Vars.drawArea2.Refresh()
-        Vars.drawArea3.Refresh()
+        self.parent.parent.OnRefreshAll()
     """
         -> Função OnEnter:
             Função para tratar o pressionamento da tecla enter sob o txtTamGrid
@@ -230,21 +222,21 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
 
     def OnEnterFocus(self, e):
         try:
-            if Vars.ultimoDrawSelected.visionOption == Vars.VISION_Z_PERSP:
-                Vars.ultimoDrawSelected.centro = (
+            if self.parent.parent.ultimoDrawSelected.camera.visionOption == Vars.VISION_Z_PERSP:
+                self.parent.parent.ultimoDrawSelected.centro = (
                 float(self.txtFocusX.GetValue()), float(self.txtFocusY.GetValue()), float(self.txtFocusZ.GetValue()))
-            elif Vars.ultimoDrawSelected.visionOption == Vars.VISION_X_POS :
-                Vars.ultimoDrawSelected.orthoCenter = (-float(self.txtFocusY.GetValue()), float(self.txtFocusZ.GetValue()))
+            elif self.parent.parent.ultimoDrawSelected.camera.visionOption == Vars.VISION_X_POS :
+                self.parent.parent.ultimoDrawSelected.orthoCenter = (-float(self.txtFocusY.GetValue()), float(self.txtFocusZ.GetValue()))
                 self.txtFocusX.SetValue("0")
-            elif Vars.ultimoDrawSelected.visionOption == Vars.VISION_X_NEG:
-                Vars.ultimoDrawSelected.orthoCenter = (
+            elif self.parent.parent.ultimoDrawSelected.camera.visionOption == Vars.VISION_X_NEG:
+                self.parent.parent.ultimoDrawSelected.orthoCenter = (
                 -float(self.txtFocusY.GetValue()), -float(self.txtFocusZ.GetValue()))
                 self.txtFocusX.SetValue("0")
-            elif Vars.ultimoDrawSelected.visionOption == Vars.VISION_Y_POS :
-                Vars.ultimoDrawSelected.orthoCenter = (-float(self.txtFocusZ.GetValue()), -float(self.txtFocusX.GetValue()))
+            elif self.parent.parent.ultimoDrawSelected.camera.visionOption == Vars.VISION_Y_POS :
+                self.parent.parent.ultimoDrawSelected.orthoCenter = (-float(self.txtFocusZ.GetValue()), -float(self.txtFocusX.GetValue()))
                 self.txtFocusY.SetValue("0")
-            elif Vars.ultimoDrawSelected.visionOption == Vars.VISION_Y_NEG:
-                Vars.ultimoDrawSelected.orthoCenter = (
+            elif self.parent.parent.ultimoDrawSelected.camera.visionOption == Vars.VISION_Y_NEG:
+                self.parent.parent.ultimoDrawSelected.orthoCenter = (
                 -float(self.txtFocusZ.GetValue()), float(self.txtFocusX.GetValue()))
                 self.txtFocusY.SetValue("0")
 
@@ -252,7 +244,4 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
             ex = wx.MessageDialog(None, "Caracter Inválido! \nTente usar ponto ao invés de virgula.", "Erro!", wx.OK)
             ex.ShowModal()
         self.Parent.SetFocus()
-        Vars.drawArea0.Refresh()
-        Vars.drawArea1.Refresh()
-        Vars.drawArea2.Refresh()
-        Vars.drawArea3.Refresh()
+        self.parent.parent.OnRefreshAll()
