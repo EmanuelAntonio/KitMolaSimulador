@@ -8,6 +8,7 @@
 #include "Base.cpp"
 #include "Laje.cpp"
 #include "Tirante.cpp"
+#include "LigRigida.cpp"
 
 class ListaObjetos
 {
@@ -30,7 +31,7 @@ class ListaObjetos
         *   Parâmetros: 'x','y','z', coordenadas do centro da semi-esfera da base
         *   Retorno: vazio
         **/
-        void addBase(float x, float y, float z);
+        void addBase(int subtipo, float x, float y, float z);
         /**
         *   Função get: retorna uma referência para o primeiro no da lista
         *   Parâmetro: vazio
@@ -184,6 +185,13 @@ class ListaObjetos
         *   Retorno: 'bool' se a diagonal foi adicionada a lista
         **/
         bool addDiagonal(int tipoDiag);
+        /**
+        *   ->Função addDiag:
+        *		Adiciona uma ligação rígida quando há uma esfera e duas barras selecionadas ou uma barra e uma base
+        *	->Parâmetros: 'vazio'
+        *	->Retorno: 'bool' se a adição foi realizada
+        **/
+        bool addLigRigida();
         int getNumSelect(){return tamSelect;}
         ~ListaObjetos();
     private:

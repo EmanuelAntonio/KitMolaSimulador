@@ -12,6 +12,10 @@
 #define DIAGONAL_SMALL 6
 #define DIAGONAL_LARGE 7
 #define LIGACAO_RIGIDA 8
+#define BASE_LIVRE 9
+#define BASE_BLOQUEADA_X 10
+#define BASE_BLOQUEADA_Y 11
+#define BASE_BLOQUEADA_XY 12
 
 #define SPHERE_RADIUS 0.75 /// em centimetros
 #define BAR_RADIUS 0.3 /// em centimetros
@@ -24,6 +28,9 @@
 #define LAJE_LEG 0.0 /// em centimetros - catetos que formam o tringulo faltante nas bordas da laje
 #define DIAGONAL_LENGTH_SMALL 11.22 /// em centimetros
 #define DIAGONAL_LENGTH_LARGE 18.625 /// em centimetros
+#define LIGACAO_RIGIDA_ALTURA 1.0 ///em centimetros
+#define LIGACAO_RIGIDA_BASE_MAIOR 2.6 ///em centimetros
+#define LIGACAO_RIGIDA_BASE_MENOR 0.8 ///em centímetros
 
 
 /**Struct cabecalhoKMP: cabeçalho do arquivo binario do projeto .kmp**/
@@ -35,14 +42,7 @@ struct cabecalhoKMP{
     float espacoGrid;
 
 };
-/*Struct Ponto: armazena um ponto em R^3
-struct Ponto{
 
-    float x;
-    float y;
-    float z;
-
-};*/
 /**Struct objeto: armazena um objeto3d para armazenamento no arquivo binario do projeto .kmp**/
 typedef struct objeto{
 
@@ -52,6 +52,7 @@ typedef struct objeto{
     Ponto MBR[2];
     int idExtremidades[16];
     int tamExtremidades;
+    int subObjeto;
 
 }Objeto;
 
@@ -81,10 +82,14 @@ class Objeto3D
         void removeExtremidades(int id);
         void swapExtremidades(int id1, int id2);
         bool buscaIdExtremidades(int id);
+        Ponto *getForca();
+        void setForca(Ponto f, Ponto aplicacao);
 
         virtual void draw(float meshQual, bool wireframe, char visionAxis, int visionOption);
         virtual void draw(float meshQual, bool wireframe, char visionAxis, int visionOption, Objeto3D *obj1, Objeto3D *obj2);
         virtual void draw(float meshQual, bool wireframe, char visionAxis, int visionOption, Ponto *p1, Ponto *p2, Ponto *p3, Ponto *p4);
+        virtual void draw(float mehQual, bool wireframe, char visionAxis, int visionOption, Objeto3D *obj1, Objeto3D *obj2, Objeto3D *obj3);
+
         virtual ~Objeto3D();
     private:
 
@@ -110,5 +115,6 @@ class Objeto3D
         GLfloat *object_especular;
         GLfloat *object_select;
         Ponto centro;/**Parâmetro de desenho, para objetos que precisem**/
+        Ponto forca[2];///vetor forca e ponto de aplicação respectivamente
 };
 #endif // OBJETO3D_H

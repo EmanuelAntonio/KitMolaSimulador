@@ -273,6 +273,8 @@ class MouseEvent(object):
     @staticmethod
     def OnMouseDown(e, canvas, window):
 
+        if Vars.KitSim.getSSim():
+            return
         if window.botaoSelecionado == Vars.MOVETELA_SELECIONADO:
             myCursor = wx.Cursor(r"icones/cursorMoveTelaClick.cur",
                                  wx.BITMAP_TYPE_CUR)
@@ -292,18 +294,26 @@ class MouseEvent(object):
             if window.botaoSelecionado == Vars.BASE_SELECIONADO:
 
                 Vars.rightMouse = e.GetPosition()
-                AdicionarObjetos.OnAddBase(canvas, window)
+                AdicionarObjetos.OnAddBase(Vars.BASE_LIVRE,canvas, window)
             elif window.botaoSelecionado == Vars.LIVRE_SELECIONADO:
                 Vars.KitLib.terminaMovimentacao()
                 Vars.KitLib.deSelectAll()
                 window.moveObjetos = False
-        idObj = Vars.KitLib.select(ponto, canvas.camera.visionAxis,canvas.camera.visionOption)
+            elif window.botaoSelecionado == Vars.ADDFORCA_SELECIONADO:
+                XYTela = e.GetPosition()
+                ponto = Vars.KitLib.getPonto3D(XYTela[0], XYTela[1])
+                Vars.KitSim.addForca(ponto,6,0,0)
+                c_float(float(window.tabs.tabSim.txtX.GetValue()))
+                c_float(float(window.tabs.tabSim.txtY.GetValue()))
+                c_float(float(window.tabs.tabSim.txtZ.GetValue()))
+
+        idObj = Vars.KitLib.select(ponto, canvas.camera.visionAxis, canvas.camera.visionOption)
         if idObj != 0:
             obj = Vars.KitLib.getObjById(idObj)
             centro = (obj.contents.centro.x, obj.contents.centro.y, obj.contents.centro.z)
-            window.tabs.tabInfo.AlteraLayoutInfo(obj.contents.id, obj.contents.obj,centro,0,0)
+            window.tabs.tabInfo.AlteraLayoutInfo(obj.contents.id, obj.contents.obj, centro, 0, 0)
         else:
-            window.tabs.tabInfo.AlteraLayoutInfo(0, 0, None,None,None)
+            window.tabs.tabInfo.AlteraLayoutInfo(0, 0, None, None, None)
 
         window.drawArea0.Refresh()
         window.drawArea1.Refresh()

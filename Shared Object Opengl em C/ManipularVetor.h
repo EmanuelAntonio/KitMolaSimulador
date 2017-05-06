@@ -129,6 +129,11 @@ namespace ManipularVetor
         return p;
     }
 
+    float anguloVetores(Ponto vet1, Ponto vet2){
+
+        return acos((prodEscalar(vet1,vet2))/(normaVet(vet1)*normaVet(vet2)));
+
+    }
 };
 
 #endif // MANIPULARVETOR_H

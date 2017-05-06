@@ -1,9 +1,6 @@
 #include "ListaObjetos.h"
-#include <iostream>
 #include <fstream>
 #include <float.h>
-
-using namespace std;
 
 ListaObjetos::ListaObjetos()
 {
@@ -33,10 +30,15 @@ Objeto3D *ListaObjetos::duplicarObj(Objeto3D *obj){
     }else if(obj->getObjeto() == BASE){
 
         objOut = new Base();
+        ((Base*)objOut)->setSubObjeto(((Base*)obj)->getSubObjeto());
 
     }else if(obj->getObjeto() == DIAGONAL_LARGE || obj->getObjeto() == DIAGONAL_SMALL){
 
         objOut = new Tirante();
+
+    }else if(obj->getObjeto() == LIGACAO_RIGIDA){
+
+        objOut = new LigRigida();
 
     }
     objOut->setObjeto(obj->getObjeto());
@@ -50,6 +52,7 @@ Objeto3D *ListaObjetos::duplicarObj(Objeto3D *obj){
     objOut->setId(obj->getId());
     objOut->setProx(NULL);
     objOut->setAnt(NULL);
+
     return objOut;
 
 }
@@ -83,6 +86,11 @@ void ListaObjetos::salvar(char* arquivo,int tamGrid, float meshQual, float espac
         obj.MBR[0] = aux->getMBR()[0];
         obj.MBR[1] = aux->getMBR()[1];
         obj.tamExtremidades = aux->getTamExtremidades();
+        if(aux->getObjeto() == BASE){
+
+            obj.subObjeto = ((Base*)aux)->getSubObjeto();
+
+        }
         for(int i = 0; i < aux->getTamExtremidades(); i++){
 
             obj.idExtremidades[i] = aux->getExtremidades()[i];
@@ -110,7 +118,32 @@ cabecalhoKMP* ListaObjetos::abrir(char* arquivo){
     if(c->numObj != 0){
 
         fread(&obj,sizeof(Objeto),1,arq);
-        pri = new Objeto3D();
+        if(obj.obj == SPHERE){
+
+            pri = new Sphere();
+
+        }else if(obj.obj == BAR_SMALL || obj.obj == BAR_LARGE){
+
+            pri = new Bar();
+
+        }else if(obj.obj == LAJE){
+
+            pri = new Laje();
+
+        }else if(obj.obj == BASE){
+
+            pri = new Base();
+            ((Base*)pri)->setSubObjeto(obj.subObjeto);
+
+        }else if(obj.obj == DIAGONAL_LARGE || obj.obj == DIAGONAL_SMALL){
+
+            pri = new Tirante();
+
+        }else if(obj.obj == LIGACAO_RIGIDA){
+
+            pri = new LigRigida();
+
+        }
         pri->setCentro(obj.centro.x,obj.centro.y,obj.centro.z);
         pri->setMBR(obj.MBR[0].x,obj.MBR[0].y,obj.MBR[0].z,obj.MBR[1].x,obj.MBR[1].y,obj.MBR[1].z);
         for(int i = 0; i < obj.tamExtremidades; i++){
@@ -149,6 +182,7 @@ cabecalhoKMP* ListaObjetos::abrir(char* arquivo){
         }else if(obj.obj == BASE){
 
             ant->setProx(new Base());
+            ((Base*)ant->getProx())->setSubObjeto(obj.subObjeto);
 
         }else if(obj.obj == DIAGONAL_LARGE || obj.obj == DIAGONAL_SMALL){
 
@@ -951,6 +985,7 @@ Objeto3D* ListaObjetos::getObj(double *ponto){
                 }
 
             }
+            aux = aux->getProx();
 
         }
         return NULL;
@@ -976,19 +1011,24 @@ void ListaObjetos::deletar(Objeto3D *p, bool completo){
 
     if(p != NULL){
 
-        cout << "deletar: " << p->getObjeto() << " com id: " << p->getId() << endl;
         if((p->getObjeto() == SPHERE && completo) || (p->getObjeto() == BASE && completo)){
 
-            if(p->getTamExtremidades() > 0){
+            int tamExt = p->getTamExtremidades();
+            int ext[tamExt];
+            for(int i = 0; i < tamExt; i++){
 
-                for(int i = 0; i < p->getTamExtremidades(); i++){
+                ext[i] = p->getExtremidades()[i];
 
-                    deletar(indexId->busca(p->getExtremidades()[i]),completo);///Como uma esfera nao se liga a outra esfera, a recursão não entrará em loop
+            }
+            if(tamExt > 0){
+
+                for(int i = 0; i < tamExt; i++){
+
+                    deletar(indexId->busca(ext[i]),!completo);///Como uma esfera nao se liga a outra esfera, a recursão não entrará em loop
 
                 }
 
             }
-            //p->setObjeto(BAR_SMALL);///Usado apenas para que a chamada recursiva entre no else do primeiro if
             deletar(p, !completo);
 
         }
@@ -1135,7 +1175,7 @@ bool ListaObjetos::duplicaSelect(){
     return true;
 
 }
-void ListaObjetos::addBase(float x, float y, float z){
+void ListaObjetos::addBase(int subtipo, float x, float y, float z){
 
     float erro = 0.0;
     if(pri == NULL){
@@ -1143,7 +1183,7 @@ void ListaObjetos::addBase(float x, float y, float z){
         pri = new Base();
         pri->setObjeto(BASE);
         pri->setCentro(x,y,z);
-        pri->setMBR(-BASE_RADIUS + erro + x,-BASE_RADIUS + erro + y,-SPHERE_RADIUS + erro + z,BASE_RADIUS + erro + x,BASE_RADIUS + erro + y,erro + z);
+        pri->setMBR(-BASE_RADIUS + erro + x,-BASE_RADIUS + erro + y,-SPHERE_RADIUS + erro + z,BASE_RADIUS + erro + x,BASE_RADIUS + erro + y,SPHERE_RADIUS + erro + z);
         pri->setAnt(NULL);
         pri->setProx(NULL);
 
@@ -1154,10 +1194,11 @@ void ListaObjetos::addBase(float x, float y, float z){
         aux->setCentro(x,y,z);
         aux->setProx(pri);
         pri->setAnt(aux);
-        aux->setMBR(-BASE_RADIUS + erro + x,-BASE_RADIUS + erro + y,-SPHERE_RADIUS + erro + z,BASE_RADIUS + erro + x,BASE_RADIUS + erro + y,erro + z);
+        aux->setMBR(-BASE_RADIUS + erro + x,-BASE_RADIUS + erro + y,-SPHERE_RADIUS + erro + z,BASE_RADIUS + erro + x,BASE_RADIUS + erro + y,SPHERE_RADIUS + erro + z);
         pri = aux;
 
     }
+    ((Base*)pri)->setSubObjeto(subtipo);
     pri->setId(idDis);
     idDis++;
     indexId->insere(pri->getId(),pri);
@@ -1508,6 +1549,138 @@ bool ListaObjetos::addDiagonal(int tipoDiag){
     idDis++;
     indexId->insere(pri->getId(),pri);
     desfazer->insere(ADICAO_OBJETOS,duplicarObj(pri),NULL);
+    refazer->clear();
+    tam++;
+    return true;
+
+}
+bool ListaObjetos::addLigRigida(){
+
+    if(tamSelect != 3){
+
+        return false;
+
+    }
+    Objeto3D *obj1 = NULL;
+    Objeto3D *obj2 = NULL;
+    Objeto3D *obj3 = NULL;
+    Objeto3D *aux = pri;
+    while(aux != NULL){
+
+        if(aux->getSelecionado()){
+
+            if(aux->getObjeto() == BAR_LARGE || aux->getObjeto() == BAR_SMALL || aux->getObjeto() == SPHERE){
+
+                if(obj1 == NULL){
+
+                    obj1 = aux;
+
+                }else if(obj2 == NULL){
+
+                    obj2 = aux;
+
+                }else{
+
+                    obj3 = aux;
+                    break;
+
+                }
+
+            }else{
+
+                return false;
+
+            }
+
+        }
+        aux = aux->getProx();
+
+    }
+
+    if(obj1->getObjeto() != SPHERE){
+
+        if(obj2->getObjeto() == SPHERE){
+
+            aux = obj1;
+            obj1 = obj2;
+            obj2 = aux;
+
+        }else if(obj3->getObjeto() == SPHERE){
+
+            aux = obj1;
+            obj1 = obj3;
+            obj3 = aux;
+
+        }else{
+
+            return false;
+
+        }
+
+    }
+
+    if(obj2->getObjeto() == obj3->getObjeto() && (obj2->getObjeto() == BAR_LARGE || obj2->getObjeto() == BAR_SMALL)){
+
+        if(obj2->buscaIdExtremidades(obj1->getId()) && obj3->buscaIdExtremidades(obj1->getId())){
+
+            Objeto3D *sph1 = NULL;
+            Objeto3D *sph2 = NULL;
+            Ponto vet1;
+            Ponto vet2;
+            if(obj2->getExtremidades()[0] == obj1->getId()){
+
+                sph1 = indexId->busca(obj2->getExtremidades()[1]);
+
+            }else{
+
+                sph1 = indexId->busca(obj2->getExtremidades()[0]);
+
+            }
+            if(obj3->getExtremidades()[0] == obj1->getId()){
+
+                sph2 = indexId->busca(obj3->getExtremidades()[1]);
+
+            }else{
+
+                sph2 = indexId->busca(obj3->getExtremidades()[0]);
+
+            }
+            vet1 = somaVetorial(*sph1->getCentro(), inverteSentido(*obj1->getCentro()));
+            vet2 = somaVetorial(*sph2->getCentro(), inverteSentido(*obj1->getCentro()));
+            if(prodEscalar(vet1,vet2) != 0){
+
+                return false;
+
+            }
+
+        }else{
+
+            return false;
+
+        }
+
+    }else{
+
+        return false;
+
+    }
+    aux = new LigRigida();
+    aux->setObjeto(LIGACAO_RIGIDA);
+    aux->addExtremidades(obj1->getId());
+    aux->addExtremidades(obj2->getId());
+    aux->addExtremidades(obj3->getId());
+    aux->setId(idDis);
+    aux->setAnt(NULL);
+    aux->setProx(pri);
+    if(pri != NULL){
+
+        pri->setAnt(aux);
+
+    }
+    pri = aux;
+    indexId->insere(aux->getId(), pri);
+    idDis++;
+    desfazer->insere(ADICAO_OBJETOS, duplicarObj(pri), NULL);
     refazer->clear();
     tam++;
     return true;

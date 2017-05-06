@@ -148,6 +148,17 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
                 self.lblRaio.SetLabel(self.strRaio + str(Vars.BAR_RADIUS) + "cm")
                 self.lblTam.SetLabel(self.strTam + str(Vars.BAR_LENGTH_LARGE) + "cm")
                 self.lblCentro.SetLabel(self.strCentro + "(-,-,-)")
+            elif obj == Vars.DIAGONAL_SMALL:
+                self.lblTipo.SetLabel(self.strTipo + "Tirante 9x9")
+                self.lblRaio.SetLabel(self.strRaio + str(Vars.BAR_RADIUS) + "cm")
+                self.lblTam.SetLabel(self.strTam + str(Vars.DIAGONAL_LENGTH_SMALL) + "cm")
+                self.lblCentro.SetLabel(self.strCentro + "(-,-,-)")
+            elif obj == Vars.DIAGONAL_LARGE:
+                self.lblTipo.SetLabel(self.strTipo + "Tirante 18x9")
+                self.lblRaio.SetLabel(self.strRaio + str(Vars.BAR_RADIUS) + "cm")
+                self.lblTam.SetLabel(self.strTam + str(Vars.DIAGONAL_LENGTH_LARGE) + "cm")
+                self.lblCentro.SetLabel(self.strCentro + "(-,-,-)")
+
             self.lblId.SetLabel(self.strId + str(id))
             self.alteraCentroMBR()
         self.parent.SetFocus()

@@ -81,5 +81,5 @@ class SalvarProjeto(object):
             self.arquivoProjeto = arquivo
             c_s = arquivo.encode("utf-8")
             Vars.KitLib.save(c_s)
-            window.atualizaPrecisaSalvar(window,False)
+            window.atualizaPrecisaSalvar(False)
         Vars.ctrlPress = False

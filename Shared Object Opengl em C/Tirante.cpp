@@ -5,9 +5,13 @@ using namespace ManipularVetor;
 Tirante::Tirante():Objeto3D()
 {
     object_difusa = new GLfloat[4];
-    object_difusa[0] = 1.0;
+    /*object_difusa[0] = 1.0;
     object_difusa[1] = 1.0;
     object_difusa[2] = 0.941176;
+    object_difusa[3] = 1.0;*/
+    object_difusa[0] = 0.5;
+    object_difusa[1] = 0.0;
+    object_difusa[2] = 0.8;
     object_difusa[3] = 1.0;
 }
 void Tirante::draw(float meshQual, bool wireframe, char visionAxis, int visionOption, Objeto3D *obj1, Objeto3D *obj2){

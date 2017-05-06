@@ -103,7 +103,7 @@ class AdicionarObjetos(object):
         window.atualizaPrecisaSalvar(True)
 
     @staticmethod
-    def OnAddBase(drawArea, window):
+    def OnAddBase(tipo, drawArea, window):
 
         x, y = Vars.rightMouse
         if drawArea.camera.visionOption != Vars.VISION_Z_PERSP:
@@ -137,12 +137,12 @@ class AdicionarObjetos(object):
                             y = (int(y) + 1) * space
                         else:
                             y = (int(y) - 1) * space
-                Vars.KitLib.addBase(c_float(x), c_float(y), 0)
+                Vars.KitLib.addBase(tipo, c_float(x), c_float(y), 0)
             elif drawArea.camera.visionAxis == Vars.ASCII_X:  # 120 Codigo ASCII para 'x'
 
                 x = ponto[0]
                 y = ponto[1]
-                if window.tab.tabConfig.blockInsert:
+                if window.tabs.tabConfig.blockInsert:
                     space = c_float(Vars.KitLib.getEspacoGrid()).value
                     x = x / space
                     dx = x - int(x)
@@ -165,9 +165,9 @@ class AdicionarObjetos(object):
                         else:
                             y = (int(y) - 1) * space
                 if drawArea.camera.visionOption == Vars.VISION_X_POS:
-                    Vars.KitLib.addBase(0, ctypes.c_float(x), ctypes.c_float(y))
+                    Vars.KitLib.addBase(tipo, 0, ctypes.c_float(x), ctypes.c_float(y))
                 else:
-                    Vars.KitLib.addBase(0, ctypes.c_float(y), ctypes.c_float(x))
+                    Vars.KitLib.addBase(tipo, 0, ctypes.c_float(y), ctypes.c_float(x))
             elif drawArea.camera.visionAxis == Vars.ASCII_Y:  # 121 Codigo ASCII para 'y'
                 x = ponto[0]
                 y = ponto[1]
@@ -194,7 +194,7 @@ class AdicionarObjetos(object):
                         else:
                             y = (int(y) - 1) * space
 
-                Vars.KitLib.addBase(ctypes.c_float(x), 0, ctypes.c_float(y))
+                Vars.KitLib.addBase(tipo, ctypes.c_float(x), 0, ctypes.c_float(y))
 
         window.OnRefreshAll()
         drawArea.Refresh()
@@ -268,6 +268,22 @@ class AdicionarObjetos(object):
         add = Vars.KitLib.addDiag(DIAGONAL_LARGE)
         if not (add):
             msg = "Para adicionar uma barra pequena certifique-se que tenha duas esferas selecionadas, ou uma esfera e uma base e que a distância entre elas seja de 18.12 cm."
+            msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
+            msgCx.ShowModal()
+            msgCx.Destroy()
+        window.OnRefreshAll()
+        if (drawArea is not None):
+            drawArea.Refresh()
+        window.toolbar.EnableTool(wx.ID_UNDO, True)
+        window.toolbar.EnableTool(wx.ID_REDO, False)
+        window.atualizaPrecisaSalvar(True)
+
+    @staticmethod
+    def OnAddLigRigida(drawArea, window):
+
+        add = Vars.KitLib.addLigRigida()
+        if not (add):
+            msg = "Para adicionar uma ligação rígida é necessário que esteja com duas barras e uma esfera selecionada\nConfira que as duas barras estejam em 90º."
             msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
             msgCx.ShowModal()
             msgCx.Destroy()

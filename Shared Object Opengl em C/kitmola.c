@@ -304,6 +304,30 @@ extern "C"{
             }else if(aux->getObjeto() == BASE){
 
                 aux->draw(meshQual, wireframe, visionAxis, visionOption);
+                if(((Base*)aux)->getSubObjeto() == BASE_BLOQUEADA_X || ((Base*)aux)->getSubObjeto() == BASE_BLOQUEADA_XY){
+
+                    LigRigida a;
+                    Objeto3D sph0;
+                    Objeto3D sph1;
+                    sph0.setCentro(aux->getCentro()->x,aux->getCentro()->y,aux->getCentro()->z + 9.0);
+                    sph1.setCentro(aux->getCentro()->x + 9.0,aux->getCentro()->y,aux->getCentro()->z);
+                    a.draw(meshQual,wireframe,visionAxis, visionOption, aux, &sph1, &sph0);
+                    sph1.setCentro(aux->getCentro()->x - 9.0,aux->getCentro()->y,aux->getCentro()->z);
+                    a.draw(meshQual,wireframe,visionAxis, visionOption, aux, &sph1, &sph0);
+
+                }
+                if(((Base*)aux)->getSubObjeto() == BASE_BLOQUEADA_Y || ((Base*)aux)->getSubObjeto() == BASE_BLOQUEADA_XY){
+
+                    LigRigida a;
+                    Objeto3D sph0;
+                    Objeto3D sph1;
+                    sph0.setCentro(aux->getCentro()->x,aux->getCentro()->y,aux->getCentro()->z + 9.0);
+                    sph1.setCentro(aux->getCentro()->x, aux->getCentro()->y + 9.0, aux->getCentro()->z);
+                    a.draw(meshQual,wireframe,visionAxis, visionOption, aux, &sph0, &sph1);
+                    sph1.setCentro(aux->getCentro()->x,aux->getCentro()->y - 9.0, aux->getCentro()->z);
+                    a.draw(meshQual,wireframe,visionAxis, visionOption, aux, &sph0, &sph1);
+
+                }
 
             }else if(aux->getObjeto() == LAJE){
 
@@ -319,6 +343,31 @@ extern "C"{
                 aux->draw(meshQual,wireframe,visionAxis,visionOption,
                           listObj->getbyId(aux->getExtremidades()[0]),
                           listObj->getbyId(aux->getExtremidades()[1]));
+
+            }else if(aux->getObjeto() == LIGACAO_RIGIDA){
+
+                Objeto3D *sph1 = listObj->getbyId(aux->getExtremidades()[0]);
+                Objeto3D *sph2 = listObj->getbyId(aux->getExtremidades()[1]);
+                if(sph2->getExtremidades()[0] == sph1->getId()){
+
+                    sph2 = listObj->getbyId((sph2->getExtremidades()[1]));
+
+                }else{
+
+                    sph2 = listObj->getbyId((sph2->getExtremidades()[0]));
+
+                }
+                Objeto3D *sph3 = listObj->getbyId(aux->getExtremidades()[2]);
+                if(sph3->getExtremidades()[0] == sph1->getId()){
+
+                    sph3 = listObj->getbyId((sph3->getExtremidades()[1]));
+
+                }else{
+
+                    sph3 = listObj->getbyId((sph3->getExtremidades()[0]));
+
+                }
+                aux->draw(meshQual, wireframe, visionAxis,visionOption,sph1,sph2,sph3);
 
             }
             if(MBRAtivo){
@@ -924,9 +973,9 @@ extern "C"{
         return listObj->duplicaSelect();
 
     }
-    void addBase(float x, float y, float z){
+    void addBase(int tipo, float x, float y, float z){
 
-        listObj->addBase(x,y,z);
+        listObj->addBase(tipo, x,y,z);
 
     }
     Ponto* getCentroMBRSelect(){
@@ -1013,6 +1062,16 @@ extern "C"{
     bool addDiag(int tipoDiag){
 
         return listObj->addDiagonal(tipoDiag);
+
+    }
+    bool addLigRigida(){
+
+        return listObj->addLigRigida();
+
+    }
+    ListaObjetos *getObjList(){
+
+        return listObj;
 
     }
 

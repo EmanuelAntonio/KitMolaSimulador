@@ -1,12 +1,13 @@
 #ifndef PONTO_H
 #define PONTO_H
 
-class Ponto
-{
-    public:
-        float x;
-        float y;
-        float z;
+//Struct Ponto: armazena um ponto em R^3
+struct Ponto{
+
+    float x;
+    float y;
+    float z;
+
 };
 
 #endif // PONTO_H

@@ -147,6 +147,13 @@ class KeyboardEvent(object):
             window.ultimoDrawSelected.OnZoomOut()
         elif (e.GetKeyCode() == e.GetKeyCode() == Vars.NUM_LESS or e.GetKeyCode() == e.GetKeyCode() == Vars.LESS_PRESS):
             window.ultimoDrawSelected.OnZoomIn()
+        elif (e.GetKeyCode() == 75):
+            if Vars.KitSim.getSSim():
+                Vars.KitSim.stop()
+            else:
+                Vars.KitSim.setListaObjetos(Vars.KitLib.getObjList())
+                Vars.KitSim.start()
+
         else:
             print(e.GetKeyCode())
 
@@ -171,11 +178,16 @@ class KeyboardEvent(object):
                     AdicionarObjetos.OnAddSmallBar(None,window)
                 elif window.botaoSelecionado == Vars.BAR18_SELECIONADO:
                     AdicionarObjetos.OnAddLargeBar(None,window)
+                elif window.botaoSelecionado == Vars.TIRANTE9_SELECIONADO:
+                    AdicionarObjetos.OnAddSmallDiag(None,window)
+                elif window.botaoSelecionado == Vars.TIRANTE18_SELECIONADO:
+                    AdicionarObjetos.OnAddLargeDiag(None,window)
                 window.botaoSelecionado = Vars.LIVRE_SELECIONADO
                 window.SetCursor(wx.StockCursor(wx.CURSOR_ARROW))
             if window.moveObjetos:
                 Vars.KitLib.terminaMovimentacao()
                 window.moveObjetos = False
-            window.ultimoDrawSelected.Refresh(True)
+            if window.ultimoDrawSelected != None:
+                window.ultimoDrawSelected.Refresh(True)
         else:# Se  caso não for pressionado a tecla enter, o else libera o evento para que possa ser usado no wx.EVT_KEY_DOWN
             e.Skip()

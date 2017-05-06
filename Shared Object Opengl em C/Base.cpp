@@ -17,7 +17,7 @@ void Base::draw(float meshQual, bool wireframe, char visionAxis, int visionOptio
 
         p2.x = centro.x;
         p2.y = centro.y;
-        p2.z = centro.z;
+        p2.z = centro.z + SPHERE_RADIUS/2;
         p1.x = centro.x;
         p1.y = centro.y;
         p1.z = centro.z - SPHERE_RADIUS/2;
@@ -25,7 +25,7 @@ void Base::draw(float meshQual, bool wireframe, char visionAxis, int visionOptio
     }else if(visionAxis == 'x'){
 
         p2.x = centro.y;
-        p2.y = centro.z;
+        p2.y = centro.z + SPHERE_RADIUS/2;
         p1.x = centro.y;
         p1.y = centro.z - SPHERE_RADIUS/2;
         if(visionOption == 1){
@@ -43,7 +43,7 @@ void Base::draw(float meshQual, bool wireframe, char visionAxis, int visionOptio
     }else{
 
         p2.x = centro.x;
-        p2.y = centro.z;
+        p2.y = centro.z + SPHERE_RADIUS/2;
         p1.x = centro.x;
         p1.y = centro.z - SPHERE_RADIUS/2;
         if(visionOption == 3){
@@ -265,6 +265,16 @@ void Base::drawBarZero(float meshQual, bool wireframe, char visionAxis, int visi
         glPopMatrix();
     }
     gluDeleteQuadric(quadric);
+
+}
+void Base::setSubObjeto(int o){
+
+    subObjeto = o;
+
+}
+int Base::getSubObjeto(){
+
+    return subObjeto;
 
 }
 Base::~Base()

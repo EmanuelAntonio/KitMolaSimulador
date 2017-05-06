@@ -9,8 +9,6 @@ class Bar : public Objeto3D
         Bar();
         void draw(float meshQual, bool wireframe, char visionAxis, int visionOption, Objeto3D *obj1, Objeto3D *obj2);
         virtual ~Bar();
-
-    private:
         void drawZero(float meshQual, bool wireframe, char visionAxis, int visionOption, Ponto *p1, Ponto *p2);
 
 };

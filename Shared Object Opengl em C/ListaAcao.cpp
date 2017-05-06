@@ -1,5 +1,6 @@
 #include "ListaAcao.h"
-
+#include <iostream>
+using namespace std;
 ListaAcao::ListaAcao()
 {
     pri = NULL;

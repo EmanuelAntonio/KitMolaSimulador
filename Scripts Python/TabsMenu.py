@@ -3,7 +3,7 @@
 from TabConfig import *
 from TabTools import *
 from TabInfo import *
-
+from TabSim import *
 
 """
     -> Classe Tabs:
@@ -43,11 +43,17 @@ class Tabs(wx.Notebook):
         self.tabConfig.Layout()
         self.AddPage(self.tabConfig, "Configurações")
 
+        self.tabSim = TabSim(self)
+        self.tabSim.Layout()
+        self.AddPage(self.tabSim, "Simulação")
+
         # Adiciona os icones nas tabs
         imgObj = imL.Add(wx.Bitmap('icones/obj.ico'))
         imgTool = imL.Add(wx.Bitmap('icones/tool.ico'))
         imgConfig = imL.Add(wx.Bitmap('icones/config.ico'))
+        imgSim = imL.Add(wx.Bitmap('icones/obj.ico'))
         self.AssignImageList(imL)
         self.SetPageImage(0, imgObj)
         self.SetPageImage(1, imgTool)
         self.SetPageImage(2, imgConfig)
+        self.SetPageImage(3, imgSim)

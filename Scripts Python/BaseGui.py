@@ -45,6 +45,7 @@ class WindowClass(wx.Frame):
         self.SetIcon(self.programIcon)
         self.createToolbar()
         Vars.KitLib.init()
+        Vars.KitSim.init(Vars.KitLib.getObjList())
 
         Vars.status = self.GetStatusBar()
         self.strTitle = "KitSim"
@@ -283,7 +284,6 @@ class WindowClass(wx.Frame):
 
         ToolBar.OnAddBarra9Toolbar(self)
 
-
     """
         -> Função OnAddBarra9Toolbar:
             Função usada ao clicar no botão de adicionar barra de 18cm na toolbar do programa.
@@ -296,6 +296,34 @@ class WindowClass(wx.Frame):
     def OnAddBarra18Toolbar(self,e):
 
         ToolBar.OnAddBarra18Toolbar(self)
+
+    """
+        -> Função OnAddTirante9Toolbar:
+            Função usada ao clicar no botão de adicionar tirante de 9x9 na cena.
+            Passa o programa para o estado de esperando a seleção dos objetos necessários,
+            se o usuário entrar com o botão ENTER confirmará a seleção, caso pressione ESC, cancelará.
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
+    def OnAddTirante9Toolbar(self,e):
+
+        ToolBar.OnAddTirante9Toolbar(self)
+
+
+    """
+        -> Função OnAddTirante18Toolbar:
+            Função usada ao clicar no botão de adicionar tirante de 18x9 na cena.
+            Passa o programa para o estado de esperando a seleção dos objetos necessários,
+            se o usuário entrar com o botão ENTER confirmará a seleção, caso pressione ESC, cancelará.
+        -> Parâmetros:
+            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
+        -> Retorno: vazio
+    """
+    def OnAddTirante18Toolbar(self,e):
+
+        ToolBar.OnAddTirante18Toolbar(self)
+
 
     """
         -> Função atualizaPrecisaSalvar:

@@ -1,5 +1,6 @@
 #include "include/GL/glut.h"
 #include "ListaObjetos.cpp"
+#include "Simulacao.cpp"
 
 extern "C"{
 
@@ -50,41 +51,6 @@ extern "C"{
 	*	->Retorno: vazio
 	**/
     void drawGrid(char visionAxis);
-    /**
-	*   ->Função drawSphere:
-	*		Desenha uma esfera de ligacao em uma posicao do espaco
-	*	->Parâmetros: 'x','y','z' é a posição do centro da esfera e 'selected' se esta selecionada
-	*	->Retorno: vazio
-	**/
-    void drawSphere(float x, float y, float z, bool selected,char visionAxis,int visionOption);
-    /**
-	*   ->Função drawSphereZero:
-	*		Desenha uma esfera de ligacao na origem
-	*	->Parâmetros: 'bool', se a esfera está selecionada, se estiver desenha de uma outra cor
-	*	->Retorno: vazio
-	**/
-    void drawSphereZero(bool selected, GLfloat *object_difusa);
-    /**
-	*   ->Função drawBar:
-	*		Desenha uma barra entre duas esferas de id1 e id2
-	*	->Parâmetros: 'id1' 'id2', ids das esferas que ligam as  duas pontas da barra
-	*	->Retorno: 'vazio'
-	**/
-    void drawBar(int id1, int id2, bool selecionado,char visionAxis,int visionOption);
-    /**
-	*   ->Função drawBarZero:
-	*		Desenha uma barra na origem
-	*	->Parâmetros: 'tamBar' tamanho da barra a ser desenhada
-    *	->Retorno: 'vazio'
-	**/
-    void drawBarZero(Ponto *p1, Ponto *p2,float radius,int subdivisions,GLUquadricObj *quadric, bool selecionado, GLfloat *object_difusa);
-    /**
-	*   ->Função drawSphere:
-	*		Desenha uma base em uma posicao do espaco
-	*	->Parâmetros: 'x','y','z' é a posição do centro da semi-esfera e 'selected' se esta selecionada
-	*	->Retorno: vazio
-	**/
-    void drawBase(float x, float y, float z, bool selected,char visionAxis,int visionOption);
     /**
 	*   ->Função setTamGrid:
 	*		Altera a variável tamGrid
@@ -359,7 +325,7 @@ extern "C"{
 	*	->Parâmetros: x,y,z, centro da semi-esfera
 	*	->Retorno: 'vazio'
 	**/
-    void addBase(float x, float y, float z);
+    void addBase(int tipo, float x, float y, float z);
     /**
 	*   ->Função getCentroMBRSelect:
 	*		Retorna o centro do MBRSelect
@@ -374,20 +340,6 @@ extern "C"{
 	*	->Retorno: 'bool' se o objeto foi adicionado na lista de objetos
 	**/
     bool addLaje();
-    /**
-	*   ->Função drawLaje:
-	*		Desenha uma laje entre p1 até p4, corrigindo a posição da laje de acordo com o visionAxis
-	*	->Parâmetros: 'visionAxis', de acordo com o eixo de visão selecionado pelo usuário esta função desenha a laje na rotação correta para cada eixo
-	*	->Retorno: 'vazio'
-	**/
-    void drawLaje(Ponto *p1, Ponto *p2, Ponto *p3, Ponto *p4, bool selected, char visionAxis,int visionOption);
-    /**
-	*   ->Função drawLajeZero:
-	*		Desenha uma laje entre p1 até p4, onde esses pontos são centros das esferas que ligam essa laje
-	*	->Parâmetros: 'p1','p2,'p3','p4', pontos dos "vertices" na laje
-	*	->Retorno: 'vazio'
-	**/
-    void drawLajeZero(Ponto *p1, Ponto *p2, Ponto *p3, Ponto *p4);
     /**
 	*   ->Função drawMBR:
 	*		Desenha uma boundbox com os pontos p1 e p2
@@ -415,11 +367,11 @@ extern "C"{
 	**/
     bool addDiag(int tipoDiag);
     /**
-	*   ->Função drawDiag:
-	*		Desenha uma diagonal entre duas esferas de id1 e id2
-	*	->Parâmetros: 'id1' 'id2', ids das esferas que ligam as  duas pontas da diagonal
-	*	->Retorno: 'vazio'
+	*   ->Função addDiag:
+	*		Adiciona uma ligação rígida quando há uma esfera e duas barras selecionadas ou uma barra e uma base
+	*	->Parâmetros: 'vazio'
+	*	->Retorno: 'bool' se a adição foi realizada
 	**/
-    void drawDiag(int id1, int id2, bool selecionado,char visionAxis,int visionOption);
-
+    bool addLigRigida();
+    ListaObjetos *getObjList();
 }

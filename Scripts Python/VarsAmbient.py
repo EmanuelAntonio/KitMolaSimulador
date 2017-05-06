@@ -38,6 +38,8 @@ class Vars(object):
     KitLib.distObjsSelect.restype = KitLib.getEspacoGrid.restype = c_float # define o tipo de retorno da funcao
     KitLib.getObjById.restype = POINTER(CObjeto3D) # define o tipo de retorno da funcao
     KitLib.getCentroMBRSelect.restype = POINTER(CPonto) # define o tipo de retorno da funcao
+    KitSim = ctypes.CDLL('libs/ksim.dll') # Variável que armazena uma referencia ao núcleo da simulacao em C
+    KitSim.getTempoTotal.restype = c_float
 
     # Constantes
     SPHERE = 1
@@ -96,7 +98,14 @@ class Vars(object):
     BASE_SELECIONADO = 3
     LAJE_SELECIONADO = 4
     MOVETELA_SELECIONADO = 5
+    TIRANTE9_SELECIONADO = 6
+    TIRANTE18_SELECIONADO = 7
+    ADDFORCA_SELECIONADO = 8
     LIVRE_SELECIONADO = -1
     ENTER_PRESS = 13
+    BASE_LIVRE = 9
+    BASE_BLOQUEADA_X = 10
+    BASE_BLOQUEADA_Y = 11
+    BASE_BLOQUEADA_XY = 12
 
 

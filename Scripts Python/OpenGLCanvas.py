@@ -39,7 +39,15 @@ class CanvasBase(glcanvas.GLCanvas):
         self.Bind(wx.EVT_MIDDLE_DOWN, self.OnScrollClick)
         self.Bind(wx.EVT_LEFT_DCLICK, self.OnDClick)
         self.Bind(wx.EVT_MIDDLE_UP, self.OnScrollMotion)
+        self.Bind(wx.EVT_IDLE, self.OnIdle)
 
+
+    def OnIdle(self, e):
+
+        if Vars.KitSim.getSSim():
+            self.Refresh(True)
+        else:
+            e.Skip()
 
     def OnScrollMotion(self, e):
         try:
@@ -248,13 +256,17 @@ class CanvasBase(glcanvas.GLCanvas):
     def OnDraw(self):
 
         self.camera.OnDrawCamera(self)
-        Vars.KitLib.drawCena(self.camera.visionAxis, self.camera.visionOption)
+        if Vars.KitSim.getSSim():
+            Vars.KitSim.drawSim()
+        else:
+            Vars.KitLib.drawCena(self.camera.visionAxis, self.camera.visionOption)
+
         Vars.KitLib.drawAxis(self.camera.visionAxis)
         Vars.KitLib.drawGrid(self.camera.visionAxis)
 
-        if self.parent.moveObjetos and self.camera.visionOption == 0:
+        if self.parent.moveObjetos and self.camera.visionOption == 0 and not(Vars.KitSim.getSSim()):
             Vars.KitLib.drawMoveAxis(self.camera.visionAxis, self.camera.visionOption, c_float(self.camera.camZoom))
-        elif self.parent.moveObjetos:
+        elif self.parent.moveObjetos and not(Vars.KitSim.getSSim()):
             Vars.KitLib.drawMoveAxis(self.camera.visionAxis, self.camera.visionOption, c_float(self.camera.orthoZoom))
 
         self.SwapBuffers()

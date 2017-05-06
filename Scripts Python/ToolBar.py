@@ -58,6 +58,8 @@ class ToolBar(object):
         imgBarra9 = wx.Bitmap('icones/barra9.ico')
         imgBarra18 = wx.Bitmap('icones/barra18.ico')
         imgLaje = wx.Bitmap('icones/laje.ico')
+        imgTirante9 = wx.Bitmap('icones/tirante9.ico')
+        imgTirante18 = wx.Bitmap('icones/tirante18.ico')
 
         window.addEsfera = window.toolbar.AddTool(wx.ID_ANY, "Adicionar Esfera", imgEsfera, "Esfera")
         window.Bind(wx.EVT_TOOL, window.OnAddEsferaToolbar, window.addEsfera)
@@ -69,6 +71,10 @@ class ToolBar(object):
         window.Bind(wx.EVT_TOOL, window.OnAddBarra18Toolbar, window.addBarra18)
         window.addLaje = window.toolbar.AddTool(wx.ID_ANY, "Adicionar Laje", imgLaje, "Laje")
         window.Bind(wx.EVT_TOOL, window.OnAddLajeToolbar, window.addLaje)
+        window.addTirante9 = window.toolbar.AddTool(wx.ID_ANY, "Adicionar Tirante de 9x9", imgTirante9, "Tirante de 9x9")
+        window.Bind(wx.EVT_TOOL, window.OnAddTirante9Toolbar, window.addTirante9)
+        window.addTirante18 = window.toolbar.AddTool(wx.ID_ANY, "Adicionar Tirante de 9x9", imgTirante18, "Tirante de 18x18")
+        window.Bind(wx.EVT_TOOL, window.OnAddTirante18Toolbar, window.addTirante18)
 
         window.toolbar.AddSeparator()
 
@@ -148,5 +154,23 @@ class ToolBar(object):
                              wx.BITMAP_TYPE_CUR)
 
         window.botaoSelecionado = Vars.BAR18_SELECIONADO
+
+        window.SetCursor(myCursor)
+
+    @staticmethod
+    def OnAddTirante9Toolbar(window):
+        myCursor = wx.Cursor(r"icones/tiranteCursor.cur",
+                             wx.BITMAP_TYPE_CUR)
+
+        window.botaoSelecionado = Vars.TIRANTE9_SELECIONADO
+
+        window.SetCursor(myCursor)
+
+    @staticmethod
+    def OnAddTirante18Toolbar(window):
+        myCursor = wx.Cursor(r"icones/tiranteCursor.cur",
+                             wx.BITMAP_TYPE_CUR)
+
+        window.botaoSelecionado = Vars.TIRANTE18_SELECIONADO
 
         window.SetCursor(myCursor)

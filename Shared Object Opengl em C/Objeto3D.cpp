@@ -181,7 +181,19 @@ bool Objeto3D::buscaIdExtremidades(int id){
     }
     return false;
 }
+void Objeto3D::setForca(Ponto f, Ponto aplicacao){
+
+    forca[0] = f;
+    forca[1] = aplicacao;
+
+}
+Ponto* Objeto3D::getForca(){
+
+    return forca;
+
+}
 void Objeto3D::draw(float meshQual, bool wireframe, char visionAxis, int visionOption){}
 void Objeto3D::draw(float meshQual, bool wireframe, char visionAxis, int visionOption, Objeto3D *obj1, Objeto3D *obj2){}
 void Objeto3D::draw(float meshQual, bool wireframe, char visionAxis, int visionOption, Ponto *p1, Ponto *p2, Ponto *p3, Ponto *p4){}
+void Objeto3D::draw(float mehQual, bool wireframe, char visionAxis, int visionOption, Objeto3D *obj1, Objeto3D *obj2, Objeto3D *obj3){}
 Objeto3D::~Objeto3D(){}
