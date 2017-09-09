@@ -10,17 +10,10 @@ class MouseEvent(object):
     def OnScrollClick(e, canvas, window):
         window.ultimoDrawSelected = canvas
         canvas.camera.atualizaCentroFocus()
-
         Vars.toolBox.SetFocus()
         canvas.CaptureMouse()
         canvas.x, canvas.y = canvas.lastx, canvas.lasty = e.GetPosition()
         Vars.centroAux = canvas.camera.centro
-        if (window.moveObjetos):
-            ponto = Vars.KitLib.getPonto3D(c_int(canvas.x), c_int(canvas.y))
-            window.moveObjetosEixo = Vars.KitLib.selectMoveSeta(ponto, canvas.camera.visionAxis)
-            if (window.moveObjetosEixo == -1):
-                if (Vars.KitLib.MBRSelectPonto(ponto)):
-                    window.moveObjetosEixo = -2
 
     @staticmethod
     def OnMouseUp(canvas, window):
@@ -29,9 +22,12 @@ class MouseEvent(object):
             canvas.dy = 0
             canvas.dz = 0
             if window.botaoSelecionado == Vars.MOVETELA_SELECIONADO:
-                myCursor = wx.Cursor(r"icones/cursorMoveTela.cur",
-                                     wx.BITMAP_TYPE_CUR)
-
+                if Vars.thema == "dark":
+                    myCursor = wx.Cursor(Vars.dirExec + "icones/cursorMoveTeladark.cur",
+                                         wx.BITMAP_TYPE_CUR)
+                else:
+                    myCursor = wx.Cursor(Vars.dirExec + "icones/cursorMoveTela.cur",
+                                         wx.BITMAP_TYPE_CUR)
                 window.SetCursor(myCursor)
             canvas.ReleaseMouse()
         except:
@@ -40,7 +36,7 @@ class MouseEvent(object):
     @staticmethod
     def OnMouseMotion(evt, canvas, window):
 
-        if (evt.Dragging() and evt.MiddleIsDown() and not(canvas.dClickEvent)) or (evt.LeftIsDown() and window.botaoSelecionado == Vars.MOVETELA_SELECIONADO):
+        if (evt.Dragging() and evt.MiddleIsDown() and not(canvas.dClickEvent) or(evt.LeftIsDown() and window.botaoSelecionado == Vars.MOVETELA_SELECIONADO)):
 
             canvas.lastx, canvas.lasty = canvas.x, canvas.y
             canvas.x, canvas.y = evt.GetPosition()
@@ -54,9 +50,9 @@ class MouseEvent(object):
                         -math.sin(canvas.camera.theta) * math.cos(canvas.camera.phi),
                         math.sin(canvas.camera.phi))
 
-                xCentro = canvas.camera.centro[0] + (dTheta[0] * ((canvas.lastx - canvas.x)/200) * c_float(Vars.KitLib.getEspacoGrid()).value) + (dPhi[0] * (((canvas.y - canvas.lasty)/200) * c_float(Vars.KitLib.getEspacoGrid()).value))
-                yCentro = canvas.camera.centro[1] + (dTheta[1] * ((canvas.lastx - canvas.x)/200) * c_float(Vars.KitLib.getEspacoGrid()).value) + (dPhi[1] * (((canvas.y - canvas.lasty)/200) * c_float(Vars.KitLib.getEspacoGrid()).value))
-                zCentro = canvas.camera.centro[2] - dPhi[2] * (((canvas.lasty - canvas.y)/200) * c_float(Vars.KitLib.getEspacoGrid()).value)
+                xCentro = canvas.camera.centro[0] + (dTheta[0] * ((canvas.lastx - canvas.x)/300) * c_float(Vars.KitLib.getEspacoGrid()).value) + (dPhi[0] * (((canvas.y - canvas.lasty)/300) * c_float(Vars.KitLib.getEspacoGrid()).value))
+                yCentro = canvas.camera.centro[1] + (dTheta[1] * ((canvas.lastx - canvas.x)/300) * c_float(Vars.KitLib.getEspacoGrid()).value) + (dPhi[1] * (((canvas.y - canvas.lasty)/300) * c_float(Vars.KitLib.getEspacoGrid()).value))
+                zCentro = canvas.camera.centro[2] - dPhi[2] * (((canvas.lasty - canvas.y)/300) * c_float(Vars.KitLib.getEspacoGrid()).value)
 
                 canvas.camera.centro = (xCentro, yCentro, zCentro)
                 if Vars.drawPrincipal != -1:
@@ -66,176 +62,34 @@ class MouseEvent(object):
 
             else: #já que o control nao está pressionado, fará uma das opções de movimento abaixo
 
-                if(window.moveObjetos):#Se o usuário selecionou a opção de movimentar objetos.
-
-                    if window.moveObjetosEixo == -1: #Porém nenhum eixo de movimento foi clicado anteriormente e nem em um objeto selecionado
-                        if canvas.camera.visionOption == 0: #Logo se está no modo perspectiva, apenas altera os parâmetros das coordenadas esféricas
-                            canvas.camera.theta = canvas.camera.theta + (canvas.lastx - canvas.x) / 100
-                            canvas.camera.phi = canvas.camera.phi + (canvas.lasty - canvas.y) / 100
-                            if canvas.camera.phi > math.pi / 2:
-                               canvas.camera.phi = math.pi / 2
-                            elif canvas.camera.phi < 0:
-                               canvas.camera.phi = 0.001
-                        else: #Se não altera os parâmetros para visao ortogonal
-                            canvas.camera.orthoCenter = (
-                                ((canvas.lasty - canvas.y) / 60) * c_float(Vars.KitLib.getEspacoGrid()).value + canvas.camera.orthoCenter[0],
-                                ((canvas.lastx - canvas.x) / 60) * c_float(Vars.KitLib.getEspacoGrid()).value + canvas.camera.orthoCenter[1])
-
-                    else:#Porém se o usuário selecionou algum modo de movimentar objetos
-                        if canvas.camera.visionOption == 0:# e está em modo perspectiva
-                            dTheta = (-math.sin(canvas.camera.theta),
-                                     math.cos(canvas.camera.theta), 0)
-                            dPhi = (-math.cos(canvas.camera.theta) * math.cos(canvas.camera.phi),
-                                   -math.sin(canvas.camera.theta) * math.cos(canvas.camera.phi),
-                                   math.sin(canvas.camera.phi))
-                            xDes =  (dTheta[0] * (canvas.lastx - canvas.x) / 50) + (dPhi[0] * (canvas.y - canvas.lasty) / 50)
-                            yDes =  (dTheta[1] * (canvas.lastx - canvas.x) / 50) + (dPhi[1] * (canvas.y - canvas.lasty) / 50)
-                            zDes = - dPhi[2] * (canvas.lasty - canvas.y) / 50
-
-                            spaceGrid = c_float(Vars.KitLib.getEspacoGrid()).value
-
-                            if spaceGrid == 9.0:
-                                spaceGrid *= 0.6
-                            elif spaceGrid == 18.0:
-                                spaceGrid *= 0.4
-
-                            if window.moveObjetosEixo == 0 or window.moveObjetosEixo == 1:#se o eixo dos X está selecionado
-                                if window.tabs.tabConfig.blockInsert[0]:
-                                    canvas.moveSelectX(-xDes,spaceGrid)
-                                else:
-                                    Vars.KitLib.moveSelect(c_float(-xDes * spaceGrid), c_float(0.0), c_float(0.0))
-
-                            elif window.moveObjetosEixo == 2 or window.moveObjetosEixo == 3:#se o eixo dos y está selecionado
-                                if window.tabs.tabConfig.blockInsert[0]:
-                                    canvas.moveSelectY(-yDes, spaceGrid)
-                                else:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes*spaceGrid), c_float(0.0))
-                            elif window.moveObjetosEixo == 4 or window.moveObjetosEixo == 5:#se o eixo dos Z está selecionado
-                                if window.tabs.tabConfig.blockInsert[0]:
-                                    canvas.moveSelectZ(-zDes, spaceGrid)
-                                else:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(-zDes*spaceGrid))
-                            else:#Porém se nenhuma seta foi selecionada, caiu na opção de ter clicado em um objeto selecionado, logo a movimentação desses objetos é livre em XYZ
-                                    Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(-yDes*spaceGrid), c_float(-zDes*spaceGrid))
-
-                        elif canvas.camera.visionOption == 5:# agora, se está na visao de cima, move os o objetos na direção correspondente
-                            xDes = (canvas.lastx - canvas.x)/100
-                            yDes = (canvas.lasty - canvas.y)/100
-
-                            spaceGrid = c_float(Vars.KitLib.getEspacoGrid()).value
-
-                            if spaceGrid == 9.0:
-                                spaceGrid *= 0.6
-                            elif spaceGrid == 18.0:
-                                spaceGrid *= 0.4
-
-                            if window.moveObjetosEixo == 0 or window.moveObjetosEixo == 1:
-                                if window.tabs.tabConfig.blockInsert[0]:
-                                    canvas.moveSelectX(-xDes, spaceGrid)
-                                else:
-                                    Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(0.0), c_float(0.0))
-                            elif window.moveObjetosEixo == 2 or window.moveObjetosEixo == 3:
-                                if window.tabs.tabConfig.blockInsert[0]:
-                                    canvas.moveSelectY(yDes, spaceGrid)
-                                else:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes*spaceGrid), c_float(0.0))
-                            elif window.moveObjetosEixo == -2:
-                                Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(yDes*spaceGrid), c_float(0.0))
-
-                        elif canvas.camera.visionOption == 1 or canvas.camera.visionOption == 2:# agora, se está na visão de frente ou de trás, move os o objetos na direção correspondente
-                            yDes = (canvas.lastx - canvas.x) / 100
-                            zDes = (canvas.lasty - canvas.y) / 100
-
-                            spaceGrid = c_float(Vars.KitLib.getEspacoGrid()).value
-
-                            if spaceGrid == 9.0:
-                                spaceGrid *= 0.6
-                            elif spaceGrid == 18.0:
-                                spaceGrid *= 0.4
-
-                            if canvas.camera.visionOption == 1:
-                                if window.moveObjetosEixo == 2 or window.moveObjetosEixo == 3:
-                                    if window.tabs.tabConfig.blockInsert[0]:
-                                        canvas.moveSelectY(-yDes, spaceGrid)
-                                    else:
-                                        Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes * spaceGrid), c_float(0.0))
-                                elif window.moveObjetosEixo == 4 or window.moveObjetosEixo == 5:
-                                    if window.tabs.tabConfig.blockInsert[0]:
-                                        canvas.moveSelectZ(zDes, spaceGrid)
-                                    else:
-                                        Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
-                                elif window.moveObjetosEixo == -2:
-                                        Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes*spaceGrid), c_float(zDes*spaceGrid))
-                            else:
-                                if window.moveObjetosEixo == 2 or window.moveObjetosEixo == 3:
-                                    if window.tabs.tabConfig.blockInsert[0]:
-                                        canvas.moveSelectY(yDes, spaceGrid)
-                                    else:
-                                        Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes*spaceGrid), c_float(0.0))
-                                elif window.moveObjetosEixo == 4 or window.moveObjetosEixo == 5:
-                                    if window.tabs.tabConfig.blockInsert[0]:
-                                        canvas.moveSelectZ(zDes, spaceGrid)
-                                    else:
-                                        Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
-                                elif window.moveObjetosEixo == -2:
-                                    Vars.KitLib.moveSelect(c_float(0.0), c_float(yDes*spaceGrid), c_float(zDes*spaceGrid))
+                if canvas.camera.visionOption == 0:  # e está na visao perspectiva, apenas altera os parâmetros da coordenada esférica
+                    canvas.camera.theta = canvas.camera.theta + (canvas.lastx - canvas.x) / 300
+                    canvas.camera.phi = canvas.camera.phi + (canvas.lasty - canvas.y) / 300
+                    if canvas.camera.phi > math.pi / 2:
+                        canvas.camera.phi = math.pi / 2
+                    elif canvas.camera.phi < 0:
+                        canvas.camera.phi = 0.001
+                else:  # se não, apenas altera os parametros da visão ortogonal
+                    canvas.camera.orthoCenter = (
+                        ((canvas.lasty - canvas.y) * canvas.camera.orthoZoom * 0.5 / 300) * c_float(
+                            Vars.KitLib.getEspacoGrid()).value + canvas.camera.orthoCenter[0],
+                        ((canvas.lastx - canvas.x) * canvas.camera.orthoZoom * 0.5 / 300) * c_float(
+                            Vars.KitLib.getEspacoGrid()).value + canvas.camera.orthoCenter[1])
 
 
-                        elif canvas.camera.visionOption == 3 or canvas.camera.visionOption == 4:# agora, se está na visao da direita ou da esquerda, move os o objetos na direção correspondente
-                            xDes = (canvas.lastx - canvas.x) / 100
-                            zDes = (canvas.lasty - canvas.y) / 100
 
-                            spaceGrid = c_float(Vars.KitLib.getEspacoGrid()).value
+        elif(evt.Dragging() and evt.LeftIsDown() and window.moveObjetos[0]):
+            canvas.lastx, canvas.lasty = canvas.x, canvas.y
+            canvas.x, canvas.y = evt.GetPosition()
+            MouseEvent.OnMoveObjs(window, canvas)
 
-                            if spaceGrid == 9.0:
-                                spaceGrid *= 0.6
-                            elif spaceGrid == 18.0:
-                                spaceGrid *= 0.4
+        elif(evt.Dragging() and evt.LeftIsDown() and window.rotacionaObjetos[0]):
+            canvas.lastx, canvas.lasty = canvas.x, canvas.y
+            canvas.x, canvas.y = evt.GetPosition()
+            MouseEvent.OnRotObjs(window, canvas)
 
-                            if canvas.camera.visionOption == 3:
-                                if window.moveObjetosEixo == 0 or window.moveObjetosEixo == 1:
-                                    if window.tabs.tabConfig.blockInsert[0]:
-                                        canvas.moveSelectX(xDes, spaceGrid)
-                                    else:
-                                        Vars.KitLib.moveSelect(c_float(xDes*spaceGrid), c_float(0.0), c_float(0.0))
-                                elif window.moveObjetosEixo == 4 or window.moveObjetosEixo == 5:
-                                    if window.tabs.tabConfig.blockInsert[0]:
-                                        canvas.moveSelectZ(zDes, spaceGrid)
-                                    else:
-                                        Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
-                                elif window.moveObjetosEixo == -2:
-                                    Vars.KitLib.moveSelect(c_float(xDes*spaceGrid), c_float(0.0), c_float(zDes*spaceGrid))
-                            else:
-                                if window.moveObjetosEixo == 0 or window.moveObjetosEixo == 1:
-                                    if window.tabs.tabConfig.blockInsert[0]:
-                                        canvas.moveSelectX(-xDes, spaceGrid)
-                                    else:
-                                        Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(0.0), c_float(0.0))
-                                elif window.moveObjetosEixo == 4 or window.moveObjetosEixo == 5:
-                                    if window.tabs.tabConfig.blockInsert[0]:
-                                        canvas.moveSelectZ(zDes, spaceGrid)
-                                    else:
-                                        Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(zDes*spaceGrid))
-                                elif window.moveObjetosEixo == -2:
-                                    Vars.KitLib.moveSelect(c_float(-xDes*spaceGrid), c_float(0.0), c_float(zDes*spaceGrid))
-                    window.tabs.tabInfo.alteraCentroMBR()
-                    window.atualizaPrecisaSalvar(True)
-                else: #se a opção de movimentar objetos não foi selecionado pelo usuário
-                    if canvas.camera.visionOption == 0: #e está na visao perspectiva, apenas altera os parâmetros da coordenada esférica
-                        canvas.camera.theta = canvas.camera.theta + (canvas.lastx - canvas.x) / 300
-                        canvas.camera.phi = canvas.camera.phi + (canvas.lasty - canvas.y) / 300
-                        if canvas.camera.phi > math.pi / 2:
-                           canvas.camera.phi = math.pi / 2
-                        elif canvas.camera.phi < 0:
-                           canvas.camera.phi = 0.001
-                    else: #se não, apenas altera os parametros da visão ortogonal
-                        canvas.camera.orthoCenter = (
-                            ((canvas.lasty - canvas.y) * canvas.camera.orthoZoom * 0.5 / 300) * c_float(Vars.KitLib.getEspacoGrid()).value + canvas.camera.orthoCenter[0],
-                            ((canvas.lastx - canvas.x) * canvas.camera.orthoZoom * 0.5 / 300) * c_float(Vars.KitLib.getEspacoGrid()).value + canvas.camera.orthoCenter[1])
-
-            canvas.camera.atualizaCentroFocus()
-            canvas.Refresh(True)
-
+        canvas.camera.atualizaCentroFocus()
+        canvas.Refresh(True)
         if canvas.dClickEvent:
             canvas.dClickEvent = False
 
@@ -244,7 +98,7 @@ class MouseEvent(object):
 
         if canvas.camera.visionOption == Vars.VISION_Z_PERSP:
 
-            zoom = 0.3
+            zoom = 0.05 * canvas.camera.camZoom
             if evt.GetWheelRotation() < 0:
 
                 canvas.camera.camZoom += zoom
@@ -255,6 +109,7 @@ class MouseEvent(object):
                 if canvas.camera.camZoom <= 0:
                     canvas.camera.camZoom = 0.2
         else:
+
             zoom = 0.3
             if evt.GetWheelRotation() < 0:
 
@@ -276,8 +131,12 @@ class MouseEvent(object):
         if Vars.KitSim.getSSim():
             return
         if window.botaoSelecionado == Vars.MOVETELA_SELECIONADO:
-            myCursor = wx.Cursor(r"icones/cursorMoveTelaClick.cur",
-                                 wx.BITMAP_TYPE_CUR)
+            if Vars.thema == "dark":
+                myCursor = wx.Cursor(Vars.dirExec + "icones/cursorMoveTelaClickdark.cur",
+                                     wx.BITMAP_TYPE_CUR)
+            else:
+                myCursor = wx.Cursor(Vars.dirExec + "icones/cursorMoveTelaClick.cur",
+                                     wx.BITMAP_TYPE_CUR)
 
             window.SetCursor(myCursor)
             MouseEvent.OnScrollClick(e,canvas,window)
@@ -296,29 +155,46 @@ class MouseEvent(object):
                 Vars.rightMouse = e.GetPosition()
                 AdicionarObjetos.OnAddBase(Vars.BASE_LIVRE,canvas, window)
             elif window.botaoSelecionado == Vars.LIVRE_SELECIONADO:
-                Vars.KitLib.terminaMovimentacao()
-                Vars.KitLib.deSelectAll()
-                window.moveObjetos = False
+                if window.moveObjetos[0] or window.rotacionaObjetos[0]:
+                    Vars.toolBox.SetFocus()
+                    canvas.CaptureMouse()
+                    canvas.x, canvas.y = canvas.lastx, canvas.lasty = e.GetPosition()
+                    Vars.centroAux = canvas.camera.centro
+                    if window.rotacionaSelectCentro and window.rotacionaObjetos[0]:
+                        ponto = Vars.KitLib.getPonto3D(canvas.x,canvas.y)
+                        Vars.KitLib.selectRotCenter(ponto, canvas.camera.visionAxis, canvas.camera.visionOption)
+
+                else:
+                    Vars.KitLib.deSelectAll()
+                    idObj = Vars.KitLib.select(ponto, canvas.camera.visionAxis, canvas.camera.visionOption)
+                    if idObj != 0:
+                        obj = Vars.KitLib.getObjById(idObj)
+                        centro = (obj.contents.centro.x, obj.contents.centro.y, obj.contents.centro.z)
+                        window.tabs.tabInfo.AlteraLayoutInfo(obj.contents.id, obj.contents.obj, centro, 0, 0)
+                    else:
+                        window.tabs.tabInfo.AlteraLayoutInfo(0, 0, None, None, None)
             elif window.botaoSelecionado == Vars.ADDFORCA_SELECIONADO:
                 XYTela = e.GetPosition()
                 ponto = Vars.KitLib.getPonto3D(XYTela[0], XYTela[1])
-                Vars.KitSim.addForca(ponto,6,0,0)
-                c_float(float(window.tabs.tabSim.txtX.GetValue()))
-                c_float(float(window.tabs.tabSim.txtY.GetValue()))
-                c_float(float(window.tabs.tabSim.txtZ.GetValue()))
+                Vars.KitSim.addForca(ponto,c_float(float(window.tabs.tabSim.txtX.GetValue())),
+                                     c_float(float(window.tabs.tabSim.txtY.GetValue())),
+                                     c_float(float(window.tabs.tabSim.txtZ.GetValue())))
+            else:
+                idObj = Vars.KitLib.select(ponto, canvas.camera.visionAxis, canvas.camera.visionOption)
+                if idObj != 0:
+                    obj = Vars.KitLib.getObjById(idObj)
+                    centro = (obj.contents.centro.x, obj.contents.centro.y, obj.contents.centro.z)
+                    window.tabs.tabInfo.AlteraLayoutInfo(obj.contents.id, obj.contents.obj, centro, 0, 0)
+                else:
+                    window.tabs.tabInfo.AlteraLayoutInfo(0, 0, None, None, None)
 
-        idObj = Vars.KitLib.select(ponto, canvas.camera.visionAxis, canvas.camera.visionOption)
-        if idObj != 0:
-            obj = Vars.KitLib.getObjById(idObj)
-            centro = (obj.contents.centro.x, obj.contents.centro.y, obj.contents.centro.z)
-            window.tabs.tabInfo.AlteraLayoutInfo(obj.contents.id, obj.contents.obj, centro, 0, 0)
         else:
-            window.tabs.tabInfo.AlteraLayoutInfo(0, 0, None, None, None)
-
-        window.drawArea0.Refresh()
-        window.drawArea1.Refresh()
-        window.drawArea2.Refresh()
-        window.drawArea3.Refresh()
+            idObj = Vars.KitLib.select(ponto, canvas.camera.visionAxis, canvas.camera.visionOption)
+            if idObj != 0:
+                obj = Vars.KitLib.getObjById(idObj)
+                centro = (obj.contents.centro.x, obj.contents.centro.y, obj.contents.centro.z)
+                window.tabs.tabInfo.AlteraLayoutInfo(obj.contents.id, obj.contents.obj, centro, 0, 0)
+        window.OnRefreshAll()
 
     @staticmethod
     def OnRightDown(e,canvas, window):
@@ -332,3 +208,106 @@ class MouseEvent(object):
         except:
             pass
         canvas.Refresh(True)
+
+    @staticmethod
+    def OnMoveObjs(window, canvas):
+        if canvas.camera.visionOption == 0:  # e está em modo perspectiva
+            dTheta = (-math.sin(canvas.camera.theta),
+                      math.cos(canvas.camera.theta), 0)
+            dPhi = (-math.cos(canvas.camera.theta) * math.cos(canvas.camera.phi),
+                    -math.sin(canvas.camera.theta) * math.cos(canvas.camera.phi),
+                    math.sin(canvas.camera.phi))
+            xDes = (dTheta[0] * (canvas.lastx - canvas.x) / 50) + (dPhi[0] * (canvas.y - canvas.lasty) / 50)
+            yDes = (dTheta[1] * (canvas.lastx - canvas.x) / 50) + (dPhi[1] * (canvas.y - canvas.lasty) / 50)
+            zDes = - dPhi[2] * (canvas.lasty - canvas.y) / 50
+
+            MouseEvent.OnDeslocaObjs(xDes,yDes,zDes,window,canvas)
+
+        elif canvas.camera.visionOption == 5:  # agora, se está na visao de cima, move os o objetos na direção correspondente
+            xDes = (canvas.lastx - canvas.x) / 100
+            yDes = (canvas.lasty - canvas.y) / 100
+
+            MouseEvent.OnDeslocaObjs(xDes, -yDes, 0, window, canvas)
+
+        elif canvas.camera.visionOption == 1:  # agora, se está na visão de frente, move os o objetos na direção correspondente
+            yDes = (canvas.lastx - canvas.x) / 100
+            zDes = (canvas.lasty - canvas.y) / 100
+
+            MouseEvent.OnDeslocaObjs(0, yDes, -zDes, window, canvas)
+
+        elif canvas.camera.visionOption == 2:  # agora, se está na visão de trás, move os o objetos na direção correspondente
+            yDes = (canvas.lastx - canvas.x) / 100
+            zDes = (canvas.lasty - canvas.y) / 100
+
+            MouseEvent.OnDeslocaObjs(0, -yDes, -zDes, window, canvas)
+
+
+        elif canvas.camera.visionOption == 3:  # agora, se está na visao da direita ou da esquerda, move os o objetos na direção correspondente
+            xDes = (canvas.lastx - canvas.x) / 100
+            zDes = (canvas.lasty - canvas.y) / 100
+
+            MouseEvent.OnDeslocaObjs(-xDes, 0, -zDes, window, canvas)
+
+        elif canvas.camera.visionOption == 4:  # agora, se está na visao da direita ou da esquerda, move os o objetos na direção correspondente
+            xDes = (canvas.lastx - canvas.x) / 100
+            zDes = (canvas.lasty - canvas.y) / 100
+
+            MouseEvent.OnDeslocaObjs(xDes, 0, -zDes, window, canvas)
+
+        window.tabs.tabInfo.alteraCentroMBR()
+        window.atualizaPrecisaSalvar(True)
+
+
+    @staticmethod
+    def OnDeslocaObjs(xDes,yDes,zDes,window,canvas):
+
+        spaceGrid = c_float(Vars.KitLib.getEspacoGrid()).value
+
+        if spaceGrid == 9.0:
+            spaceGrid *= 0.6
+        elif spaceGrid == 18.0:
+            spaceGrid *= 0.4
+
+        if window.moveObjetos[1] == Vars.ASCII_X:  # se o eixo dos X está selecionado
+            if window.tabs.tabConfig.blockInsert[0]:
+                canvas.moveSelectX(-xDes, spaceGrid)
+            else:
+                Vars.KitLib.moveSelect(c_float(-xDes * spaceGrid), c_float(0.0), c_float(0.0))
+
+        elif window.moveObjetos[1] == Vars.ASCII_Y:  # se o eixo dos y está selecionado
+            if window.tabs.tabConfig.blockInsert[0]:
+                canvas.moveSelectY(-yDes, spaceGrid)
+            else:
+                Vars.KitLib.moveSelect(c_float(0.0), c_float(-yDes * spaceGrid), c_float(0.0))
+        elif window.moveObjetos[1] == Vars.ASCII_Z:  # se o eixo dos Z está selecionado
+            if window.tabs.tabConfig.blockInsert[0]:
+                canvas.moveSelectZ(-zDes, spaceGrid)
+
+    @staticmethod
+    def OnRotObjs(window, canvas):
+
+        rot = False
+        if canvas.camera.visionOption == 0:  # e está em modo perspectiva
+
+            dTheta = (-math.sin(canvas.camera.theta),
+                      math.cos(canvas.camera.theta), 0)
+            dPhi = (-math.cos(canvas.camera.theta) * math.cos(canvas.camera.phi),
+                    -math.sin(canvas.camera.theta) * math.cos(canvas.camera.phi),
+                    math.sin(canvas.camera.phi))
+            xDes = (dTheta[0] * (canvas.lastx - canvas.x) / 50) + (dPhi[0] * (canvas.y - canvas.lasty) / 50)
+            yDes = (dTheta[1] * (canvas.lastx - canvas.x) / 50) + (dPhi[1] * (canvas.y - canvas.lasty) / 50)
+            zDes = - dPhi[2] * (canvas.lasty - canvas.y) / 50
+            if window.rotacionaObjetos[1] == Vars.ASCII_X:
+                rot = Vars.KitLib.rotacionaSelect(True,False,False, c_float(xDes))
+            elif window.rotacionaObjetos[1] == Vars.ASCII_Y:
+                rot = Vars.KitLib.rotacionaSelect(False,True,False, c_float(yDes))
+            elif window.rotacionaObjetos[1] == Vars.ASCII_Z:
+                rot = Vars.KitLib.rotacionaSelect(False,False,True, c_float(zDes))
+
+            if not(rot):
+                Msg.exibirStatusBar("Bases só podem ser rotacionadas no eixo Z.",10)
+
+
+        elif canvas.camera.visionOption == 5:  # agora, se está na visao de cima, move os o objetos na direção correspondente
+            xDes = (canvas.lastx - canvas.x) / 100
+            yDes = (canvas.lasty - canvas.y) / 100

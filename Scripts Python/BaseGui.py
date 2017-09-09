@@ -5,6 +5,8 @@ from ToolBar import *
 from KeyboardEvent import *
 from SalvarProjeto import *
 from SplashScreen import *
+from Msg import *
+from StatusBar import *
 
 """
     -> WindowClass:
@@ -16,16 +18,18 @@ class WindowClass(wx.Frame):
         super(WindowClass,self).__init__(*args, **kwargs)
 
         #Variaveis da classe:
-        self.version = "0.7.9"  # Variável de controle de versão
-        self.dateModificacao = "28/04/2017"  # Data da última atualização do programa
+        self.version = "0.8.9"  # Variável de controle de versão
+        self.dateModificacao = "26/07/2017"  # Data da última atualização do programa
         self.drawArea0 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
         self.drawArea1 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
         self.drawArea2 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
         self.drawArea3 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
         self.ultimoDrawSelected = None  # Variável que armazena uma referência para qual drawArea foi interagido por último
         self.botaoSelecionado = -1 # Variavel que armazena a opção selecionada pelo usuário nos botoes auxiliares na toolbar, se nao está nenhum selecionado
-        self.moveObjetos = False  # Variável que armazena se a opção de mover objetos está ativa
-        self.moveObjetosEixo = -1  # Variável que armazena qual eixo a seleção irá se mover, apenas usado quando clica-se em cima da seta de movimento
+        self.moveObjetos = (False,Vars.ASCII_0)  # Variável que armazena se a opção de mover objetos está ativa, na segunda opção qual eixo esta selecionado para movimentacao
+        self.rotacionaObjetos = (False,Vars.ASCII_0) # Variável que armazena se a opção de rotacionar objetos está ativa
+        self.rotacionaObjetosEixo = -1 # Variável que armazena qual eixo a seleção irá rotacionar, apenas usado quando clica-se em cima da seta de rotação
+        self.rotacionaSelectCentro = False
         self.salvar = SalvarProjeto(self)
         self.toolbar = None
         #splash = Splash(self)
@@ -39,20 +43,32 @@ class WindowClass(wx.Frame):
     """
     def base_gui(self):
 
-        self.CreateStatusBar()
+        self.statusSizer = wx.BoxSizer(wx.VERTICAL)
+        Msg.statusBar = StatusBar(self)
+        self.statusSizer.Add(Msg.statusBar, 0, wx.ALIGN_LEFT | wx.EXPAND, 5)
+        Msg.statusBar.SetColor(StatusBar.COLOR_RED)
+
         self.programIcon = wx.EmptyIcon()
-        self.programIcon.CopyFromBitmap(wx.Bitmap('icones/icon.ico', wx.BITMAP_TYPE_ANY))
+        self.programIcon.CopyFromBitmap(wx.Bitmap(Vars.dirExec + 'icones/icon.ico', wx.BITMAP_TYPE_ANY))
         self.SetIcon(self.programIcon)
+        self.sizerToolSide = wx.BoxSizer(wx.VERTICAL)
+        self.showToolbarSide = True
+        self.showToolbarTop = True
+
         self.createToolbar()
+
+        if(Vars.thema == "dark"):
+            Msg.statusBar.SetBackgroundColour(Vars.corThema)
         Vars.KitLib.init()
         Vars.KitSim.init(Vars.KitLib.getObjList())
 
-        Vars.status = self.GetStatusBar()
         self.strTitle = "KitSim"
         self.strSemTitulo = "Sem Titulo"
         self.SetTitle(self.strTitle + " - " + self.strSemTitulo)
 
         #definição dos sizers
+        self.sizerWindowStatus = wx.BoxSizer(wx.VERTICAL)
+        self.sizerWindow = wx.BoxSizer(wx.HORIZONTAL)
         self.boxMain = wx.BoxSizer(wx.HORIZONTAL)
         box = wx.BoxSizer(wx.VERTICAL)
         self.boxBtn = wx.BoxSizer(wx.VERTICAL)
@@ -65,8 +81,9 @@ class WindowClass(wx.Frame):
         self.boxBtn.Add(self.tabs, 1, wx.ALIGN_TOP | wx.EXPAND, 1)
 
         #Definição dos menus
-        menuBar = wx.MenuBar()
+        menuBar = wx.MenuBar(style=wx.MB_DOCKABLE)
         fileMenu = wx.Menu()
+        janelaMenu = wx.Menu()
         aboutMenu = wx.Menu()
 
         #Criação dos itens dos menus
@@ -76,17 +93,12 @@ class WindowClass(wx.Frame):
         exitItem = fileMenu.Append(wx.ID_EXIT, 'Sair', 'Fechar Programa')
         helpItem = aboutMenu.Append(wx.ID_ABOUT, 'Ajuda', 'Ajuda')
         versionItem = aboutMenu.Append(wx.ID_DEFAULT, 'Versão', 'Informações sobre a versão')
-
-        """
-        #Criação do label de visao(ao lado esquerdo)
-        visionItem = wx.StaticText(self,0,Vars.visionModes[0], pos=(10,10), style=wx.ALIGN_CENTER)
-        visionItem.SetFont(wx.Font(10, wx.SWISS, wx.NORMAL, wx.BOLD))
-        visionItem.SetBackgroundColour((128,128,128))
-        visionItem.SetForegroundColour((255,255,255))
-        Vars.visionItem = visionItem"""
+        themaItemLight = janelaMenu.Append(wx.ID_ANY, 'Padrão', 'Altera o tema da janela padrão.')
+        themaItemDark = janelaMenu.Append(wx.ID_ANY, 'Escuro', 'Altera o tema da janela escuro.')
 
         #Adição dos menus à barra de menus
         menuBar.Append(fileMenu, '&Arquivo')
+        menuBar.Append(janelaMenu, '&Tema')
         menuBar.Append(aboutMenu, '&Sobre')
 
         #Criação da area de desenho
@@ -175,28 +187,79 @@ class WindowClass(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnOpen, openItem)
         self.Bind(wx.EVT_MENU, self.OnSave, saveItem)
         self.Bind(wx.EVT_MENU, self.OnSaveAs, saveAsItem)
+        self.Bind(wx.EVT_MENU, self.OnChangeToLight, themaItemLight)
+        self.Bind(wx.EVT_MENU, self.OnChangeToDark, themaItemDark)
         self.Bind(wx.EVT_MENU, self.OnHelp, helpItem)
         self.Bind(wx.EVT_MENU, self.OnVersion, versionItem)
         self.tabs.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
         self.tabs.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
         self.tabs.Bind(wx.EVT_CHAR_HOOK, self.OnEnterKeyDown)
         self.Bind(wx.EVT_CLOSE, self.OnClose)
+        self.Bind(wx.EVT_SET_FOCUS, self.OnFocus, self)
 
         Vars.toolBox = self.tabs
 
+        self.sizerToolSide.Add(self.toolbarside,1, wx.EXPAND, 15)
+        self.sizerWindow.Add(self.sizerToolSide,0, wx.ALIGN_LEFT | wx.EXPAND,15)
+        self.sizerWindow.Add(self.boxMain, 1, wx.ALIGN_RIGHT | wx.EXPAND, 15)
+
+        self.sizerWindowStatus.Add(self.sizerWindow,1, wx.ALIGN_TOP | wx.EXPAND,15)
+        self.sizerWindowStatus.Add(self.statusSizer, 0, wx.ALIGN_BOTTOM | wx.EXPAND, 15)
+
         #Configurações finais
+
+        self.SetMinSize((1024,768))
 
         self.boxBtn.Layout()
         self.boxMain.Layout()
+        self.sizerWindow.Layout()
+        self.sizerWindowStatus.Layout()
         self.Maximize(True)
-        self.SetSizer(self.boxMain)
-        self.Show()
+        self.SetSizer(self.sizerWindowStatus)
+        self.Show(True)
+        self.tabs.SetFocus()
+
+        if Vars.openFile != False:
+            self.salvar.onOpen(Vars.openFile)
+
+    def OnFocus(self, e):
+
+        self.tabs.SetFocus()
+        e.Skip()
 
     def createToolbar(self):
 
-        self.toolBar = None
-        ToolBar.CreateToolBar(self)
+        self.toolbar = None
+        self.toolbarside = None
+        ToolBar.CreateToolBarTopo(self)
+        ToolBar.CreateToolBar(self,self.sizerToolSide)
 
+    def OnChangeToLight(self, e):
+
+        if Vars.thema == "light":
+            e.Skip()
+        else:
+            Vars.thema = "light"
+            option = Msg.exibirMensagem("Para realizar as alterações é necessário reiniciar o programa, deseja fazer isso agora?",
+                                        "Alterar tema",
+                                        Msg.tipoYesNo,
+                                        Msg.janelaWarning)
+            if (option == wx.ID_YES):
+                Vars.reset = True
+                self.Destroy()
+
+    def OnChangeToDark(self, e):
+        if Vars.thema == "dark":
+            e.Skip()
+        else:
+            Vars.thema = "dark"
+            option = Msg.exibirMensagem("Para realizar as alterações é necessário reiniciar o programa, deseja fazer isso agora?",
+                                        "Alterar tema",
+                                        Msg.tipoYesNo,
+                                        Msg.janelaWarning)
+            if (option == wx.ID_YES):
+                Vars.reset = True
+                self.Destroy()
 
     """
         -> Função OnMoverSelectToolbar:
@@ -346,10 +409,11 @@ class WindowClass(wx.Frame):
         -> Retorno: vazio
     """
     def OnClose(self, e):
+        if Msg.timer != None:
+            Msg.timer.cancel()
+            del Msg.timer
         if self.salvar.precisaSalvar:
-            msg = wx.MessageDialog(None, "Deseja sair do programa sem salvar?", "Fechar Programa", wx.YES_NO | wx.ICON_WARNING)
-            option = msg.ShowModal()
-            msg.Destroy()
+            option = Msg.exibirMensagem("Deseja sair do programa sem salvar?", "Fechar Programa", Msg.tipoYesNo, Msg.janelaWarning)
             if(option == wx.ID_YES):
                 self.Destroy()
         else:
@@ -377,12 +441,12 @@ class WindowClass(wx.Frame):
     """
     def OnDuplica(self, e):
         if Vars.KitLib.duplicaSelect():
-            self.moveObjetos = True
+            self.moveObjetos = (True,Vars.ASCII_0)
+            Msg.exibirStatusBar("Selecione um eixo de mivimentação precionando x, y ou z", 10)
+            if self.rotacionaObjetos:
+                self.rotacionaObjetos = (False,Vars.ASCII_0)
             self.atualizaPrecisaSalvar(True)
-        self.drawArea0.Refresh()
-        self.drawArea1.Refresh()
-        self.drawArea2.Refresh()
-        self.drawArea3.Refresh()
+        self.OnRefreshAll()
     """
         -> Função OnSelectAll:
             Função para selecionar todos os objetos da cena. Utiliza a função do KitLib para fazer isso.
@@ -414,19 +478,6 @@ class WindowClass(wx.Frame):
         #Vars.drawArea.SetMinSize(resize)
         self.Layout()
 
-
-    """
-        -> Função onQuit:
-            Função utilizada na barra de menus para terminar a execução do programa em python.
-        -> Parâmetros:
-            -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
-        -> Retorno: vazio
-
-    """
-    def OnQuit(self, e):
-
-        self.Close()
-
     """
         ->Função onHelp:
             Função utilizada para testes, será substituida em versões futuras
@@ -456,9 +507,24 @@ class WindowClass(wx.Frame):
     """
     def OnVersion(self,e):
 
-        ver = wx.MessageDialog(None, "Versão: " + self.version + "\nData de modificação: " + self.dateModificacao, "Versão",  wx.OK)
+        """ver = wx.MessageDialog(None, "Versão: " + self.version + "\nData de modificação: " + self.dateModificacao, "Versão",  wx.OK)
         ver.ShowModal()
-        ver.Destroy()
+        ver.Destroy()"""
+        ver = wx.adv.AboutDialogInfo()
+
+        ver.SetIcon(wx.Icon(Vars.dirExec + 'icones\logoKitSim.png', wx.BITMAP_TYPE_PNG))
+        ver.SetName('KitSim')
+        ver.SetVersion(self.version + " " + self.dateModificacao)
+        #ver.SetDescription(description)
+        #ver.SetCopyright('(C) 2007 - 2014 Jan Bodnar')
+        #ver.SetWebSite('http://www.zetcode.com')
+        #ver.SetLicence(licence)
+        ver.AddDeveloper('Adriele Valle\nEmanuel Antônio Parreiras')
+        #ver.AddDocWriter('Jan Bodnar')
+        #ver.AddArtist('The Tango crew')
+        #ver.AddTranslator('Jan Bodnar')
+        wx.adv.AboutBox(ver)
+
 
 
     """
@@ -549,19 +615,16 @@ class WindowClass(wx.Frame):
         if(Vars.KitLib.refazerSize() > 0):
             Vars.KitLib.refazer()
             if (Vars.KitLib.desfazerSize() > 0):
-                self.toobar.EnableTool(wx.ID_UNDO, True)
+                self.toolbar.EnableTool(wx.ID_UNDO, True)
             else:
-                self.toobar.EnableTool(wx.ID_UNDO, False)
+                self.toolbar.EnableTool(wx.ID_UNDO, False)
             if(Vars.KitLib.refazerSize() == 0):
                 self.toolbar.EnableTool(wx.ID_REDO, False)
 
         else:
-            self.toolBar.EnableTool(wx.ID_REDO, False)
+            self.toolbar.EnableTool(wx.ID_REDO, False)
 
-        self.drawArea0.Refresh()
-        self.drawArea1.Refresh()
-        self.drawArea2.Refresh()
-        self.drawArea3.Refresh()
+        self.OnRefreshAll()
 
     """
         -> Função OnZoomOut:

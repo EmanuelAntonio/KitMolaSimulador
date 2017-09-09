@@ -1,9 +1,9 @@
 #ifndef LIGRIGIDA_H
 #define LIGRIGIDA_H
+#include "Objeto3D.h"
 
 
-class LigRigida : public Objeto3D
-{
+class LigRigida : public Objeto3D{
     public:
         LigRigida();
         ~LigRigida();

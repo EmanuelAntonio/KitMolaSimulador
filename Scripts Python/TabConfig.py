@@ -13,22 +13,22 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
 
         self.blockInsert = (True,1) #Variavel que armazena se a opção de bloquear a posição da inserção está ativado
 
-        wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent=parent, size = (10,-1), id=wx.ID_ANY, style=wx.DOUBLE_BORDER)
+        wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent=parent, size = (10,-1), id=wx.ID_ANY)#, style=wx.DOUBLE_BORDER)
         self.SetupScrolling(scroll_x=False)
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.parent = parent
 
         #Configurações de tamanho do grid
-        lblTamGrid = wx.StaticText(self,wx.ID_ANY,"Tamanho do grid: ")
-        lblTamGrid.SetExtraStyle(wx.TE_CENTRE)
+        self.lblTamGrid = wx.StaticText(self,wx.ID_ANY,"Tamanho do grid: ")
+        self.lblTamGrid.SetExtraStyle(wx.TE_CENTRE)
         self.txtTamGrid = wx.TextCtrl(self, wx.ID_ANY, str(Vars.KitLib.getTamGrid()),style=wx.TE_PROCESS_ENTER)
         self.txtTamGrid.Bind(wx.EVT_KEY_DOWN, self.OnEnter)
         btnTamGrid = wx.Button(self,wx.ID_ANY,"Ok")
 
         # Configurações de espaçamento do grid
         sizerDistGrid = wx.BoxSizer(wx.VERTICAL)
-        lblDistGrid = wx.StaticText(self, wx.ID_ANY, "Espaçamento do Grid:")
+        self.lblDistGrid = wx.StaticText(self, wx.ID_ANY, "Espaçamento do Grid:")
         self.cbxDistGrid = wx.ComboBox(self, wx.ID_ANY, "1cm", style=wx.CB_READONLY)
         self.cbxDistGrid.Append("1cm",1)
         self.cbxDistGrid.Append("9cm",2)
@@ -78,14 +78,14 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
 
         # Configurações de qualidade da malha
         sizerQuality = wx.BoxSizer(wx.VERTICAL)
-        lblQuality = wx.StaticText(self,wx.ID_ANY, "Qualidade da Malha:")
+        self.lblQuality = wx.StaticText(self,wx.ID_ANY, "Qualidade da Malha:")
         self.sldQuality = wx.Slider(self, value=100, minValue=14, maxValue=100,style=wx.SL_HORIZONTAL | wx.SL_LABELS)
-        sizerQuality.Add(self.sldQuality, 1, wx.ALIGN_CENTRE | wx.EXPAND, 5)
+        sizerQuality.Add(self.sldQuality, 0, wx.ALIGN_CENTER | wx.EXPAND, 0)
         self.sldQuality.Bind(wx.EVT_SLIDER, self.OnSliderScroll)
 
         # Configurações de bloqueio de inserção
         sizerBlock = wx.BoxSizer(wx.VERTICAL)
-        lblBlock = wx.StaticText(self,wx.ID_ANY, "Bloqueio de Movimentação:")
+        self.lblBlock = wx.StaticText(self,wx.ID_ANY, "Bloqueio de Movimentação:")
         self.cbxBlockInsert = wx.ComboBox(self, wx.ID_ANY, "1cm", style=wx.CB_READONLY)
         self.cbxBlockInsert.Append("Livre", 1)
         self.cbxBlockInsert.Append("1cm", 2)
@@ -94,12 +94,12 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
         sizerBlock.Add(self.cbxBlockInsert, 0, wx.ALIGN_CENTER,5)
 
         # Adição do sizer principal
-        self.sizer.Add(lblTamGrid, 0, wx.ALIGN_CENTER,5)
+        self.sizer.Add(self.lblTamGrid, 0, wx.ALIGN_CENTER,5)
         self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
         self.sizer.Add(self.txtTamGrid, 0, wx.ALIGN_CENTER, 5)
         self.sizer.Add(btnTamGrid, 0, wx.ALIGN_CENTER, 5)
         self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
-        self.sizer.Add(lblDistGrid, 0, wx.ALIGN_CENTER,5)
+        self.sizer.Add(self.lblDistGrid, 0, wx.ALIGN_CENTER,5)
         self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
         self.sizer.Add(sizerDistGrid,0,wx.ALIGN_CENTRE,5)
         self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
@@ -108,12 +108,12 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
         self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
         self.sizer.Add(self.sizerFocus, 0, wx.ALIGN_CENTER, 5)
         self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
-        self.sizer.Add(lblQuality, 0, wx.ALIGN_CENTER, 5)
+        self.sizer.Add(self.lblQuality, 0, wx.ALIGN_CENTER, 5)
         self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
         self.sizer.Add(sizerQuality, 0, wx.ALIGN_CENTRE | wx.EXPAND, 5)
         self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
 
-        self.sizer.Add(lblBlock, 0, wx.ALIGN_CENTER, 5)
+        self.sizer.Add(self.lblBlock, 0, wx.ALIGN_CENTER, 5)
         self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
         self.sizer.Add(sizerBlock, 0, wx.ALIGN_CENTRE | wx.EXPAND, 5)
         self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
@@ -129,7 +129,46 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
         self.cbxBlockInsert.Bind(wx.EVT_COMBOBOX, self.OnBlockInsert)
         self.Bind(wx.EVT_CHECKBOX, self.OnBlockInsert)
 
+        #tema dark
+        if Vars.thema == "dark":
+            self.themaDark()
+
         self.SetSizer(self.sizer)
+
+    def themaDark(self):
+
+        self.lblBlock.SetForegroundColour("white")
+        self.lblBlock.SetBackgroundColour(Vars.corThema)
+
+        self.lblCmX.SetForegroundColour("white")
+        self.lblCmX.SetBackgroundColour(Vars.corThema)
+
+        self.lblCmY.SetForegroundColour("white")
+        self.lblCmY.SetBackgroundColour(Vars.corThema)
+
+        self.lblCmZ.SetForegroundColour("white")
+        self.lblCmZ.SetBackgroundColour(Vars.corThema)
+
+        self.lblDistGrid.SetForegroundColour("white")
+        self.lblDistGrid.SetBackgroundColour(Vars.corThema)
+
+        self.lblFocus.SetForegroundColour("white")
+        self.lblFocus.SetBackgroundColour(Vars.corThema)
+
+        self.lblQuality.SetForegroundColour("white")
+        self.lblQuality.SetBackgroundColour(Vars.corThema)
+
+        self.lblX.SetForegroundColour("white")
+        self.lblX.SetBackgroundColour(Vars.corThema)
+
+        self.lblY.SetForegroundColour("white")
+        self.lblY.SetBackgroundColour(Vars.corThema)
+
+        self.lblZ.SetForegroundColour("white")
+        self.lblZ.SetBackgroundColour(Vars.corThema)
+
+        self.lblTamGrid.SetForegroundColour("white")
+        self.lblTamGrid.SetBackgroundColour(Vars.corThema)
 
     def OnBlockInsert(self,e):
 
@@ -223,20 +262,20 @@ class TabConfig(wx.lib.scrolledpanel.ScrolledPanel):
     def OnEnterFocus(self, e):
         try:
             if self.parent.parent.ultimoDrawSelected.camera.visionOption == Vars.VISION_Z_PERSP:
-                self.parent.parent.ultimoDrawSelected.centro = (
+                self.parent.parent.ultimoDrawSelected.camera.centro = (
                 float(self.txtFocusX.GetValue()), float(self.txtFocusY.GetValue()), float(self.txtFocusZ.GetValue()))
             elif self.parent.parent.ultimoDrawSelected.camera.visionOption == Vars.VISION_X_POS :
                 self.parent.parent.ultimoDrawSelected.orthoCenter = (-float(self.txtFocusY.GetValue()), float(self.txtFocusZ.GetValue()))
                 self.txtFocusX.SetValue("0")
             elif self.parent.parent.ultimoDrawSelected.camera.visionOption == Vars.VISION_X_NEG:
-                self.parent.parent.ultimoDrawSelected.orthoCenter = (
+                self.parent.parent.ultimoDrawSelected.camera.orthoCenter = (
                 -float(self.txtFocusY.GetValue()), -float(self.txtFocusZ.GetValue()))
                 self.txtFocusX.SetValue("0")
             elif self.parent.parent.ultimoDrawSelected.camera.visionOption == Vars.VISION_Y_POS :
-                self.parent.parent.ultimoDrawSelected.orthoCenter = (-float(self.txtFocusZ.GetValue()), -float(self.txtFocusX.GetValue()))
+                self.parent.parent.ultimoDrawSelected.camera.orthoCenter = (-float(self.txtFocusZ.GetValue()), -float(self.txtFocusX.GetValue()))
                 self.txtFocusY.SetValue("0")
             elif self.parent.parent.ultimoDrawSelected.camera.visionOption == Vars.VISION_Y_NEG:
-                self.parent.parent.ultimoDrawSelected.orthoCenter = (
+                self.parent.parent.ultimoDrawSelected.camera.orthoCenter = (
                 -float(self.txtFocusZ.GetValue()), float(self.txtFocusX.GetValue()))
                 self.txtFocusY.SetValue("0")
 

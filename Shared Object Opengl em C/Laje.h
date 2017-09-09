@@ -8,6 +8,7 @@ class Laje : public Objeto3D
         Laje();
         ~Laje();
         void draw(float meshQual, bool wireframe, char visionAxis, int visionOption, Ponto *p1, Ponto *p2, Ponto *p3, Ponto *p4);
+        //void recalculaMBR(Ponto *p1, Ponto *p2, Ponto *p3, Ponto *p4);
 
     private:
         void drawZero(float meshQual, bool wireframe, char visionAxis, int visionOption, Ponto *p1, Ponto *p2, Ponto *p3, Ponto *p4);

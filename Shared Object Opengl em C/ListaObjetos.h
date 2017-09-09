@@ -1,14 +1,13 @@
 #ifndef LISTAOBJETOS_H
 #define LISTAOBJETOS_H
-#include "ListaAcao.cpp"
-#include "AVL.cpp"
-#include "ManipularVetor.h"
-#include "Sphere.cpp"
-#include "Bar.cpp"
-#include "Base.cpp"
-#include "Laje.cpp"
-#include "Tirante.cpp"
-#include "LigRigida.cpp"
+#include "ListaAcao.h"
+#include "AVL.h"
+#include "Sphere.h"
+#include "Bar.h"
+#include "Base.h"
+#include "Laje.h"
+#include "Tirante.h"
+#include "LigRigida.h"
 
 class ListaObjetos
 {
@@ -192,6 +191,7 @@ class ListaObjetos
         *	->Retorno: 'bool' se a adição foi realizada
         **/
         bool addLigRigida();
+        bool rotacionaObjSelect(float angle, bool x, bool y, bool z, Ponto centro);
         int getNumSelect(){return tamSelect;}
         ~ListaObjetos();
     private:

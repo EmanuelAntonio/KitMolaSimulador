@@ -16,7 +16,7 @@ class TabSim(wx.lib.scrolledpanel.ScrolledPanel):
 
         self.parent = parent
 
-        wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent=parent,size = (10,-1), id=wx.ID_ANY,style=wx.DOUBLE_BORDER)
+        wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent=parent,size = (10,-1), id=wx.ID_ANY)#,style=wx.DOUBLE_BORDER)
         self.SetScrollbar(wx.VERTICAL, 0, 0, 2, 0)
         self.SetupScrolling(scroll_x=False)
 

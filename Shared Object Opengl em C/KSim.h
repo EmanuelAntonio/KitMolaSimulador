@@ -1,6 +1,5 @@
-#include "include/GL/glut.h"
-#include "Simulacao.cpp"
-#include "ListaObjetos.cpp"
+#include "Simulacao.h"
+#include "ListaObjetos.h"
 #include <time.h>
 
 extern "C"{

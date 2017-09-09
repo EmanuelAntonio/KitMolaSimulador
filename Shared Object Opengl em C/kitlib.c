@@ -1,30 +1,33 @@
-#include "kitmola.h"
+#include "kitlib.h"
 
 extern "C"{
 
     using namespace ManipularVetor;
     void init(){
 
-        tamGrid = 18;
+        tamGrid = 8;
         resetMBRSelect();
         listObj = new ListaObjetos();
         espacoGrid = 9.0;
         meshQual = 1.0;
         wireframe = false;
-        MBRAtivo = false;
+        MBRAtivo = true;
+        initBuffer = false;
+        idRotCenter = -1; ///Nenhum objeto selecionado
 
     }
-    void initGL(){
+    void initGL(float r, float g, float b, bool dark){
 
         GLfloat object_difusa[] = {0.5,0.5,0.5,1.0};
         GLfloat posLuz[] = {0.0,0.0,0.0,1.0};
-        glClearColor(0.5, 0.5, 0.5, 1.0);
+        glClearColor(r, g, b, 1.0);
 
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
         glEnable(GL_NORMALIZE);
         glEnable(GL_LIGHTING);
 
+        glEnable(GL_MULTISAMPLE);
         glShadeModel(GL_SMOOTH);
 
         /*glEnable( GL_LINE_SMOOTH );
@@ -32,13 +35,23 @@ extern "C"{
         glEnable( GL_POLYGON_SMOOTH );
         glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
         glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST );
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glDisable(GL_BLEND);*/
 
         glLightfv(GL_LIGHT0, GL_AMBIENT, object_ambient);
         glLightfv(GL_LIGHT0, GL_DIFFUSE, object_difusa);
         glLightfv(GL_LIGHT0, GL_POSITION, posLuz);
-
         glEnable(GL_LIGHT0);
+
+        if(!initBuffer){
+
+            glewInit();
+            Sphere::initBuffer();
+            Bar::initBuffer();
+
+        }
+
 
     }
     void drawAxisZero(){
@@ -163,6 +176,7 @@ extern "C"{
 
 	void drawGrid(char visionAxis){
 
+        glEnable(GL_BLEND);
         float iniGrid = -tamGrid/(2/espacoGrid);
 
         glDisable(GL_LIGHTING);
@@ -222,7 +236,7 @@ extern "C"{
         glBegin(GL_LINES);
             if(espacoGrid > 1.0){
 
-                glColor3f(0.45,0.45,0.45);
+                glColor3f(0.25,0.25,0.25);
 
             }else{
 
@@ -257,7 +271,7 @@ extern "C"{
 
                     if(espacoGrid > 1.0){
 
-                        glColor3f(0.45,0.45,0.45);
+                        glColor3f(0.25,0.25,0.25);
 
                     }else{
 
@@ -280,6 +294,7 @@ extern "C"{
         glEnd();
         glLineWidth(0.5);
         glEnable(GL_LIGHTING);
+        glDisable(GL_BLEND);
 	}
     int tamanhoListaObjetos(){
 
@@ -378,7 +393,6 @@ extern "C"{
             aux = aux->getProx();
 
         }
-
     }
     void save(char* arquivo){
 
@@ -556,225 +570,81 @@ extern "C"{
         MBRSelect[1].z = -FLT_MAX;
 
     }
-    void drawMoveAxis(char visionAxis, int visionOption, float zoom){
+    void drawMoveAxis(char visionAxis, int visionOption, char eixo){
 
         Ponto centro;
+        float max = 10000.0;
         centro.x = (MBRSelect[1].x + MBRSelect[0].x)/2.0;
         centro.y = (MBRSelect[1].y + MBRSelect[0].y)/2.0;
         centro.z = (MBRSelect[1].z + MBRSelect[0].z)/2.0;
 
-        float dx = 0.06*zoom*espacoGrid;
-        float dy = 0.02*zoom*espacoGrid;
-        float dz = 0.02*zoom*espacoGrid;
-        float dc = 0.2*zoom*espacoGrid;
+        if(listObj->getNumSelect() == 0){
 
-        ///MBR para X
-        MBRMoveX[0].x = MBRSelect[1].x + dx;
-        MBRMoveX[0].y = centro.y - dy ;
-        MBRMoveX[0].z = centro.z - dz;
+            return;
 
-        MBRMoveX[1].x = MBRSelect[1].x + dc;
-        MBRMoveX[1].y = centro.y + dy;
-        MBRMoveX[1].z = centro.z + dz;
-
-        MBRMoveX[2].x = MBRSelect[0].x - dc;
-        MBRMoveX[2].y = centro.y - dy;
-        MBRMoveX[2].z = centro.z - dz;
-
-        MBRMoveX[3].x = MBRSelect[0].x - dx;
-        MBRMoveX[3].y = centro.y + dy;
-        MBRMoveX[3].z = centro.z + dz;
-
-        ///MBR para Y
-        dx = 0.02*zoom*espacoGrid;
-        dy = 0.05*zoom*espacoGrid;
-
-        MBRMoveY[0].x = centro.x - dx;
-        MBRMoveY[0].y = MBRSelect[1].y + dy ;
-        MBRMoveY[0].z = centro.z - dz;
-
-        MBRMoveY[1].x = centro.x + dx;
-        MBRMoveY[1].y = MBRSelect[1].y + dc;
-        MBRMoveY[1].z = centro.z + dz;
-
-        MBRMoveY[2].x = centro.x - dx;
-        MBRMoveY[2].y = MBRSelect[0].y - dc;
-        MBRMoveY[2].z = centro.z - dz;
-
-        MBRMoveY[3].x = centro.x + dx;
-        MBRMoveY[3].y = MBRSelect[0].y - dy;
-        MBRMoveY[3].z = centro.z + dz;
-
-        ///MBR para Z
-        dy = 0.02*zoom*espacoGrid;
-        dz = 0.06*zoom*espacoGrid;
-
-        MBRMoveZ[0].x = centro.x - dx;
-        MBRMoveZ[0].y = centro.y - dy ;
-        MBRMoveZ[0].z = MBRSelect[1].z + dz;
-
-        MBRMoveZ[1].x = centro.x + dx;
-        MBRMoveZ[1].y = centro.y + dy;
-        MBRMoveZ[1].z = MBRSelect[1].z + dc;
-
-
-        MBRMoveZ[2].x = centro.x - dx;
-        MBRMoveZ[2].y = centro.y - dy;
-        MBRMoveZ[2].z = MBRSelect[0].z - dc;
-
-        MBRMoveZ[3].x = centro.x + dx;
-        MBRMoveZ[3].y = centro.y + dy;
-        MBRMoveZ[3].z = MBRSelect[0].z - dz;
-
+        }
         glPushMatrix();
-        if(visionAxis == 'z'){
+            if(visionAxis == 'z'){
 
-            glTranslatef(centro.x, centro.y, centro.z);
+                glTranslatef(centro.x, centro.y, centro.z);
 
-        }
-        else if(visionAxis == 'x'){
+            }
+            else if(visionAxis == 'x'){
 
-            glTranslatef(centro.y, centro.z, centro.x);
-            glRotatef(90,1.0,0.0,0.0);
-            glRotatef(90,0.0,0.0,1.0);
+                glTranslatef(centro.y, centro.z, centro.x);
+                glRotatef(90,1.0,0.0,0.0);
+                glRotatef(90,0.0,0.0,1.0);
 
-        }else if(visionAxis == 'y'){
+            }else if(visionAxis == 'y'){
 
-            glTranslatef(centro.x, centro.z, centro.y);
-            glRotatef(90,1.0,0.0,0.0);
-            glRotatef(180,0.0,0.0,1.0);
+                glTranslatef(centro.x, centro.z, centro.y);
+                glRotatef(90,1.0,0.0,0.0);
+                glRotatef(180,0.0,0.0,1.0);
 
-        }
-        drawMoveAxisZero(visionOption, zoom*espacoGrid);
+            }
+            glDisable(GL_LIGHTING);
+
+            glLineWidth(3);
+            ///Eixo X
+            if(eixo == '0' || eixo == 'x'){
+
+                glColor3f(1.0,0.0,0.0);
+                glBegin(GL_LINES);
+
+                    glVertex3f(-max,0.0,0.0);
+                    glVertex3f(max,0.0,0.0);
+
+                glEnd();
+
+            }
+
+            ///Eixo Y
+            if(eixo == '0' || eixo == 'y'){
+
+                glColor3f(0.0,1.0,0.0);
+                glBegin(GL_LINES);
+
+                    glVertex3f(0.0,-max,0.0);
+                    glVertex3f(0.0,max,0.0);
+
+                glEnd();
+
+            }
+            ///Eixo Z
+            if(eixo == '0' || eixo == 'z'){
+
+                glColor3f(0.0,0.0,1.0);
+                glBegin(GL_LINES);
+
+                    glVertex3f(0.0,0.0,-max);
+                    glVertex3f(0.0,0.0,max);
+
+                glEnd();
+
+            }
+            glLineWidth(1);
+            glEnable(GL_LIGHTING);
         glPopMatrix();
-    }
-    void drawMoveAxisZero(int visionOption, float zoom){
-
-        Ponto centro;
-        centro.x = (MBRSelect[1].x - MBRSelect[0].x)/2.0;
-        centro.y = (MBRSelect[1].y - MBRSelect[0].y)/2.0;
-        centro.z = (MBRSelect[1].z - MBRSelect[0].z)/2.0;
-
-        glDisable(GL_LIGHTING);
-
-        ///X
-        if(visionOption != 1 && visionOption != 2){
-
-            glPushMatrix();
-
-                glTranslatef(centro.x,0,0);
-                drawSetaMove(zoom);
-
-                glTranslatef(-2*centro.x,0,0);
-                glRotatef(180.0,0.0,1.0,0.0);
-                drawSetaMove(zoom);
-
-            glPopMatrix();
-
-        }
-
-        ///Y
-        if(visionOption != 3 && visionOption != 4){
-
-            glPushMatrix();
-
-                glTranslatef(0,centro.y,0);
-                glRotatef(90.0,0.0,0.0,1.0);
-                drawSetaMove(zoom);
-
-            glPopMatrix();
-
-            glPushMatrix();
-
-                glTranslatef(0,-centro.y,0);
-                glRotatef(-90.0,0.0,0.0,1.0);
-                drawSetaMove(zoom);
-
-            glPopMatrix();
-
-        }
-        if(visionOption != 5){
-
-            ///Z
-            glPushMatrix();
-
-                glTranslatef(0,0,centro.z);
-                glRotatef(-90.0,0.0,1.0,0.0);
-                drawSetaMove(zoom);
-
-            glPopMatrix();
-
-            glPushMatrix();
-
-                glTranslatef(0,0,-centro.z);
-                glRotatef(90.0,0.0,1.0,0.0);
-                drawSetaMove(zoom);
-
-            glPopMatrix();
-
-
-        }
-
-        glEnable(GL_LIGHTING);
-
-    }
-    void drawSetaMove(float zoom){
-
-        float dx = 0.06*zoom;
-        float dy = 0.02*zoom;
-        float dz = 0.02*zoom;
-        float dc = 0.2*zoom;
-        ///X
-        glColor3f(0.69,0.933333,0.933333);
-        glBegin(GL_TRIANGLE_FAN);
-
-            glVertex3f(dc, 0, 0);
-            glVertex3f(dx, dy, dz);
-            glVertex3f(dx,-dy, dz);
-            glVertex3f(dx,-dy,-dz);
-            glVertex3f(dx, dy,-dz);
-            glVertex3f(dx, dy, dz);
-
-        glEnd();
-
-        glBegin(GL_QUADS);
-
-            glVertex3f(dx, -dy, dz);
-            glVertex3f(dx,dy, dz);
-            glVertex3f(dx,dy,-dz);
-            glVertex3f(dx, -dy,-dz);
-
-        glEnd();
-
-        glColor3f(1.0,0.0,0.0);
-        glBegin(GL_LINES);
-
-            glVertex3f(dc, 0, 0);
-            glVertex3f(dx, dy, dz);
-            glVertex3f(dc, 0, 0);
-            glVertex3f(dx,-dy, dz);
-            glVertex3f(dc, 0, 0);
-            glVertex3f(dx,-dy,-dz);
-            glVertex3f(dc, 0, 0);
-            glVertex3f(dx, dy,-dz);
-            glVertex3f(dc, 0, 0);
-            glVertex3f(dx, dy, dz);
-
-            glVertex3f(dx, dy, dz);
-            glVertex3f(dx, -dy, dz);
-
-            glVertex3f(dx, -dy, dz);
-            glVertex3f(dx, -dy, -dz);
-
-            glVertex3f(dx, -dy, -dz);
-            glVertex3f(dx, dy, -dz);
-
-            glVertex3f(dx, dy, -dz);
-            glVertex3f(dx, dy, dz);
-
-        glEnd();
-        glBegin(GL_LINES);
-        glEnd();
 
     }
     int selectMoveSeta(double *ponto, char visionAxis){
@@ -1074,5 +944,44 @@ extern "C"{
         return listObj;
 
     }
+    void drawRotAxis(char visionAxis, int visionOption, char axis){
 
+        drawMoveAxis(visionAxis, visionOption, axis);
+
+    }
+    bool rotacionaSelect(bool x, bool y, bool z, float angle){
+
+        if(idRotCenter == -1){
+
+            Ponto centro;
+            centro.x = (MBRSelect[1].x + MBRSelect[0].x)/2.0;
+            centro.y = (MBRSelect[1].y + MBRSelect[0].y)/2.0;
+            centro.z = (MBRSelect[1].z + MBRSelect[0].z)/2.0;
+            return listObj->rotacionaObjSelect(angle,x,y,z,centro);
+
+        }else{
+
+            return listObj->rotacionaObjSelect(angle,x,y,z,rotCenter);
+
+        }
+
+
+    }
+    void selectRotCenter(double *ponto, char visionAxis, int visionOption){
+
+        Objeto3D *p = listObj->getObj(ponto);
+        if(p != NULL){
+
+            idRotCenter = p->getId();
+            rotCenter = *p->getCentro();
+
+        }
+
+    }
+    void terminaRotacao(){
+
+        idRotCenter = -1;
+        rotCenter = iniVet();
+
+    }
 }

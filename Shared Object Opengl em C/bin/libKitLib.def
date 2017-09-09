@@ -1,0 +1,295 @@
+EXPORTS
+    MBRAtivo @1 DATA
+    MBRMoveX @2 DATA
+    MBRMoveY @3 DATA
+    MBRMoveZ @4 DATA
+    MBRSelect @5 DATA
+    MBRSelectPonto @6
+    _ZN12ListaObjetos10moveSelectEfff @7
+    _ZN12ListaObjetos11addDiagonalEi @8
+    _ZN12ListaObjetos11deSelectAllEv @9
+    _ZN12ListaObjetos11duplicarObjEP8Objeto3D @10
+    _ZN12ListaObjetos11refazerAcaoEP5Ponto @11
+    _ZN12ListaObjetos11refazerSizeEv @12
+    _ZN12ListaObjetos12addLigRigidaEv @13
+    _ZN12ListaObjetos12desfazerAcaoEP5Ponto @14
+    _ZN12ListaObjetos12desfazerSizeEv @15
+    _ZN12ListaObjetos12getNumSelectEv @16
+    _ZN12ListaObjetos13duplicaSelectEv @17
+    _ZN12ListaObjetos14distObjsSelectEv @18
+    _ZN12ListaObjetos16setFocusToSelectEv @19
+    _ZN12ListaObjetos18recalculaMBRSelectEP5Ponto @20
+    _ZN12ListaObjetos18rotacionaObjSelectEfbbb5Ponto @21
+    _ZN12ListaObjetos19terminaMovimentacaoE5Ponto @22
+    _ZN12ListaObjetos3getEv @23
+    _ZN12ListaObjetos4sizeEv @24
+    _ZN12ListaObjetos5abrirEPc @25
+    _ZN12ListaObjetos5clearEv @26
+    _ZN12ListaObjetos6addBarEi @27
+    _ZN12ListaObjetos6getObjEPd @28
+    _ZN12ListaObjetos6salvarEPciff @29
+    _ZN12ListaObjetos6selectEfffP5Ponto @30
+    _ZN12ListaObjetos7addBaseEifff @31
+    _ZN12ListaObjetos7addLajeEv @32
+    _ZN12ListaObjetos7deletarEP8Objeto3Db @33
+    _ZN12ListaObjetos7getbyIdEi @34
+    _ZN12ListaObjetos7moveObjEifff @35
+    _ZN12ListaObjetos7removerEfff @36
+    _ZN12ListaObjetos9addSphereEfff @37
+    _ZN12ListaObjetos9getCenterEfffPf @38
+    _ZN12ListaObjetos9removeAllEv @39
+    _ZN12ListaObjetos9selectAllEP5Ponto @40
+    _ZN12ListaObjetosC1Ev @41
+    _ZN12ListaObjetosC2Ev @42
+    _ZN12ListaObjetosD1Ev @43
+    _ZN12ListaObjetosD2Ev @44
+    _ZN14ManipularVetor11prodEscalarE5PontoS0_ @45
+    _ZN14ManipularVetor12prodVetorialE5PontoS0_ @46
+    _ZN14ManipularVetor12somaVetorialE5PontoS0_ @47
+    _ZN14ManipularVetor13anguloVetoresE5PontoS0_ @48
+    _ZN14ManipularVetor13normalizarVetE5Ponto @49
+    _ZN14ManipularVetor14inverteSentidoE5Ponto @50
+    _ZN14ManipularVetor14prodPorEscalarEf5Ponto @51
+    _ZN14ManipularVetor6copiarE5Ponto @52
+    _ZN14ManipularVetor6iniVetEv @53
+    _ZN14ManipularVetor7vetNuloE5Ponto @54
+    _ZN14ManipularVetor8maiorXYZE5PontoS0_ @55
+    _ZN14ManipularVetor8menorXYZE5PontoS0_ @56
+    _ZN14ManipularVetor8normaVetE5Ponto @57
+    _ZN14ManipularVetor9distanciaE5PontoS0_ @58
+    _ZN2No6getAntEv @59
+    _ZN2No6getObjEv @60
+    _ZN2No6setAntEPS_ @61
+    _ZN2No6setObjEP8Objeto3D @62
+    _ZN2No7getProxEv @63
+    _ZN2No7setProxEPS_ @64
+    _ZN2No8getMarcaEv @65
+    _ZN2No8getValorEv @66
+    _ZN2No8setMarcaEi @67
+    _ZN2No8setValorEi @68
+    _ZN2NoC1Ev @69
+    _ZN2NoD1Ev @70
+    _ZN3AVL10Calcula_FBEP2No @71
+    _ZN3AVL10CorrigeAVLEP2No @72
+    _ZN3AVL15rotacao_direitaEP2No @73
+    _ZN3AVL16rotacao_esquerdaEP2No @74
+    _ZN3AVL21rotacao_dupla_direitaEP2No @75
+    _ZN3AVL22rotacao_dupla_esquerdaEP2No @76
+    _ZN3AVL5buscaEi @77
+    _ZN3AVL6AlturaEP2No @78
+    _ZN3AVL6RemoveEP2Noi @79
+    _ZN3AVL6insereEiP8Objeto3D @80
+    _ZN3AVL7Seta_FBEP2No @81
+    _ZN3AVL7deletaHEP2No @82
+    _ZN3AVL7removerEi @83
+    _ZN3AVL8ConsultaEP2Noi @84
+    _ZN3AVL9InsereAVLEP2NoiP8Objeto3D @85
+    _ZN3AVL9RemoveAVLEP2No @86
+    _ZN3AVLC1Ev @87
+    _ZN3AVLC2Ev @88
+    _ZN3AVLD1Ev @89
+    _ZN3AVLD2Ev @90
+    _ZN3Bar10initBufferEv @91
+    _ZN3Bar12recalculaMBREP5PontoS1_ @92
+    _ZN3Bar4drawEfbciP8Objeto3DS1_ @93
+    _ZN3Bar5bar64E @94 DATA
+    _ZN3Bar5splitE @95 DATA
+    _ZN3Bar6bar64nE @96 DATA
+    _ZN3Bar8drawZeroEfbciP5PontoS1_ @97
+    _ZN3BarC1Ev @98
+    _ZN3BarC2Ev @99
+    _ZN3BarD0Ev @100
+    _ZN3BarD1Ev @101
+    _ZN3BarD2Ev @102
+    _ZN4Acao7getAcaoEv @103
+    _ZN4Acao7getObjsEv @104
+    _ZN4Acao7getProxEv @105
+    _ZN4Acao7setAcaoEi @106
+    _ZN4Acao7setObjsEP8Objeto3D @107
+    _ZN4Acao7setProxEPS_ @108
+    _ZN4Acao9getVetDesEv @109
+    _ZN4Acao9setVetDesEfff @110
+    _ZN4AcaoC1Ev @111
+    _ZN4AcaoD1Ev @112
+    _ZN4Base11drawBarZeroEfbcifP5PontoS1_ @113
+    _ZN4Base12getSubObjetoEv @114
+    _ZN4Base12recalculaMBREv @115
+    _ZN4Base12setSubObjetoEi @116
+    _ZN4Base14drawSphereZeroEfb @117
+    _ZN4Base4drawEfbci @118
+    _ZN4BaseC1Ev @119
+    _ZN4BaseC2Ev @120
+    _ZN4BaseD0Ev @121
+    _ZN4BaseD1Ev @122
+    _ZN4BaseD2Ev @123
+    _ZN4Laje4drawEfbciP5PontoS1_S1_S1_ @124
+    _ZN4Laje8drawZeroEfbciP5PontoS1_S1_S1_ @125
+    _ZN4LajeC1Ev @126
+    _ZN4LajeC2Ev @127
+    _ZN4LajeD0Ev @128
+    _ZN4LajeD1Ev @129
+    _ZN4LajeD2Ev @130
+    _ZN6Sphere10initBufferEv @131
+    _ZN6Sphere12recalculaMBREv @132
+    _ZN6Sphere4drawEfbci @133
+    _ZN6Sphere5sph64E @134 DATA
+    _ZN6Sphere6sph64nE @135 DATA
+    _ZN6Sphere6sphVaoE @136 DATA
+    _ZN6Sphere8drawZeroEfb @137
+    _ZN6SphereC1Ev @138
+    _ZN6SphereC2Ev @139
+    _ZN6SphereD0Ev @140
+    _ZN6SphereD1Ev @141
+    _ZN6SphereD2Ev @142
+    _ZN7Tirante12recalculaMBREP5PontoS1_ @143
+    _ZN7Tirante4drawEfbciP8Objeto3DS1_ @144
+    _ZN7Tirante8drawZeroEfbcifP5PontoS1_ @145
+    _ZN7TiranteC1Ev @146
+    _ZN7TiranteC2Ev @147
+    _ZN7TiranteD0Ev @148
+    _ZN7TiranteD1Ev @149
+    _ZN7TiranteD2Ev @150
+    _ZN8Objeto3D12recalculaMBREP5PontoS1_ @151
+    _ZN8Objeto3D12recalculaMBREP5PontoS1_S1_S1_ @152
+    _ZN8Objeto3D12recalculaMBREv @153
+    _ZN8Objeto3D14getSelecionadoEv @154
+    _ZN8Objeto3D14setSelecionadoEb @155
+    _ZN8Objeto3D15addExtremidadesEi @156
+    _ZN8Objeto3D15getExtremidadesEv @157
+    _ZN8Objeto3D16swapExtremidadesEii @158
+    _ZN8Objeto3D18getTamExtremidadesEv @159
+    _ZN8Objeto3D18removeExtremidadesEi @160
+    _ZN8Objeto3D18setTamExtremidadesEi @161
+    _ZN8Objeto3D19buscaIdExtremidadesEi @162
+    _ZN8Objeto3D4drawEfbci @163
+    _ZN8Objeto3D4drawEfbciP5PontoS1_S1_S1_ @164
+    _ZN8Objeto3D4drawEfbciPS_S0_ @165
+    _ZN8Objeto3D4drawEfbciPS_S0_S0_ @166
+    _ZN8Objeto3D5getIdEv @167
+    _ZN8Objeto3D5setIdEi @168
+    _ZN8Objeto3D6getAntEv @169
+    _ZN8Objeto3D6getMBREv @170
+    _ZN8Objeto3D6setAntEPS_ @171
+    _ZN8Objeto3D6setMBREffffff @172
+    _ZN8Objeto3D7getProxEv @173
+    _ZN8Objeto3D7setProxEPS_ @174
+    _ZN8Objeto3D9getCentroEv @175
+    _ZN8Objeto3D9getObjetoEv @176
+    _ZN8Objeto3D9setCentroEfff @177
+    _ZN8Objeto3D9setObjetoEi @178
+    _ZN8Objeto3DC1Ev @179
+    _ZN8Objeto3DC2Ev @180
+    _ZN8Objeto3DD0Ev @181
+    _ZN8Objeto3DD1Ev @182
+    _ZN8Objeto3DD2Ev @183
+    _ZN9LigRigida4drawEfbciP8Objeto3DS1_S1_ @184
+    _ZN9LigRigida8drawZeroEfbciP5PontoS1_S1_ @185
+    _ZN9LigRigidaC1Ev @186
+    _ZN9LigRigidaC2Ev @187
+    _ZN9LigRigidaD0Ev @188
+    _ZN9LigRigidaD1Ev @189
+    _ZN9LigRigidaD2Ev @190
+    _ZN9ListaAcao3getEv @191
+    _ZN9ListaAcao4sizeEv @192
+    _ZN9ListaAcao5clearEv @193
+    _ZN9ListaAcao6insereEiP8Objeto3DP5Ponto @194
+    _ZN9ListaAcaoC1Ev @195
+    _ZN9ListaAcaoC2Ev @196
+    _ZN9ListaAcaoD1Ev @197
+    _ZN9ListaAcaoD2Ev @198
+    _ZTI3Bar @199 DATA
+    _ZTI4Base @200 DATA
+    _ZTI4Laje @201 DATA
+    _ZTI6Sphere @202 DATA
+    _ZTI7Tirante @203 DATA
+    _ZTI8Objeto3D @204 DATA
+    _ZTI9LigRigida @205 DATA
+    _ZTS3Bar @206 DATA
+    _ZTS4Base @207 DATA
+    _ZTS4Laje @208 DATA
+    _ZTS6Sphere @209 DATA
+    _ZTS7Tirante @210 DATA
+    _ZTS8Objeto3D @211 DATA
+    _ZTS9LigRigida @212 DATA
+    _ZTV3Bar @213 DATA
+    _ZTV4Base @214 DATA
+    _ZTV4Laje @215 DATA
+    _ZTV6Sphere @216 DATA
+    _ZTV7Tirante @217 DATA
+    _ZTV8Objeto3D @218 DATA
+    _ZTV9LigRigida @219 DATA
+    _get_output_format @220
+    _nm____glewBindBuffer @221 DATA
+    _nm____glewBindVertexArray @222 DATA
+    _nm____glewBufferData @223 DATA
+    _nm____glewEnableVertexAttribArray @224 DATA
+    _nm____glewGenBuffers @225 DATA
+    _nm____glewGenVertexArrays @226 DATA
+    addBar @227
+    addBase @228
+    addDiag @229
+    addLaje @230
+    addLigRigida @231
+    addSphere @232
+    cancelarMovimentacao @233
+    clear @234
+    deSelectAll @235
+    desfazer @236
+    desfazerSize @237
+    distObjsSelect @238
+    drawAxis @239
+    drawAxisZero @240
+    drawCena @241
+    drawGrid @242
+    drawMBR @243
+    drawMoveAxis @244
+    drawRotAxis @245
+    duplicaSelect @246
+    espacoGrid @247 DATA
+    getCenter @248
+    getCentroMBRSelect @249
+    getEspacoGrid @250
+    getMeshQual @251
+    getObjById @252
+    getObjList @253
+    getPonto3D @254
+    getPonto3DFloat @255
+    getTamGrid @256
+    getWireframe @257
+    idRotCenter @258 DATA
+    init @259
+    initBuffer @260 DATA
+    initGL @261
+    listObj @262 DATA
+    meshQual @263 DATA
+    moveObj @264
+    moveObjSelect @265
+    moveSelect @266
+    object_ambient @267 DATA
+    object_brilho @268 DATA
+    object_especular @269 DATA
+    object_select @270 DATA
+    open @271
+    refazer @272
+    refazerSize @273
+    removeAll @274
+    remover @275
+    resetMBRSelect @276
+    rotCenter @277 DATA
+    rotacionaSelect @278
+    save @279
+    select @280
+    selectAll @281
+    selectMoveSeta @282
+    selectRotCenter @283
+    setEspacoGrid @284
+    setFocusToSelect @285
+    setMeshQual @286
+    setTamGrid @287
+    setWireframe @288
+    tamGrid @289 DATA
+    tamanhoListaObjetos @290
+    terminaMovimentacao @291
+    terminaRotacao @292
+    vetDeslocamento @293 DATA
+    wireframe @294 DATA

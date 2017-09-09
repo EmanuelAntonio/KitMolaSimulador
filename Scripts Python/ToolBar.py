@@ -5,89 +5,110 @@ from KeyboardEvent import *
 class ToolBar(object):
 
     @staticmethod
-    def CreateToolBar(window):
-        """
-        Create a toolbar.
-        """
+    def CreateToolBar(window, sizer):
+
+        window.toolbarside = wx.ToolBar(window,style=wx.TB_LEFT)
+
+        imgEsfera = wx.Bitmap(Vars.dirExec + 'icones/esfera.ico')
+        imgBase = wx.Bitmap(Vars.dirExec + 'icones/base.ico')
+        imgLaje = wx.Bitmap(Vars.dirExec + 'icones/laje.ico')
+        if (Vars.thema == "dark"):
+            window.toolbarside.SetBackgroundColour(Vars.corThema)
+            imgBarra9 = wx.Bitmap(Vars.dirExec + 'icones/barra9dark.ico')
+            imgBarra18 = wx.Bitmap(Vars.dirExec + 'icones/barra18dark.ico')
+            imgTirante9 = wx.Bitmap(Vars.dirExec + 'icones/tirante9dark.ico')
+            imgTirante18 = wx.Bitmap(Vars.dirExec + 'icones/tirante18dark.ico')
+
+        else:
+            imgBarra9 = wx.Bitmap(Vars.dirExec + 'icones/barra9.ico')
+            imgBarra18 = wx.Bitmap(Vars.dirExec + 'icones/barra18.ico')
+            imgTirante9 = wx.Bitmap(Vars.dirExec + 'icones/tirante9.ico')
+            imgTirante18 = wx.Bitmap(Vars.dirExec + 'icones/tirante18.ico')
+
+        window.addEsfera = window.toolbarside.AddTool(wx.ID_ANY, "Adicionar Esfera", imgEsfera, "Esfera")
+        window.Bind(wx.EVT_TOOL, window.OnAddEsferaToolbar, window.addEsfera)
+        window.addBase = window.toolbarside.AddTool(wx.ID_ANY, "Adicionar Base", imgBase, "Base")
+        window.Bind(wx.EVT_TOOL, window.OnAddBaseToolbar, window.addBase)
+        window.addBarra9 = window.toolbarside.AddTool(wx.ID_ANY, "Adicionar Barra de 9cm", imgBarra9, "Barra de 9cm")
+        window.Bind(wx.EVT_TOOL, window.OnAddBarra9Toolbar, window.addBarra9)
+        window.addBarra18 = window.toolbarside.AddTool(wx.ID_ANY, "Adicionar Barra de 18cm", imgBarra18, "Barra de 18cm")
+        window.Bind(wx.EVT_TOOL, window.OnAddBarra18Toolbar, window.addBarra18)
+        window.addLaje = window.toolbarside.AddTool(wx.ID_ANY, "Adicionar Laje", imgLaje, "Laje")
+        window.Bind(wx.EVT_TOOL, window.OnAddLajeToolbar, window.addLaje)
+        window.addTirante9 = window.toolbarside.AddTool(wx.ID_ANY, "Adicionar Tirante de 9x9", imgTirante9, "Tirante de 9x9")
+        window.Bind(wx.EVT_TOOL, window.OnAddTirante9Toolbar, window.addTirante9)
+        window.addTirante18 = window.toolbarside.AddTool(wx.ID_ANY, "Adicionar Tirante de 18x9", imgTirante18, "Tirante de 18x18")
+        window.Bind(wx.EVT_TOOL, window.OnAddTirante18Toolbar, window.addTirante18)
+
+        window.toolbarside.Realize()
+
+    @staticmethod
+    def CreateToolBarTopo(window):
 
         window.toolbar = window.CreateToolBar()
+        if(Vars.thema == "dark"):
+            window.toolbar.SetBackgroundColour(Vars.corThema)
+            imgMoveTela = wx.Bitmap(Vars.dirExec + 'icones/movedark.ico')
+            imgCopiar = wx.Bitmap(Vars.dirExec + 'icones/copiardark.ico')
+            open_ico = wx.Bitmap(Vars.dirExec + 'icones/openIcondark.ico')
+            save_ico = wx.Bitmap(Vars.dirExec + 'icones/saveIcondark.ico')
+            saveAs_ico = wx.Bitmap(Vars.dirExec + 'icones/saveasIcondark.ico')
+            imgMoverObj = wx.Bitmap(Vars.dirExec + 'icones/moverObjdark.ico')
+
+        else:
+            imgMoveTela = wx.Bitmap(Vars.dirExec + 'icones/move.ico')
+            imgCopiar = wx.Bitmap(Vars.dirExec + 'icones/copiar.ico')
+            open_ico = wx.Bitmap(Vars.dirExec + 'icones/openIcon.ico')
+            save_ico = wx.Bitmap(Vars.dirExec + 'icones/saveIcon.ico')
+            saveAs_ico = wx.Bitmap(Vars.dirExec + 'icones/saveasIcon.ico')
+            imgMoverObj = wx.Bitmap(Vars.dirExec + 'icones/moverObj.ico')
+
         window.toolbar.SetToolBitmapSize((32, 32))  # sets icon size
 
         # Use wx.ArtProvider for default icons
-        open_ico = wx.ArtProvider.GetBitmap(wx.ART_FILE_OPEN, wx.ART_TOOLBAR, (32, 32))
+
         openTool = window.toolbar.AddTool(wx.ID_OPEN, "Abre um Projeto Existente", open_ico, "Abrir")
         window.Bind(wx.EVT_MENU, window.OnOpen, openTool)
 
-        save_ico = wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE, wx.ART_TOOLBAR, (32, 32))
+
         saveTool = window.toolbar.AddTool(wx.ID_SAVE, "Salva o Projeto Corrente", save_ico, "Salvar")
         window.Bind(wx.EVT_MENU, window.OnSave, saveTool)
 
-        saveAs_ico = wx.ArtProvider.GetBitmap(wx.ART_FILE_SAVE_AS, wx.ART_TOOLBAR, (32, 32))
         saveAsTool = window.toolbar.AddTool(wx.ID_SAVEAS, "Salva o Projeto Corrente em um Novo Arquivo", saveAs_ico,
-                                          "Salvar Como...")
+                                            "Salvar Como...")
         window.Bind(wx.EVT_MENU, window.OnSaveAs, saveAsTool)
 
         window.toolbar.AddSeparator()
 
-        undo_ico = wx.ArtProvider.GetBitmap(wx.ART_UNDO, wx.ART_TOOLBAR, (32, 32))
+        undo_ico = wx.Bitmap(Vars.dirExec + 'icones/undoIcon.ico')
         window.undoTool = window.toolbar.AddTool(wx.ID_UNDO, "Desfazer", undo_ico, "Desfazer")
         window.toolbar.EnableTool(wx.ID_UNDO, False)
         window.Bind(wx.EVT_TOOL, window.OnUndo, window.undoTool)
 
-        redo_ico = wx.ArtProvider.GetBitmap(wx.ART_REDO, wx.ART_TOOLBAR, (32, 32))
+        redo_ico = wx.Bitmap(Vars.dirExec + 'icones/reundoIcon.ico')
         window.redoTool = window.toolbar.AddTool(wx.ID_REDO, "Refazer", redo_ico, "Refazer")
         window.toolbar.EnableTool(wx.ID_REDO, False)
         window.Bind(wx.EVT_TOOL, window.OnRedo, window.redoTool)
 
-        window.toolbar.AddSeparator()
+        window.moveTela = window.toolbar.AddTool(wx.ID_ANY, "Mover Tela", imgMoveTela, "Mover Tela")
+        window.Bind(wx.EVT_TOOL, window.OnMoveTelaToolbar, window.moveTela)
 
-        imgCopiar = wx.Bitmap('icones/copiar.ico')
+        window.toolbar.AddSeparator()
 
         window.copiarSelect = window.toolbar.AddTool(wx.ID_ANY, "Copiar Seleção", imgCopiar, "Copiar Seleção")
         window.Bind(wx.EVT_TOOL, window.OnCopiarSelectToolbar, window.copiarSelect)
-
-        imgMoverObj = wx.Bitmap('icones/moverObj.ico')
 
         window.copiarSelect = window.toolbar.AddTool(wx.ID_ANY, "Mover Seleção", imgMoverObj, "Mover Seleção")
         window.Bind(wx.EVT_TOOL, window.OnMoverSelectToolbar, window.copiarSelect)
 
         window.toolbar.AddSeparator()
 
-        imgEsfera = wx.Bitmap('icones/esfera.ico')
-        imgBase = wx.Bitmap('icones/base.ico')
-        imgBarra9 = wx.Bitmap('icones/barra9.ico')
-        imgBarra18 = wx.Bitmap('icones/barra18.ico')
-        imgLaje = wx.Bitmap('icones/laje.ico')
-        imgTirante9 = wx.Bitmap('icones/tirante9.ico')
-        imgTirante18 = wx.Bitmap('icones/tirante18.ico')
-
-        window.addEsfera = window.toolbar.AddTool(wx.ID_ANY, "Adicionar Esfera", imgEsfera, "Esfera")
-        window.Bind(wx.EVT_TOOL, window.OnAddEsferaToolbar, window.addEsfera)
-        window.addBase = window.toolbar.AddTool(wx.ID_ANY, "Adicionar Base", imgBase, "Base")
-        window.Bind(wx.EVT_TOOL, window.OnAddBaseToolbar, window.addBase)
-        window.addBarra9 = window.toolbar.AddTool(wx.ID_ANY, "Adicionar Barra de 9cm", imgBarra9, "Barra de 9cm")
-        window.Bind(wx.EVT_TOOL, window.OnAddBarra9Toolbar, window.addBarra9)
-        window.addBarra18 = window.toolbar.AddTool(wx.ID_ANY, "Adicionar Barra de 18cm", imgBarra18, "Barra de 18cm")
-        window.Bind(wx.EVT_TOOL, window.OnAddBarra18Toolbar, window.addBarra18)
-        window.addLaje = window.toolbar.AddTool(wx.ID_ANY, "Adicionar Laje", imgLaje, "Laje")
-        window.Bind(wx.EVT_TOOL, window.OnAddLajeToolbar, window.addLaje)
-        window.addTirante9 = window.toolbar.AddTool(wx.ID_ANY, "Adicionar Tirante de 9x9", imgTirante9, "Tirante de 9x9")
-        window.Bind(wx.EVT_TOOL, window.OnAddTirante9Toolbar, window.addTirante9)
-        window.addTirante18 = window.toolbar.AddTool(wx.ID_ANY, "Adicionar Tirante de 9x9", imgTirante18, "Tirante de 18x18")
-        window.Bind(wx.EVT_TOOL, window.OnAddTirante18Toolbar, window.addTirante18)
-
-        window.toolbar.AddSeparator()
-
-        imgMoveTela = wx.Bitmap('icones/move.ico')
-
-        window.moveTela = window.toolbar.AddTool(wx.ID_ANY, "Mover Tela", imgMoveTela, "Mover Tela")
-        window.Bind(wx.EVT_TOOL, window.OnMoveTelaToolbar, window.moveTela)
-
         window.toolbar.Realize()
 
     @staticmethod
     def OnMoveSelectToolBar(window):
-        window.moveObjetos = True
+        window.moveObjetos = (True, Vars.ASCII_0)
+        Msg.exibirStatusBar("Selecione um eixo de mivimentação precionando x, y ou z", 10)
         window.drawArea0.Refresh(True)
         window.drawArea1.Refresh(True)
         window.drawArea2.Refresh(True)
@@ -96,7 +117,7 @@ class ToolBar(object):
     @staticmethod
     def OnAddLajeToolBar(window):
 
-        myCursor = wx.Cursor(r"icones/lajeCursor.cur",
+        myCursor = wx.Cursor(Vars.dirExec + "icones/lajeCursor.cur",
                              wx.BITMAP_TYPE_CUR)
         window.botaoSelecionado = Vars.LAJE_SELECIONADO
         window.SetCursor(myCursor)
@@ -110,8 +131,13 @@ class ToolBar(object):
 
     @staticmethod
     def OnMoveTelaToolbar(window):
-        myCursor = wx.Cursor(r"icones/cursorMoveTela.cur",
-                             wx.BITMAP_TYPE_CUR)
+
+        if Vars.thema == "dark":
+            myCursor = wx.Cursor(Vars.dirExec + "icones/cursorMoveTeladark.cur",
+                                 wx.BITMAP_TYPE_CUR)
+        else:
+            myCursor = wx.Cursor(Vars.dirExec + "icones/cursorMoveTela.cur",
+                                 wx.BITMAP_TYPE_CUR)
 
         window.botaoSelecionado = Vars.MOVETELA_SELECIONADO
 
@@ -120,7 +146,7 @@ class ToolBar(object):
     @staticmethod
     def OnAddEsferaToolbar(window):
 
-        myCursor = wx.Cursor(r"icones/cursorEsfera.cur",
+        myCursor = wx.Cursor(Vars.dirExec + "icones/cursorEsfera.cur",
                              wx.BITMAP_TYPE_CUR)
 
         window.botaoSelecionado = Vars.SPHERE_SELECIONADO
@@ -130,7 +156,7 @@ class ToolBar(object):
     @staticmethod
     def OnAddBaseToolbar(window):
 
-        myCursor = wx.Cursor(r"icones/baseCursor.cur",
+        myCursor = wx.Cursor(Vars.dirExec + "icones/baseCursor.cur",
                              wx.BITMAP_TYPE_CUR)
 
         window.botaoSelecionado = Vars.BASE_SELECIONADO
@@ -141,7 +167,7 @@ class ToolBar(object):
     @staticmethod
     def OnAddBarra9Toolbar(window):
 
-        myCursor = wx.Cursor(r"icones/cursorBarra.cur",
+        myCursor = wx.Cursor(Vars.dirExec + "icones/cursorBarra.cur",
                              wx.BITMAP_TYPE_CUR)
 
         window.botaoSelecionado = Vars.BAR9_SELECIONADO
@@ -150,7 +176,7 @@ class ToolBar(object):
 
     @staticmethod
     def OnAddBarra18Toolbar(window):
-        myCursor = wx.Cursor(r"icones/cursorBarra.cur",
+        myCursor = wx.Cursor(Vars.dirExec + "icones/cursorBarra.cur",
                              wx.BITMAP_TYPE_CUR)
 
         window.botaoSelecionado = Vars.BAR18_SELECIONADO
@@ -159,7 +185,7 @@ class ToolBar(object):
 
     @staticmethod
     def OnAddTirante9Toolbar(window):
-        myCursor = wx.Cursor(r"icones/tiranteCursor.cur",
+        myCursor = wx.Cursor(Vars.dirExec + "icones/tiranteCursor.cur",
                              wx.BITMAP_TYPE_CUR)
 
         window.botaoSelecionado = Vars.TIRANTE9_SELECIONADO
@@ -168,7 +194,7 @@ class ToolBar(object):
 
     @staticmethod
     def OnAddTirante18Toolbar(window):
-        myCursor = wx.Cursor(r"icones/tiranteCursor.cur",
+        myCursor = wx.Cursor(Vars.dirExec + "icones/tiranteCursor.cur",
                              wx.BITMAP_TYPE_CUR)
 
         window.botaoSelecionado = Vars.TIRANTE18_SELECIONADO

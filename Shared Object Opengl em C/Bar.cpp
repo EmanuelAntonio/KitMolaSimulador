@@ -2,6 +2,10 @@
 
 using namespace ManipularVetor;
 
+GLuint Bar::bar64;
+GLuint Bar::bar64n;
+int Bar::split = 32;
+
 Bar::Bar():Objeto3D(){
     object_difusa = new GLfloat[4];
     object_difusa[0] = 1.0;
@@ -138,6 +142,16 @@ void Bar::drawZero(float meshQual, bool wireframe, char visionAxis, int visionOp
             glRotatef(ax, rx, ry, 0.0);
             gluQuadricOrientation(quadric,GLU_OUTSIDE);
             gluCylinder(quadric, BAR_RADIUS, BAR_RADIUS, v, 16, 1);
+            /*glPushMatrix();
+
+                glScalef(BAR_RADIUS,BAR_RADIUS,v);
+                glBindBuffer(GL_ARRAY_BUFFER, bar64n);
+                glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+                glBindBuffer(GL_ARRAY_BUFFER, bar64);
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+                glDrawArrays(GL_QUADS,0,split*4);
+
+            glPopMatrix();*/
 
             glPolygonMode(GL_FRONT,GL_FILL);
 
@@ -160,6 +174,17 @@ void Bar::drawZero(float meshQual, bool wireframe, char visionAxis, int visionOp
             gluQuadricOrientation(quadric,GLU_OUTSIDE);
             gluCylinder(quadric, BAR_RADIUS, BAR_RADIUS, v, resolucao, 1);
 
+            /*glPushMatrix();
+
+                glScalef(BAR_RADIUS,BAR_RADIUS,v);
+                glBindBuffer(GL_ARRAY_BUFFER, bar64n);
+                glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+                glBindBuffer(GL_ARRAY_BUFFER, bar64);
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+                glDrawArrays(GL_QUADS,0,split*4);
+
+            glPopMatrix();*/
+
             //draw the first cap
             gluQuadricOrientation(quadric,GLU_INSIDE);
             gluDisk( quadric, 0.0, BAR_RADIUS, resolucao, 1);
@@ -172,6 +197,113 @@ void Bar::drawZero(float meshQual, bool wireframe, char visionAxis, int visionOp
         glPopMatrix();
     }
     gluDeleteQuadric(quadric);
+}
+void Bar::initBuffer(){
+
+    float b64[split*3*4];///numero de divisoes dabarra: split
+    float b64n[split*3*4];
+    int num = 0;
+    float theta = 0;
+
+    for(int i = 0; i < split; i++){
+
+        ///vertice 1
+        b64[num] = cos(theta);
+        b64n[num] = cos(theta);
+        num++;
+        b64[num] = sin(theta);
+        b64n[num] = sin(theta);
+        num++;
+        b64[num] = 1.0;
+        b64n[num] = 0;
+        num++;
+
+        ///vertice 2
+        b64[num] = cos(theta);
+        b64n[num] = cos(theta);
+        num++;
+        b64[num] = sin(theta);
+        b64n[num] = sin(theta);
+        num++;
+        b64[num] = 0.0;
+        b64n[num] = 0.0;
+        num++;
+
+        ///vertice 3
+        b64[num] = cos(theta + 2*M_PI/(float)split);
+        b64n[num] = cos(theta + 2*M_PI/(float)split);
+        num++;
+        b64[num] = sin(theta + 2*M_PI/(float)split);
+        b64n[num] = sin(theta + 2*M_PI/(float)split);
+        num++;
+        b64[num] = 0.0;
+        b64n[num] = 0.0;
+        num++;
+
+        ///vertice 4
+        b64[num] = cos(theta + 2*M_PI/(float)split);
+        b64n[num] = cos(theta + 2*M_PI/(float)split);
+        num++;
+        b64[num] = sin(theta + 2*M_PI/(float)split);
+        b64n[num] = sin(theta + 2*M_PI/(float)split);
+        num++;
+        b64[num] = 1.0;
+        b64n[num] = 0.0;
+        num++;
+
+        theta += 2*M_PI/(float)split;
+
+
+    }
+    glGenBuffers(1, &bar64);
+    glBindBuffer(GL_ARRAY_BUFFER, bar64);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(b64), b64, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &bar64n);
+    glBindBuffer(GL_ARRAY_BUFFER, bar64n);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*split*3*4, b64n, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(2);
+
+
+}
+void Bar::recalculaMBR(Ponto *p1, Ponto *p2){
+
+    float xMBR, yMBR, zMBR, XMBR, YMBR, ZMBR;
+    if(p1->x < p2->x){
+
+        xMBR = p1->x - BAR_RADIUS;
+        XMBR = p2->x + BAR_RADIUS;
+
+    }else{
+
+        XMBR = p1->x + BAR_RADIUS;
+        xMBR = p2->x - BAR_RADIUS;
+
+    }
+    if(p1->y < p2->y){
+
+        yMBR = p1->y - BAR_RADIUS;
+        YMBR = p2->y + BAR_RADIUS;
+
+    }else{
+
+        YMBR = p1->y + BAR_RADIUS;
+        yMBR = p2->y - BAR_RADIUS;
+
+    }
+    if(p1->z < p2->z){
+
+        zMBR = p1->z - BAR_RADIUS;
+        ZMBR = p2->z + BAR_RADIUS;
+
+    }else{
+
+        ZMBR = p1->z + BAR_RADIUS;
+        zMBR = p2->z - BAR_RADIUS;
+
+    }
+    setMBR(xMBR, yMBR, zMBR, XMBR, YMBR, ZMBR);
+
 }
 Bar::~Bar()
 {

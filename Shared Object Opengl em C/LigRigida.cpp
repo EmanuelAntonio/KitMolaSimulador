@@ -1,4 +1,5 @@
 #include "LigRigida.h"
+
 using namespace ManipularVetor;
 
 LigRigida::LigRigida() : Objeto3D()
@@ -81,7 +82,7 @@ void LigRigida::drawZero(float mehQual, bool wireframe, char visionAxis, int vis
         normalRet = normalizarVet(prodVetorial(vetDir1,vetDir2));
 
 
-        centroRet = prodPorEscalar(0.5,somaVetorial(retangulo[1],inverteSentido(retangulo[2])));
+        centroRet = prodPorEscalar(0.5,somaVetorial(retangulo[1],retangulo[2]));
         if(prodEscalar(normalRet, somaVetorial(centroRet, inverteSentido(centro))) < 0){
 
             glNormal3f(-normalRet.x,-normalRet.y,-normalRet.z);

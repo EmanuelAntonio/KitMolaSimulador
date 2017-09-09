@@ -17,11 +17,14 @@ class Simulacao
     private:
 
         float centimetroMetro(float c);
-        float deformadaBiapoiada(float x, Ponto forca);
+        float deformadaBiapoiada(float x, float P, float I, float b, float L);
+        float compressao(float P, float L);
+        float flambagem(float x, float P, float L, float I, float n);
+        float deformadaMonoapoiada(float x, float P, float L, float I);
         void addForcaEsfera(Objeto3D *e, Ponto forca);
         void addForcaBar(ListaObjetos *p, Objeto3D *b, double *ponto, Ponto forca);
-        void drawForca(Ponto p1, Ponto p2);
-        void drawForcaZero(float tam);
+        void drawForca(Ponto forca, Ponto aplicacao);
+        void drawSetaForca();
 
 };
 

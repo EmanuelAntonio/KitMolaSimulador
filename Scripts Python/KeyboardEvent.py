@@ -26,7 +26,7 @@ class KeyboardEvent(object):
 
             Vars.ctrlPress = True
 
-        elif (e.GetKeyCode() == Vars.W_PRESS and window.moveObjetos):
+        elif (e.GetKeyCode() == Vars.W_PRESS and window.moveObjetos[0]):
 
             delta = 0.1
             if window.tabs.tabConfig.blockInsert[0]:
@@ -38,7 +38,7 @@ class KeyboardEvent(object):
 
             window.atualizaPrecisaSalvar(True)
 
-        elif (e.GetKeyCode() == Vars.S_PRESS and window.moveObjetos):
+        elif (e.GetKeyCode() == Vars.S_PRESS and window.moveObjetos[0]):
 
             delta = 0.1
             if window.tabs.tabConfig.blockInsert[0]:
@@ -49,7 +49,7 @@ class KeyboardEvent(object):
                 Vars.KitLib.moveSelect(c_float(0.0), c_float(0.0), c_float(-delta))
             window.atualizaPrecisaSalvar(True)
 
-        elif (e.GetKeyCode() == Vars.A_PRESS and window.moveObjetos):
+        elif (e.GetKeyCode() == Vars.A_PRESS and window.moveObjetos[0]):
             delta = 0.1
             if window.tabs.tabConfig.blockInsert[0]:
                 delta = window.tabs.tabConfig.blockInsert[1]
@@ -66,7 +66,7 @@ class KeyboardEvent(object):
 
             window.atualizaPrecisaSalvar(True)
 
-        elif (e.GetKeyCode() == Vars.D_PRESS and window.moveObjetos):
+        elif (e.GetKeyCode() == Vars.D_PRESS and window.moveObjetos[0]):
             delta = 0.1
             if window.tabs.tabConfig.blockInsert[0]:
                 delta = window.tabs.tabConfig.blockInsert[1]
@@ -83,11 +83,15 @@ class KeyboardEvent(object):
             window.atualizaPrecisaSalvar(True)
 
         elif (e.GetKeyCode() == Vars.G_PRESS):
-            window.moveObjetos = not (window.moveObjetos)
-            # window.SetCursor(wx.StockCursor(wx.CURSOR_CROSS))
 
-        elif (e.GetKeyCode() == Vars.Z_PRESS):
-            Vars.KitLib.setWireframe(not (Vars.KitLib.getWireframe()))
+            window.moveObjetos = (not (window.moveObjetos[0]), Vars.ASCII_0)
+            if window.moveObjetos[0]:
+                Msg.exibirStatusBar("Selecione um eixo de mivimentação precionando x, y ou z",10)
+
+            if window.rotacionaObjetos[0]:
+                window.rotacionaObjetos = (False, Vars.ASCII_0)
+            # window.SetCursor(wx.StockCursor(wx.CURSOR_CROSS))
+            window.OnRefreshAll()
         elif (e.GetKeyCode() == Vars.NUM_0_PRESS or e.GetKeyCode() == Vars.N_0_PRESS):
             if window.ultimoDrawSelected != None:
                 window.ultimoDrawSelected.camera.visionOption = Vars.VISION_Z_PERSP
@@ -125,24 +129,78 @@ class KeyboardEvent(object):
                 # window.visionItem.SetLabelText(Vars.visionModes[4])
                 window.ultimoDrawSelected.Refresh()
         elif (e.GetKeyCode() == Vars.ESC_PRESS):
-            if window.moveObjetos:
-                Vars.KitLib.cancelarMovimentacao()
-                window.moveObjetos = False
-                Vars.KitLib.deSelectAll()
+            if window.moveObjetos[0]:
+                if window.botaoSelecionado != Vars.MOVETELA_SELECIONADO:
+                    Vars.KitLib.cancelarMovimentacao()
+                    window.moveObjetos = (False, Vars.ASCII_0)
+                    Vars.KitLib.deSelectAll()
+                    Msg.limpaStatusBar()
+            if window.rotacionaObjetos[0]:
+                if window.botaoSelecionado != Vars.MOVETELA_SELECIONADO:
+                    window.rotacionaObjetos = (False, Vars.ASCII_0)
+                    Vars.KitLib.deSelectAll()
+                    Msg.limpaStatusBar()
             if window.botaoSelecionado != Vars.LIVRE_SELECIONADO:
                 window.botaoSelecionado = Vars.LIVRE_SELECIONADO
                 window.SetCursor(wx.StockCursor(wx.CURSOR_ARROW))
         elif (e.GetKeyCode() == Vars.T_PRESS):
+            if window.showTabs or window.showToolbarSide:
+                window.showTabs = False
+                window.showToolbarSide = False
+                window.tabs.Hide()
+                window.toolbarside.Hide()
+                window.sizerToolSide.Layout()
+                window.boxBtn.Layout()
+                window.boxMain.Layout()
+                window.sizerWindow.Layout()
+                window.sizerWindowStatus.Layout()
+                window.tabs.SetFocus()
+            else:
+                window.showTabs = True
+                window.showToolbarSide = True
+                window.tabs.Show(True)
+                window.toolbarside.Show(True)
+                window.sizerToolSide.Layout()
+                window.boxBtn.Layout()
+                window.boxMain.Layout()
+                window.sizerWindow.Layout()
+                window.sizerWindowStatus.Layout()
+                window.tabs.SetFocus()
+
+        elif(e.GetKeyCode() == Vars.F1_PRESS):
             if window.showTabs:
                 window.showTabs = False
                 window.tabs.Hide()
+                window.boxBtn.Layout()
                 window.boxMain.Layout()
+                window.sizerWindow.Layout()
+                window.sizerWindowStatus.Layout()
                 window.tabs.SetFocus()
             else:
                 window.showTabs = True
                 window.tabs.Show(True)
+                window.boxBtn.Layout()
                 window.boxMain.Layout()
+                window.sizerWindow.Layout()
+                window.sizerWindowStatus.Layout()
                 window.tabs.SetFocus()
+        elif(e.GetKeyCode() == Vars.F2_PRESS):
+            if window.showToolbarSide:
+                window.showToolbarSide = False
+                window.toolbarside.Hide()
+                window.sizerToolSide.Layout()
+                window.boxMain.Layout()
+                window.sizerWindow.Layout()
+                window.sizerWindowStatus.Layout()
+                window.tabs.SetFocus()
+            else:
+                window.showToolbarSide = True
+                window.toolbarside.Show(True)
+                window.sizerToolSide.Layout()
+                window.sizerWindow.Layout()
+                window.sizerWindowStatus.Layout()
+                window.tabs.SetFocus()
+
         elif (e.GetKeyCode() == e.GetKeyCode() == Vars.NUM_PLUS):
             window.ultimoDrawSelected.OnZoomOut()
         elif (e.GetKeyCode() == e.GetKeyCode() == Vars.NUM_LESS or e.GetKeyCode() == e.GetKeyCode() == Vars.LESS_PRESS):
@@ -153,7 +211,53 @@ class KeyboardEvent(object):
             else:
                 Vars.KitSim.setListaObjetos(Vars.KitLib.getObjList())
                 Vars.KitSim.start()
+        elif (e.GetKeyCode() == Vars.R_PRESS):
+            window.rotacionaObjetos = (not(window.rotacionaObjetos[0]), Vars.ASCII_0)
+            if window.rotacionaObjetos[0]:
+                window.rotacionaSelectCentro = True
+                Msg.exibirStatusBar("Selecione um objeto com o botão esquerdo do mouse para ser o centro de rotacão", 10)
+            if window.moveObjetos[0]:
+                window.moveObjetos = (False,Vars.ASCII_0)
 
+        elif (e.GetKeyCode() == Vars.X_PRESS):
+            if window.moveObjetos[0]:
+                window.moveObjetos = (window.moveObjetos[0],Vars.ASCII_X)
+                Msg.exibirStatusBar("Use o botão esquerdo do mouse para movimentar os objetos selecionados, ESC para cancelar, ou ENTER para confirmar a ação", 10)
+
+            elif window.rotacionaObjetos[0]:
+                window.rotacionaObjetos = (window.rotacionaObjetos[0],Vars.ASCII_X)
+                window.rotacionaSelectCentro = False
+                Msg.exibirStatusBar("Use o botão esquerdo do mouse para rotacionar os objetos selecionados, ESC para cancelar, ou ENTER para confirmar a ação",10)
+
+        elif (e.GetKeyCode() == Vars.Y_PRESS):
+            if window.moveObjetos[0]:
+                window.moveObjetos = (window.moveObjetos[0],Vars.ASCII_Y)
+                Msg.exibirStatusBar(
+                    "Use o botão esquerdo do mouse para movimentar os objetos selecionados, ESC para cancelar, ou ENTER para confirmar a ação",
+                    10)
+
+            elif window.rotacionaObjetos[0]:
+                window.rotacionaObjetos = (window.rotacionaObjetos[0], Vars.ASCII_Y)
+                window.rotacionaSelectCentro = False
+                Msg.exibirStatusBar(
+                    "Use o botão esquerdo do mouse para rotacionar os objetos selecionados, ESC para cancelar, ou ENTER para confirmar a ação",
+                    10)
+
+        elif (e.GetKeyCode() == Vars.Z_PRESS):
+            if window.moveObjetos[0]:
+                window.moveObjetos = (window.moveObjetos[0], Vars.ASCII_Z)
+                Msg.exibirStatusBar(
+                    "Use o botão esquerdo do mouse para movimentar os objetos selecionados, ESC para cancelar, ou ENTER para confirmar a ação",
+                    10)
+
+            elif window.rotacionaObjetos[0]:
+                window.rotacionaObjetos = (window.rotacionaObjetos[0], Vars.ASCII_Z)
+                window.rotacionaSelectCentro = False
+                Msg.exibirStatusBar(
+                    "Use o botão esquerdo do mouse para rotacionar os objetos selecionados, ESC para cancelar, ou ENTER para confirmar a ação",
+                    10)
+            else:
+                Vars.KitLib.setWireframe(not (Vars.KitLib.getWireframe()))
         else:
             print(e.GetKeyCode())
 
@@ -170,6 +274,7 @@ class KeyboardEvent(object):
     @staticmethod
     def OnEnterKeyDown(e, window):
 
+        moveTelaSelected = False
         if e.GetKeyCode() == Vars.ENTER_PRESS:
             if window.botaoSelecionado != Vars.LIVRE_SELECIONADO:
                 if window.botaoSelecionado == Vars.LAJE_SELECIONADO:
@@ -182,11 +287,25 @@ class KeyboardEvent(object):
                     AdicionarObjetos.OnAddSmallDiag(None,window)
                 elif window.botaoSelecionado == Vars.TIRANTE18_SELECIONADO:
                     AdicionarObjetos.OnAddLargeDiag(None,window)
+                elif window.botaoSelecionado == Vars.MOVETELA_SELECIONADO:
+                    moveTelaSelected = True
                 window.botaoSelecionado = Vars.LIVRE_SELECIONADO
                 window.SetCursor(wx.StockCursor(wx.CURSOR_ARROW))
-            if window.moveObjetos:
+
+            if window.moveObjetos[0] and not(moveTelaSelected):
                 Vars.KitLib.terminaMovimentacao()
-                window.moveObjetos = False
+                window.moveObjetos = (False,Vars.ASCII_0)
+                Msg.limpaStatusBar()
+            if window.rotacionaObjetos[0]:
+                if window.rotacionaSelectCentro:
+                    window.rotacionaSelectCentro = False
+                    Msg.exibirStatusBar("Selecione um eixo de mivimentação precionando x, y ou z", 10)
+                else:
+                    Vars.KitLib.terminaRotacao()
+                    window.rotacionaObjetos = (False, Vars.ASCII_0)
+                    Vars.KitLib.deSelectAll()
+                    Msg.limpaStatusBar()
+
             if window.ultimoDrawSelected != None:
                 window.ultimoDrawSelected.Refresh(True)
         else:# Se  caso não for pressionado a tecla enter, o else libera o evento para que possa ser usado no wx.EVT_KEY_DOWN

@@ -1,7 +1,7 @@
 #ifndef NO_H
 #define NO_H
 #include <stdlib.h>
-#include "Objeto3D.cpp"
+#include "Objeto3D.h"
 
 class No
 {

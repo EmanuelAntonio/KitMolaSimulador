@@ -2,7 +2,13 @@
 #define OBJETO3D_H
 #include <stdlib.h>
 #include <stdio.h>
+#include "include/GL/glew.h"
+#include "include/GL/glut.h"
 #include "ManipularVetor.h"
+
+#ifndef M_PI
+    #define M_PI 3.1415
+#endif
 
 #define SPHERE 1
 #define BAR_SMALL 2
@@ -82,13 +88,14 @@ class Objeto3D
         void removeExtremidades(int id);
         void swapExtremidades(int id1, int id2);
         bool buscaIdExtremidades(int id);
-        Ponto *getForca();
-        void setForca(Ponto f, Ponto aplicacao);
 
         virtual void draw(float meshQual, bool wireframe, char visionAxis, int visionOption);
         virtual void draw(float meshQual, bool wireframe, char visionAxis, int visionOption, Objeto3D *obj1, Objeto3D *obj2);
         virtual void draw(float meshQual, bool wireframe, char visionAxis, int visionOption, Ponto *p1, Ponto *p2, Ponto *p3, Ponto *p4);
         virtual void draw(float mehQual, bool wireframe, char visionAxis, int visionOption, Objeto3D *obj1, Objeto3D *obj2, Objeto3D *obj3);
+        virtual void recalculaMBR();///função para esfera e base
+        virtual void recalculaMBR(Ponto *p1, Ponto *p2);///função para barra e tirante
+        virtual void recalculaMBR(Ponto *p1, Ponto *p2, Ponto *p3, Ponto *p4);///função para laje
 
         virtual ~Objeto3D();
     private:
@@ -115,6 +122,5 @@ class Objeto3D
         GLfloat *object_especular;
         GLfloat *object_select;
         Ponto centro;/**Parâmetro de desenho, para objetos que precisem**/
-        Ponto forca[2];///vetor forca e ponto de aplicação respectivamente
 };
 #endif // OBJETO3D_H

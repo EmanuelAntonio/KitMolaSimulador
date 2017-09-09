@@ -5,12 +5,12 @@ from VarsAmbient import *
 class Camera(object):
 
     def __init__(self,ref,parent):
-        self.camZoom = 16  # Variável que armazena o raio da coordenada esférica correspondente ao zoom da câmera
+        self.camZoom = 8  # Variável que armazena o raio da coordenada esférica correspondente ao zoom da câmera
         self.theta = math.pi / 4  # Variável que armazena em radianos o ângulo XY da câmera
         self.phi = math.pi / 3  # Variável que armazena em radianos o ângulo do eixo Z com o plano XY
         self.centro = (0,0,0) #Variável que armazena a posição do foco da cãmera
         self.orthoCenter = (0,0) #Tupla que armazena o ponto central da visão ortho
-        self.orthoZoom = 5 #Variável que armazena a distancia do centro para visao ortho
+        self.orthoZoom = 4.2 #Variável que armazena a distancia do centro para visao ortho
         self.parent = parent
         if ref == 0:
             self.visionAxis = Vars.ASCII_Z

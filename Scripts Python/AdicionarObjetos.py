@@ -1,4 +1,4 @@
-from VarsAmbient import *
+from Msg import *
 
 
 class AdicionarObjetos(object):
@@ -101,6 +101,7 @@ class AdicionarObjetos(object):
         window.toolbar.EnableTool(wx.ID_UNDO, True)
         window.toolbar.EnableTool(wx.ID_REDO, False)
         window.atualizaPrecisaSalvar(True)
+        window.tabs.SetFocus()
 
     @staticmethod
     def OnAddBase(tipo, drawArea, window):
@@ -201,6 +202,7 @@ class AdicionarObjetos(object):
         window.toolbar.EnableTool(wx.ID_UNDO, True)
         window.toolbar.EnableTool(wx.ID_REDO, False)
         window.atualizaPrecisaSalvar(True)
+        window.tabs.SetFocus()
 
     @staticmethod
     def OnAddSmallBar(drawArea, window):
@@ -209,15 +211,15 @@ class AdicionarObjetos(object):
         add = Vars.KitLib.addBar(BAR_SMALL)
         if not (add):
             msg = "Para adicionar uma barra pequena certifique-se que tenha duas esferas selecionadas, ou uma esfera e uma base e que a distância entre elas seja de 7.5 cm."
-            msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
-            msgCx.ShowModal()
-            msgCx.Destroy()
+            Msg.exibirStatusBar(msg,10)
+
         window.OnRefreshAll()
         if(drawArea is not None):
             drawArea.Refresh()
         window.toolbar.EnableTool(wx.ID_UNDO, True)
         window.toolbar.EnableTool(wx.ID_REDO, False)
         window.atualizaPrecisaSalvar(True)
+        window.tabs.SetFocus()
 
     @staticmethod
     def OnAddLargeBar(drawArea, window):
@@ -226,9 +228,7 @@ class AdicionarObjetos(object):
         add = Vars.KitLib.addBar(BAR_LARGE)
         if not (add):
             msg = "Para adicionar uma barra grande certifique-se que tenha duas esferas selecionadas, ou uma esfera e uma base e que a distância entre elas seja de 16.5 cm."
-            msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
-            msgCx.ShowModal()
-            msgCx.Destroy()
+            Msg.exibirStatusBar(msg,10)
 
         window.OnRefreshAll()
         if (drawArea is not None):
@@ -236,15 +236,15 @@ class AdicionarObjetos(object):
         window.toolbar.EnableTool(wx.ID_UNDO, True)
         window.toolbar.EnableTool(wx.ID_REDO, False)
         window.atualizaPrecisaSalvar(True)
+        window.tabs.SetFocus()
 
     @staticmethod
     def OnAddLaje(window):
         if not(Vars.KitLib.addLaje()):
             msg = "Para adicionar uma laje, certifique-se de selecionar quatro esferas, e estas sejam os vertices de um retângulo 9cm X 18cm(contando do centro da esfera)."
-            msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
-            msgCx.ShowModal()
-            msgCx.Destroy()
+            Msg.exibirStatusBar(msg, 10)
             window.atualizaPrecisaSalvar(True)
+        window.tabs.SetFocus()
 
     @staticmethod
     def OnAddSmallDiag(drawArea, window):
@@ -252,15 +252,14 @@ class AdicionarObjetos(object):
         add = Vars.KitLib.addDiag(DIAGONAL_SMALL)
         if not (add):
             msg = "Para adicionar uma diagonal 9x9 certifique-se que tenha duas esferas selecionadas, ou uma esfera e uma base e que a distância entre elas seja de 10.61 cm"
-            msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
-            msgCx.ShowModal()
-            msgCx.Destroy()
+            Msg.exibirStatusBar(msg, 10)
         window.OnRefreshAll()
         if (drawArea is not None):
             drawArea.Refresh()
         window.toolbar.EnableTool(wx.ID_UNDO, True)
         window.toolbar.EnableTool(wx.ID_REDO, False)
         window.atualizaPrecisaSalvar(True)
+        window.tabs.SetFocus()
 
     @staticmethod
     def OnAddLargeDiag(drawArea, window):
@@ -268,15 +267,14 @@ class AdicionarObjetos(object):
         add = Vars.KitLib.addDiag(DIAGONAL_LARGE)
         if not (add):
             msg = "Para adicionar uma barra pequena certifique-se que tenha duas esferas selecionadas, ou uma esfera e uma base e que a distância entre elas seja de 18.12 cm."
-            msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
-            msgCx.ShowModal()
-            msgCx.Destroy()
+            Msg.exibirStatusBar(msg, 10)
         window.OnRefreshAll()
         if (drawArea is not None):
             drawArea.Refresh()
         window.toolbar.EnableTool(wx.ID_UNDO, True)
         window.toolbar.EnableTool(wx.ID_REDO, False)
         window.atualizaPrecisaSalvar(True)
+        window.tabs.SetFocus()
 
     @staticmethod
     def OnAddLigRigida(drawArea, window):
@@ -284,12 +282,11 @@ class AdicionarObjetos(object):
         add = Vars.KitLib.addLigRigida()
         if not (add):
             msg = "Para adicionar uma ligação rígida é necessário que esteja com duas barras e uma esfera selecionada\nConfira que as duas barras estejam em 90º."
-            msgCx = wx.MessageDialog(None, msg, "ERRO!", wx.OK)
-            msgCx.ShowModal()
-            msgCx.Destroy()
+            Msg.exibirStatusBar(msg, 10)
         window.OnRefreshAll()
         if (drawArea is not None):
             drawArea.Refresh()
         window.toolbar.EnableTool(wx.ID_UNDO, True)
         window.toolbar.EnableTool(wx.ID_REDO, False)
         window.atualizaPrecisaSalvar(True)
+        window.tabs.SetFocus()

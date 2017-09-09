@@ -153,7 +153,7 @@ class RightMenu(wx.Menu):
 
     def OnDuplicaSelect(self, e):
         if Vars.KitLib.duplicaSelect():
-            self.parent.parent.moveObjetos = True
+            self.parent.parent.moveObjetos = (True,Vars.ASCII_0)
         self.parent.parent.OnRefreshAll()
         self.parent.parent.atualizaPrecisaSalvar(True)
 

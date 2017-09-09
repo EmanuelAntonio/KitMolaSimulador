@@ -9,19 +9,19 @@ Objeto3D::Objeto3D()
     selecionado = false;
     tamExtremidades = 0;
     object_ambient = new GLfloat[4];
-    object_ambient[0] = 0.5;
-    object_ambient[1] = 0.5;
-    object_ambient[2] = 0.5;
+    object_ambient[0] = 0.2;
+    object_ambient[1] = 0.2;
+    object_ambient[2] = 0.2;
     object_ambient[3] = 1.0;
 
     object_brilho = new GLfloat[1];
-    object_brilho[0] = 128.0;
+    object_brilho[0] = 25.6;
 
 
     object_especular = new GLfloat[4];
-    object_especular[0] = 1.0;
-    object_especular[1] = 1.0;
-    object_especular[2] = 1.0;
+    object_especular[0] = 0.5;
+    object_especular[1] = 0.5;
+    object_especular[2] = 0.5;
     object_especular[3] = 1.0;
 
     object_select = new GLfloat[3];
@@ -181,19 +181,11 @@ bool Objeto3D::buscaIdExtremidades(int id){
     }
     return false;
 }
-void Objeto3D::setForca(Ponto f, Ponto aplicacao){
-
-    forca[0] = f;
-    forca[1] = aplicacao;
-
-}
-Ponto* Objeto3D::getForca(){
-
-    return forca;
-
-}
 void Objeto3D::draw(float meshQual, bool wireframe, char visionAxis, int visionOption){}
 void Objeto3D::draw(float meshQual, bool wireframe, char visionAxis, int visionOption, Objeto3D *obj1, Objeto3D *obj2){}
 void Objeto3D::draw(float meshQual, bool wireframe, char visionAxis, int visionOption, Ponto *p1, Ponto *p2, Ponto *p3, Ponto *p4){}
 void Objeto3D::draw(float mehQual, bool wireframe, char visionAxis, int visionOption, Objeto3D *obj1, Objeto3D *obj2, Objeto3D *obj3){}
+void Objeto3D::recalculaMBR(){}
+void Objeto3D::recalculaMBR(Ponto *p1, Ponto *p2){}
+void Objeto3D::recalculaMBR(Ponto *p1, Ponto *p2, Ponto *p3, Ponto *p4){}
 Objeto3D::~Objeto3D(){}

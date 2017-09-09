@@ -120,10 +120,7 @@ class CanvasBase(glcanvas.GLCanvas):
             Vars.boxUp.Layout()
             Vars.boxDraw.Layout()
 
-        self.parent.drawArea0.Refresh()
-        self.parent.drawArea1.Refresh()
-        self.parent.drawArea2.Refresh()
-        self.parent.drawArea3.Refresh()
+        self.parent.OnRefreshAll()
         self.Refresh(True)
 
     """
@@ -202,14 +199,14 @@ class CanvasBase(glcanvas.GLCanvas):
     def OnZoomIn(self):
         if self.camera.visionOption == Vars.VISION_Z_PERSP:
             zoom = 0.5
-            self.camZoom -= zoom
-            if self.camZoom <= 0:
-                self.camZoom = 0.2
+            self.camera.camZoom -= zoom
+            if self.camera.camZoom <= 0:
+                self.camera.camZoom = 0.2
         else:
             zoom = 0.5
-            self.orthoZoom -= zoom
-            if self.orthoZoom <= 0:
-                self.orthoZoom = 0.2
+            self.camera.orthoZoom -= zoom
+            if self.camera.orthoZoom <= 0:
+                self.camera.orthoZoom = 0.2
 
 
         self.parent.Refresh(False)
@@ -219,11 +216,11 @@ class CanvasBase(glcanvas.GLCanvas):
 
             zoom = 0.5
 
-            self.camZoom += zoom
+            self.camera.camZoom += zoom
 
         else:
             zoom = 0.5
-            self.orthoZoom += zoom
+            self.camera.orthoZoom += zoom
 
 
 
@@ -251,7 +248,7 @@ class CanvasBase(glcanvas.GLCanvas):
 
     def InitGL(self):
 
-        Vars.KitLib.initGL()
+        Vars.KitLib.initGL(c_float(0.003921/2), c_float(0.27059/2), c_float(0.3098/2))
 
     def OnDraw(self):
 
@@ -264,10 +261,10 @@ class CanvasBase(glcanvas.GLCanvas):
         Vars.KitLib.drawAxis(self.camera.visionAxis)
         Vars.KitLib.drawGrid(self.camera.visionAxis)
 
-        if self.parent.moveObjetos and self.camera.visionOption == 0 and not(Vars.KitSim.getSSim()):
-            Vars.KitLib.drawMoveAxis(self.camera.visionAxis, self.camera.visionOption, c_float(self.camera.camZoom))
-        elif self.parent.moveObjetos and not(Vars.KitSim.getSSim()):
-            Vars.KitLib.drawMoveAxis(self.camera.visionAxis, self.camera.visionOption, c_float(self.camera.orthoZoom))
+        if self.parent.moveObjetos[0] and not(Vars.KitSim.getSSim()):
+            Vars.KitLib.drawMoveAxis(self.camera.visionAxis, self.camera.visionOption, self.parent.moveObjetos[1])
+
+        if self.parent.rotacionaObjetos[0] and not(Vars.KitSim.getSSim()):
+            Vars.KitLib.drawRotAxis(self.camera.visionAxis, self.camera.visionOption, self.parent.rotacionaObjetos[1])
 
         self.SwapBuffers()
-

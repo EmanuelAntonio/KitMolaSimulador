@@ -9,7 +9,7 @@ class TabTools(wx.lib.scrolledpanel.ScrolledPanel):
     # ----------------------------------------------------------------------
     def __init__(self, parent):
 
-        wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent=parent, size = (10,-1), id=wx.ID_ANY, style=wx.DOUBLE_BORDER)
+        wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent=parent, size = (10,-1), id=wx.ID_ANY)#, style=wx.DOUBLE_BORDER)
         self.SetupScrolling(scroll_x=False)
 
         self.parent = parent

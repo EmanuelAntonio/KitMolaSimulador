@@ -277,6 +277,11 @@ int Base::getSubObjeto(){
     return subObjeto;
 
 }
+void Base::recalculaMBR(){
+
+    setMBR(-BASE_RADIUS + centro.x,-BASE_RADIUS + centro.y,-SPHERE_RADIUS + centro.z,BASE_RADIUS + centro.x,BASE_RADIUS + centro.y,SPHERE_RADIUS + centro.z);
+
+}
 Base::~Base()
 {
     delete []object_difusa;

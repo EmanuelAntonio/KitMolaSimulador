@@ -2,6 +2,8 @@
 #include <fstream>
 #include <float.h>
 
+using namespace ManipularVetor;
+
 ListaObjetos::ListaObjetos()
 {
     pri = NULL;
@@ -188,6 +190,9 @@ cabecalhoKMP* ListaObjetos::abrir(char* arquivo){
 
             ant->setProx(new Tirante());
 
+        }else if(obj.obj == LIGACAO_RIGIDA){
+
+           ant->setProx(new LigRigida());
         }
         ant->getProx()->setAnt(ant);
         ant = ant->getProx();
@@ -763,13 +768,12 @@ void ListaObjetos::recalculaMBRSelect(Ponto* MBRSelect){
 }
 void ListaObjetos::addSphere(float x, float y, float z){
 
-    float erro = 0;
     if(pri == NULL){
 
         pri = new Sphere();
         pri->setObjeto(SPHERE);
         pri->setCentro(x,y,z);
-        pri->setMBR(-SPHERE_RADIUS - erro + x,-SPHERE_RADIUS - erro + y,-SPHERE_RADIUS - erro + z,SPHERE_RADIUS + erro + x,SPHERE_RADIUS + erro + y,SPHERE_RADIUS + erro + z);
+        pri->recalculaMBR();
         pri->setAnt(NULL);
         pri->setProx(NULL);
 
@@ -778,9 +782,9 @@ void ListaObjetos::addSphere(float x, float y, float z){
         Objeto3D *aux = new Sphere();
         aux->setObjeto(SPHERE);
         aux->setCentro(x,y,z);
+        aux->recalculaMBR();
         aux->setProx(pri);
         pri->setAnt(aux);
-        aux->setMBR(-SPHERE_RADIUS - erro + x,-SPHERE_RADIUS - erro + y,-SPHERE_RADIUS - erro + z,SPHERE_RADIUS + erro + x,SPHERE_RADIUS + erro + y,SPHERE_RADIUS + erro + z);
         pri = aux;
 
     }
@@ -864,7 +868,6 @@ bool ListaObjetos::addBar(int tipoBar){
         }
 
     }
-    float xMBR, yMBR, zMBR, XMBR, YMBR, ZMBR;
     if(pri == NULL){
 
         pri = new Bar();
@@ -884,40 +887,7 @@ bool ListaObjetos::addBar(int tipoBar){
 
     }
 
-    if(objId1->getCentro()->x < objId2->getCentro()->x){
-
-        xMBR = objId1->getCentro()->x - BAR_RADIUS;
-        XMBR = objId2->getCentro()->x + BAR_RADIUS;
-
-    }else{
-
-        XMBR = objId1->getCentro()->x + BAR_RADIUS;
-        xMBR = objId2->getCentro()->x - BAR_RADIUS;
-
-    }
-    if(objId1->getCentro()->y < objId2->getCentro()->y){
-
-        yMBR = objId1->getCentro()->y - BAR_RADIUS;
-        YMBR = objId2->getCentro()->y + BAR_RADIUS;
-
-    }else{
-
-        YMBR = objId1->getCentro()->y + BAR_RADIUS;
-        yMBR = objId2->getCentro()->y - BAR_RADIUS;
-
-    }
-    if(objId1->getCentro()->z < objId2->getCentro()->z){
-
-        zMBR = objId1->getCentro()->z - BAR_RADIUS;
-        ZMBR = objId2->getCentro()->z + BAR_RADIUS;
-
-    }else{
-
-        ZMBR = objId1->getCentro()->z + BAR_RADIUS;
-        zMBR = objId2->getCentro()->z - BAR_RADIUS;
-
-    }
-    pri->setMBR(xMBR, yMBR, zMBR, XMBR, YMBR, ZMBR);
+    pri->recalculaMBR(objId1->getCentro(),objId2->getCentro());
     pri->setId(idDis);
     pri->setSelecionado(true);
     objId1->addExtremidades(idDis);
@@ -1177,13 +1147,12 @@ bool ListaObjetos::duplicaSelect(){
 }
 void ListaObjetos::addBase(int subtipo, float x, float y, float z){
 
-    float erro = 0.0;
     if(pri == NULL){
 
         pri = new Base();
         pri->setObjeto(BASE);
         pri->setCentro(x,y,z);
-        pri->setMBR(-BASE_RADIUS + erro + x,-BASE_RADIUS + erro + y,-SPHERE_RADIUS + erro + z,BASE_RADIUS + erro + x,BASE_RADIUS + erro + y,SPHERE_RADIUS + erro + z);
+        pri->recalculaMBR();
         pri->setAnt(NULL);
         pri->setProx(NULL);
 
@@ -1194,7 +1163,7 @@ void ListaObjetos::addBase(int subtipo, float x, float y, float z){
         aux->setCentro(x,y,z);
         aux->setProx(pri);
         pri->setAnt(aux);
-        aux->setMBR(-BASE_RADIUS + erro + x,-BASE_RADIUS + erro + y,-SPHERE_RADIUS + erro + z,BASE_RADIUS + erro + x,BASE_RADIUS + erro + y,SPHERE_RADIUS + erro + z);
+        aux->recalculaMBR();
         pri = aux;
 
     }
@@ -1488,7 +1457,6 @@ bool ListaObjetos::addDiagonal(int tipoDiag){
         }
 
     }
-    float xMBR, yMBR, zMBR, XMBR, YMBR, ZMBR;
     if(pri == NULL){
 
         pri = new Tirante();
@@ -1508,40 +1476,7 @@ bool ListaObjetos::addDiagonal(int tipoDiag){
 
     }
 
-    if(objId1->getCentro()->x < objId2->getCentro()->x){
-
-        xMBR = objId1->getCentro()->x - BAR_RADIUS;
-        XMBR = objId2->getCentro()->x + BAR_RADIUS;
-
-    }else{
-
-        XMBR = objId1->getCentro()->x + BAR_RADIUS;
-        xMBR = objId2->getCentro()->x - BAR_RADIUS;
-
-    }
-    if(objId1->getCentro()->y < objId2->getCentro()->y){
-
-        yMBR = objId1->getCentro()->y - BAR_RADIUS;
-        YMBR = objId2->getCentro()->y + BAR_RADIUS;
-
-    }else{
-
-        YMBR = objId1->getCentro()->y + BAR_RADIUS;
-        yMBR = objId2->getCentro()->y - BAR_RADIUS;
-
-    }
-    if(objId1->getCentro()->z < objId2->getCentro()->z){
-
-        zMBR = objId1->getCentro()->z - BAR_RADIUS;
-        ZMBR = objId2->getCentro()->z + BAR_RADIUS;
-
-    }else{
-
-        ZMBR = objId1->getCentro()->z + BAR_RADIUS;
-        zMBR = objId2->getCentro()->z - BAR_RADIUS;
-
-    }
-    pri->setMBR(xMBR, yMBR, zMBR, XMBR, YMBR, ZMBR);
+    pri->recalculaMBR(objId1->getCentro(), objId2->getCentro());
     pri->setId(idDis);
     pri->setSelecionado(true);
     objId1->addExtremidades(idDis);
@@ -1579,9 +1514,12 @@ bool ListaObjetos::addLigRigida(){
 
                     obj2 = aux;
 
-                }else{
+                }else if(obj3 == NULL){
 
                     obj3 = aux;
+
+                }else{
+
                     break;
 
                 }
@@ -1596,7 +1534,6 @@ bool ListaObjetos::addLigRigida(){
         aux = aux->getProx();
 
     }
-
     if(obj1->getObjeto() != SPHERE){
 
         if(obj2->getObjeto() == SPHERE){
@@ -1619,7 +1556,7 @@ bool ListaObjetos::addLigRigida(){
 
     }
 
-    if(obj2->getObjeto() == obj3->getObjeto() && (obj2->getObjeto() == BAR_LARGE || obj2->getObjeto() == BAR_SMALL)){
+    if(obj2->getObjeto() == BAR_LARGE || obj2->getObjeto() == BAR_SMALL || obj3->getObjeto() == BAR_LARGE || obj3->getObjeto() == BAR_SMALL){
 
         if(obj2->buscaIdExtremidades(obj1->getId()) && obj3->buscaIdExtremidades(obj1->getId())){
 
@@ -1647,7 +1584,7 @@ bool ListaObjetos::addLigRigida(){
             }
             vet1 = somaVetorial(*sph1->getCentro(), inverteSentido(*obj1->getCentro()));
             vet2 = somaVetorial(*sph2->getCentro(), inverteSentido(*obj1->getCentro()));
-            if(prodEscalar(vet1,vet2) != 0){
+            if(prodEscalar(vet1,vet2) > 0.001 || prodEscalar(vet1,vet2) < -0.001){
 
                 return false;
 
@@ -1685,4 +1622,86 @@ bool ListaObjetos::addLigRigida(){
     tam++;
     return true;
 
+}
+bool ListaObjetos::rotacionaObjSelect(float angle, bool x, bool y, bool z, Ponto centro){
+
+    Objeto3D *aux = pri;
+    float X,Y,Z;
+    Ponto a;
+
+    if(x || y){
+
+        while(aux != NULL){
+
+            if(aux->getSelecionado() && aux->getObjeto() == BASE){
+
+                return false;
+
+            }
+            aux = aux->getProx();
+        }
+        aux = pri;
+
+    }
+
+    while(aux != NULL){
+
+        if(aux->getSelecionado()){
+
+            if(aux->getObjeto() == SPHERE || (aux->getObjeto() == BASE && z)){
+                a = *aux->getCentro();
+                a = somaVetorial(a, inverteSentido(centro));
+                X = a.x;
+                Y = a.y;
+                Z = a.z;
+                if(x){
+
+                    a.y = Y*cos(angle) - Z*sin(angle);
+                    a.z = Y*sin(angle) + Z*cos(angle);
+
+                    a = somaVetorial(a, centro);
+                    aux->setCentro(a.x, a.y, a.z);
+
+                }else if(y){
+
+                    a.x = X*cos(angle) - Z*sin(angle);
+                    a.z = X*sin(angle) + Z*cos(angle);
+
+                    a = somaVetorial(a, centro);
+                    aux->setCentro(a.x, a.y, a.z);
+
+                }else{
+
+
+                    a.x = X*cos(angle) - Y*sin(angle);
+                    a.y = X*sin(angle) + Y*cos(angle);
+
+                    a = somaVetorial(a, centro);
+                    aux->setCentro(a.x, a.y, a.z);
+
+                }
+
+            }
+
+        }
+        aux = aux->getProx();
+
+    }
+    ///Recalcula a MBR dos objetos
+    aux = pri;
+    while(aux != NULL){
+
+        if(aux->getObjeto() == SPHERE || aux->getObjeto() == BASE){
+
+            aux->recalculaMBR();
+
+        }else if(aux->getObjeto() == BAR_SMALL || aux->getObjeto() == BAR_LARGE || aux->getObjeto() == DIAGONAL_LARGE || aux->getObjeto() == DIAGONAL_SMALL){
+
+            aux->recalculaMBR(indexId->busca(aux->getExtremidades()[0])->getCentro(),indexId->busca(aux->getExtremidades()[1])->getCentro());
+
+        }
+        aux = aux->getProx();
+
+    }
+    return true;
 }

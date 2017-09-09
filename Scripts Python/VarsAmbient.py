@@ -5,6 +5,7 @@ from CStructs import *
 import wx
 from wx import glcanvas
 import wx.lib.scrolledpanel
+import wx.adv
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from OpenGL.GL import *
@@ -16,6 +17,9 @@ warnings.filterwarnings("ignore")
 
 class Vars(object):
 
+    thema = "dark"
+    corThema = (50,50,50)
+    reset = True
     lineUp = None # Variável que armazena uma referência para a linha que separa a drawArea0 e a drawArea1
     lineDown = None  # Variável que armazena uma referência para a linha que separa a drawArea2 e a drawArea3
     boxUp = None # Variável que armazena o sizer que engloba drawArea0 e drawArea1
@@ -24,22 +28,14 @@ class Vars(object):
     boxDraw = None # variável que armazena uma referência ao sizer que contêm toda a parte de draw
     drawPrincipal = -1 #Variável que armazena qual das drawAreas foi selecionado como principal
     posLuz = (0.0,0.0,0.0,1.0) # variável que armazena a posição da luz na cena
-    toolBar = None # Variável que armazena uma refência para a toolbar
-    toolBox = None # Variável que armazena uma referencia ao menu do lado direito da tela
-    status = None # Varável que armazena uma referência ao 'status bar', pode ser utilizado em usos futuros
     visionModes = ("Perspectiva", "Frente Ortho", "Atrás Ortho", "Direita Ortho", "Esquerda Ortho", "Cima Ortho")  # Variável que armazena os modos de visão(Perspectiva, direita, esquerda, frente, atrás, cima, baixo)
     visionItem = None  # Variável que armazena o label que mostra na janela qual o tipo de visão que estamos utilizando
     rightMouse = (0,0,0) #Variável que armazena a ultima posição do mouse ao clicar com o botao direito
     shiftPress = False #Variável que armazena se o shift está sendo pressionado nesse exato momento
     ctrlPress = False #Variável que armazena se o control está sendo pressionado nesse exato momento
 
-    ctypes.WinDLL('libs/freeglut.dll') #Importa a dll freeglut.dll, usado apenas no windows, a versão para linux não terá esta linha
-    KitLib = ctypes.CDLL('libs/kitmola.dll')  # Variável que armazena uma referência ao núcleo do programa em C
-    KitLib.distObjsSelect.restype = KitLib.getEspacoGrid.restype = c_float # define o tipo de retorno da funcao
-    KitLib.getObjById.restype = POINTER(CObjeto3D) # define o tipo de retorno da funcao
-    KitLib.getCentroMBRSelect.restype = POINTER(CPonto) # define o tipo de retorno da funcao
-    KitSim = ctypes.CDLL('libs/ksim.dll') # Variável que armazena uma referencia ao núcleo da simulacao em C
-    KitSim.getTempoTotal.restype = c_float
+    dirExec = '' # Variável que armazena o diretorio de execução do programa, necessário para abrir arquivos do sistema
+    openFile = False #Variável que armazena o diretório da abertura de um arquivo, usado para abrir um arquivo ao iniciar o programa
 
     # Constantes
     SPHERE = 1
@@ -60,6 +56,7 @@ class Vars(object):
     LAJE_LEG = 0.0 # em centimetros - catetos que formam o tringulo faltante nas bordas da laje
     DIAGONAL_LENGTH_SMALL = 11.22 # em centimetros
     DIAGONAL_LENGTH_LARGE = 18.625 # em centimetros
+    ASCII_0 = 48
     ASCII_X = 120
     ASCII_Y = 121
     ASCII_Z = 122
@@ -74,6 +71,8 @@ class Vars(object):
     G_PRESS = 71
     A_PRESS = 65
     D_PRESS = 68
+    X_PRESS = 88
+    Y_PRESS = 89
     Z_PRESS = 90
     T_PRESS = 84
     NUM_0_PRESS = 324
@@ -89,9 +88,13 @@ class Vars(object):
     N_4_PRESS = 52
     N_5_PRESS = 53
     ESC_PRESS = 27
+    R_PRESS = 82
     NUM_PLUS = 388
     NUM_LESS = 390
     LESS_PRESS = 45
+    F1_PRESS = 340
+    F2_PRESS = 341
+    F3_PRESS = 342
     SPHERE_SELECIONADO = 0
     BAR9_SELECIONADO = 1
     BAR18_SELECIONADO = 2
@@ -107,5 +110,20 @@ class Vars(object):
     BASE_BLOQUEADA_X = 10
     BASE_BLOQUEADA_Y = 11
     BASE_BLOQUEADA_XY = 12
+
+    @staticmethod
+    def __init__():
+        ctypes.WinDLL(
+            Vars.dirExec + 'libs/freeglut.dll')  # Importa a dll freeglut.dll, usado apenas no windows, a versão para linux não terá esta linha
+        ctypes.WinDLL(
+            Vars.dirExec + 'libs/glew32.dll')  # Importa a dll glew32.dll, usado apenas no windows, a versão para linux não terá esta linha
+        Vars.KitLib = ctypes.CDLL(
+            Vars.dirExec + 'libs/KitLib.dll')  # Variável que armazena uma referência ao núcleo do programa em C
+        Vars.KitLib.distObjsSelect.restype = Vars.KitLib.getEspacoGrid.restype = c_float  # define o tipo de retorno da funcao
+        Vars.KitLib.getObjById.restype = POINTER(CObjeto3D)  # define o tipo de retorno da funcao
+        Vars.KitLib.getCentroMBRSelect.restype = POINTER(CPonto)  # define o tipo de retorno da funcao
+        Vars.KitSim = ctypes.CDLL(
+            Vars.dirExec + 'libs/ksim.dll')  # Variável que armazena uma referencia ao núcleo da simulacao em C
+        Vars.KitSim.getTempoTotal.restype = c_float
 
 

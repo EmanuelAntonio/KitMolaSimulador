@@ -1,6 +1,5 @@
-#include "include/GL/glut.h"
-#include "ListaObjetos.cpp"
-#include "Simulacao.cpp"
+#include "ListaObjetos.h"
+#include "float.h"
 
 extern "C"{
 
@@ -19,7 +18,9 @@ extern "C"{
     bool wireframe; /// Variavel que armazena se será exibido em modo wireframe
     bool MBRAtivo; /// Variável que armazena se o programa irá mostrar as MBRs dos objetos
     Ponto vetDeslocamento; ///Variável que armazena o deslocamento dos objetos, subistitui
-
+    bool initBuffer; ///Variavel que armazena se os buffers de desenho ja foram inicializados
+    int idRotCenter; ///Variável que armazena o id do objeto que está selecionado para realizar a rotacao
+    Ponto rotCenter; ///Variavel que armazena o centro de rotação
 
     /**
 	*	->Função init:
@@ -29,11 +30,11 @@ extern "C"{
 	**/
     void init();
 
-    void initGL();
+    void initGL(float r, float g, float b, bool dark);
 	/**
 	*	->Função drawAxis:
 	*		Desenha os eixos cartesianos no centro do espaco R^3
-	*	->Parâmetros: vazio
+	*	->Parâmetros: 'r,g,b' cores do background do OpenGL, dark, se o tema do programa está em dark
 	*	->Retorno: vazio
 	**/
 	void drawAxis(char visionAxis);
@@ -193,19 +194,7 @@ extern "C"{
     *   Parâmetros: 'vazio'
     *   Retorno: 'vazio'
     **/
-    void drawMoveAxis(char visionAxis, int visionOption, float zoom);
-    /**
-    *   Função drawMoveAxisZero: desenha os eixos de movimento dos objetos na cena na origem, eh usado em na funcao drawMoveAxis
-    *   Parâmetros: 'vazio'
-    *   Retorno: 'vazio'
-    **/
-    void drawMoveAxisZero(int visionOption, float zoom);
-    /**
-    *   Função drawSetaMove: desenha uma parte
-    *   Parâmetros: 'vazio'
-    *   Retorno: 'vazio'
-    **/
-    void drawSetaMove(float zoom);
+    void drawMoveAxis(char visionAxis, int visionOption, char eixo);
     /**
     *   Função resetMBRSelect: inicializa todos os parametros de MBRSelect com os valores maximos e minimos
     *   Parâmetros: 'vazio'
@@ -374,4 +363,8 @@ extern "C"{
 	**/
     bool addLigRigida();
     ListaObjetos *getObjList();
+    bool rotacionaSelect(bool x, bool y, bool z, float angle);
+    void drawRotAxis(char visionAxis, int visionOption, char axis);
+    void selectRotCenter(double *ponto, char visionAxis, int visionOption);
+    void terminaRotacao();
 }

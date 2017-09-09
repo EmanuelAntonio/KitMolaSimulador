@@ -16,23 +16,26 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
 
         self.parent = parent
 
-        wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent=parent,size = (10,-1), id=wx.ID_ANY,style=wx.DOUBLE_BORDER)
+        wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent=parent,size = (10,-1), id=wx.ID_ANY)#,style=wx.DOUBLE_BORDER)
         self.SetScrollbar(wx.VERTICAL, 0, 0, 2, 0)
         self.SetupScrolling(scroll_x=False)
 
         self.idUltObj = 0
         self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.strId = "\n\nId: "
-        self.strCentro = "\n\nCentro: "
+        self.strId = "Id: "
+        self.strCentro = "Centro: "
         self.strTipo = "\n\nTipo: "
-        self.strTam = "\n\nTamanho: "
-        self.strRaio = "\n\nRaio: "
+        self.strTam = "Tamanho: "
+        self.strRaio = "Raio: "
+        self.strInfoObj = "Informações Sobre Objetos"
+        self.lblIndoObj = wx.StaticText(self, wx.ID_ANY, self.strInfoObj)
         self.lblTipo = wx.StaticText(self, wx.ID_ANY, self.strTipo + "Nenhum Objeto Selecionado")
         self.lblId = wx.StaticText(self, wx.ID_ANY, self.strId + "0")
         self.lblTam = wx.StaticText(self, wx.ID_ANY, self.strTam + "0mm")
         self.lblRaio = wx.StaticText(self, wx.ID_ANY, self.strRaio + "0mm")
         self.lblCentro = wx.StaticText(self, wx.ID_ANY, self.strCentro + "(-,-,-)")
 
+        self.lblOpt = wx.StaticText(self, wx.ID_ANY, "Opções:")
         sizerFocus = wx.BoxSizer(wx.VERTICAL)
         self.sizerX = wx.BoxSizer(wx.HORIZONTAL)
         self.sizerY = wx.BoxSizer(wx.HORIZONTAL)
@@ -71,7 +74,7 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
         #self.Bind(wx.EVT_BUTTON, self.OnMoveObj, self.btnObj)
         self.Bind(wx.EVT_BUTTON, self.OnMoveObjSelect, self.btnSelect)
 
-        self.sizer.Add(wx.StaticText(self, wx.ID_ANY,"Informações Sobre Objetos"), 0, wx.ALIGN_CENTRE, 5)
+        self.sizer.Add(self.lblIndoObj, 0, wx.ALIGN_CENTRE, 5)
         self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
         self.sizer.Add(self.lblTipo, 0, wx.ALIGN_LEFT, 5)
         self.sizer.Add(self.lblId, 0, wx.ALIGN_LEFT, 5)
@@ -80,13 +83,16 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
         self.sizer.Add(self.lblRaio, 0, wx.ALIGN_LEFT, 5)
         self.sizer.Add(wx.StaticText(self, wx.ID_ANY, "\n"), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
         self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
-        self.sizer.Add(wx.StaticText(self, wx.ID_ANY, "Opções:"), 0, wx.ALIGN_CENTER, 5)
+        self.sizer.Add(self.lblOpt, 0, wx.ALIGN_CENTER, 5)
         self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
         self.sizer.Add(sizerFocus, 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
         self.sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
 
         self.SetSizer(self.sizer)
 
+        #thema dark
+        if(Vars.thema == "dark"):
+            self.themaDark()
 
 
     def OnMoveObj(self,e):
@@ -169,3 +175,43 @@ class TabInfo(wx.lib.scrolledpanel.ScrolledPanel):
         self.txtFocusX.SetValue(str(round(MBRSelect.contents.x,3)))
         self.txtFocusY.SetValue(str(round(MBRSelect.contents.y,3)))
         self.txtFocusZ.SetValue(str(round(MBRSelect.contents.z,3)))
+
+    def themaDark(self):
+        self.lblTipo.SetForegroundColour("white")
+        self.lblTipo.SetBackgroundColour(Vars.corThema)
+
+        self.lblTam.SetForegroundColour("white")
+        self.lblTam.SetBackgroundColour(Vars.corThema)
+
+        self.lblId.SetForegroundColour("white")
+        self.lblId.SetBackgroundColour(Vars.corThema)
+
+        self.lblRaio.SetForegroundColour("white")
+        self.lblRaio.SetBackgroundColour(Vars.corThema)
+
+        self.lblCentro.SetForegroundColour("white")
+        self.lblCentro.SetBackgroundColour(Vars.corThema)
+
+        self.lblX.SetForegroundColour("white")
+        self.lblX.SetBackgroundColour(Vars.corThema)
+
+        self.lblY.SetForegroundColour("white")
+        self.lblY.SetBackgroundColour(Vars.corThema)
+
+        self.lblZ.SetForegroundColour("white")
+        self.lblZ.SetBackgroundColour(Vars.corThema)
+
+        self.lblCmX.SetForegroundColour("white")
+        self.lblCmX.SetBackgroundColour(Vars.corThema)
+
+        self.lblCmY.SetForegroundColour("white")
+        self.lblCmY.SetBackgroundColour(Vars.corThema)
+
+        self.lblCmZ.SetForegroundColour("white")
+        self.lblCmZ.SetBackgroundColour(Vars.corThema)
+
+        self.lblIndoObj.SetForegroundColour("white")
+        self.lblIndoObj.SetBackgroundColour(Vars.corThema)
+
+        self.lblOpt.SetForegroundColour("white")
+        self.lblOpt.SetBackgroundColour(Vars.corThema)

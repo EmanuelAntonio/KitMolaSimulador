@@ -5,10 +5,6 @@ using namespace ManipularVetor;
 Tirante::Tirante():Objeto3D()
 {
     object_difusa = new GLfloat[4];
-    /*object_difusa[0] = 1.0;
-    object_difusa[1] = 1.0;
-    object_difusa[2] = 0.941176;
-    object_difusa[3] = 1.0;*/
     object_difusa[0] = 0.5;
     object_difusa[1] = 0.0;
     object_difusa[2] = 0.8;
@@ -193,6 +189,47 @@ void Tirante::drawZero(float meshQual, bool wireframe, char visionAxis, int visi
         glPopMatrix();
     }
     gluDeleteQuadric(quadric);
+
+}
+void Tirante::recalculaMBR(Ponto *p1, Ponto *p2){
+
+    float xMBR, yMBR, zMBR, XMBR, YMBR, ZMBR;
+    if(p1->x < p2->x){
+
+        xMBR = p1->x - BAR_RADIUS;
+        XMBR = p2->x + BAR_RADIUS;
+
+    }else{
+
+        XMBR = p1->x + BAR_RADIUS;
+        xMBR = p2->x - BAR_RADIUS;
+
+    }
+    if(p1->y < p2->y){
+
+        yMBR = p1->y - BAR_RADIUS;
+        YMBR = p2->y + BAR_RADIUS;
+
+    }else{
+
+        YMBR = p1->y + BAR_RADIUS;
+        yMBR = p2->y - BAR_RADIUS;
+
+    }
+    if(p1->z < p2->z){
+
+        zMBR = p1->z - BAR_RADIUS;
+        ZMBR = p2->z + BAR_RADIUS;
+
+    }else{
+
+        ZMBR = p1->z + BAR_RADIUS;
+        zMBR = p2->z - BAR_RADIUS;
+
+    }
+    setMBR(xMBR, yMBR, zMBR, XMBR, YMBR, ZMBR);
+
+
 
 }
 Tirante::~Tirante()

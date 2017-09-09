@@ -30,7 +30,7 @@ class SalvarProjeto(object):
         window.toolbar.EnableTool(wx.ID_UNDO, False)
         window.toolbar.EnableTool(wx.ID_REDO, False)
         openFileDialog = wx.FileDialog(window, "Abrir...", "", "",
-                                       "Projeto KitMola (*.kmp)|*.kmp",
+                                       "Projeto KitSim (*.kmp)|*.kmp",
                                        wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         openFileDialog.ShowModal()
         arquivo = openFileDialog.GetPath()
@@ -38,13 +38,9 @@ class SalvarProjeto(object):
         if arquivo != "":
             self.arquivoProjeto = arquivo
             window.SetTitle(window.strTitle + " - [" + self.arquivoProjeto + "]")
-            c_s = arquivo.encode("utf-8")
-            try:
-                Vars.KitLib.open(c_s)
-            except:
-                msg = wx.MessageDialog(None, "Arquivo Corrompido!", "Erro!", wx.OK)
-                msg.ShowModal()
-                msg.Destroy()
+
+            self.onOpen(self.arquivoProjeto)
+
             window.tabs.tabConfig.txtTamGrid.SetValue(str(Vars.KitLib.getTamGrid()))
             espacoGrid = c_float(Vars.KitLib.getEspacoGrid()).value
             window.tabs.tabConfig.cbxDistGrid.SetValue(str(int(espacoGrid)) + "cm")
@@ -59,12 +55,7 @@ class SalvarProjeto(object):
         else:
             window.toolbar.EnableTool(wx.ID_UNDO, False)
             window.toolbar.EnableTool(wx.ID_REDO, False)
-            try:
-                Vars.KitLib.save(self.arquivoProjeto.encode("utf-8"))
-            except:
-                msg = wx.MessageDialog(None, "Erro ao Salvar o Arquivo!", "Erro!", wx.OK)
-                msg.ShowModal()
-                msg.Destroy()
+            self.onSave(self.arquivoProjeto)
             self.atualizaPrecisaSalvar(window,False)
         Vars.ctrlPress = False
 
@@ -72,7 +63,7 @@ class SalvarProjeto(object):
         window.toolbar.EnableTool(wx.ID_UNDO, False)
         window.toolbar.EnableTool(wx.ID_REDO, False)
         saveFileDialog = wx.FileDialog(window, "Salvar como...", "", "",
-                                       "Projeto KitMola (*.kmp)|*.kmp",
+                                       "Projeto KitSim (*.kmp)|*.kmp",
                                        wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         saveFileDialog.ShowModal()
         arquivo = saveFileDialog.GetPath()
@@ -83,3 +74,21 @@ class SalvarProjeto(object):
             Vars.KitLib.save(c_s)
             window.atualizaPrecisaSalvar(False)
         Vars.ctrlPress = False
+
+    def onOpen(self, dir):
+
+        c_s = dir.encode("utf-8")
+        try:
+            Vars.KitLib.open(c_s)
+        except:
+            msg = wx.MessageDialog(None, "Arquivo Corrompido!", "Erro!", wx.OK)
+            msg.ShowModal()
+            msg.Destroy()
+
+    def onSave(self, dir):
+        try:
+            Vars.KitLib.save(dir.encode("utf-8"))
+        except:
+            msg = wx.MessageDialog(None, "Erro ao Salvar o Arquivo!", "Erro!", wx.OK)
+            msg.ShowModal()
+            msg.Destroy()

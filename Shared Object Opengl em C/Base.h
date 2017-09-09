@@ -7,6 +7,7 @@ class Base : public Objeto3D
     public:
         Base();
         void draw(float meshQual, bool wireframe, char visionAxis, int visionOption);
+        void recalculaMBR();
         void setSubObjeto(int o);
         int getSubObjeto();
         virtual ~Base();
