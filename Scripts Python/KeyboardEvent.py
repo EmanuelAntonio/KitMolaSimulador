@@ -93,41 +93,68 @@ class KeyboardEvent(object):
             # window.SetCursor(wx.StockCursor(wx.CURSOR_CROSS))
             window.OnRefreshAll()
         elif (e.GetKeyCode() == Vars.NUM_0_PRESS or e.GetKeyCode() == Vars.N_0_PRESS):
-            if window.ultimoDrawSelected != None:
+            if (window.rotacionaObjetos[0]):
+                KeyboardEvent.OnRotObj(window, 0)
+            elif window.ultimoDrawSelected != None:
                 window.ultimoDrawSelected.camera.visionOption = Vars.VISION_Z_PERSP
                 window.ultimoDrawSelected.camera.visionAxis = Vars.ASCII_Z  # 122 Codigo ASCII para 'z'
                 # Vars.visionItem.SetLabelText(Vars.visionModes[0])
                 window.ultimoDrawSelected.Refresh()
         elif (e.GetKeyCode() == Vars.NUM_1_PRESS or e.GetKeyCode() == Vars.N_1_PRESS):
-            if window.ultimoDrawSelected != None:
+            if (window.rotacionaObjetos[0]):
+                KeyboardEvent.OnRotObj(window, 1)
+            elif window.ultimoDrawSelected != None:
                 window.ultimoDrawSelected.camera.visionOption = Vars.VISION_Z_ORTHO
                 window.ultimoDrawSelected.camera.visionAxis = Vars.ASCII_Z  # 122 Codigo ASCII para 'z'
                 # Vars.visionItem.SetLabelText(Vars.visionModes[5])
                 window.ultimoDrawSelected.Refresh()
         elif (e.GetKeyCode() == Vars.NUM_2_PRESS or e.GetKeyCode() == Vars.N_2_PRESS):
-            if window.ultimoDrawSelected != None:
+            if (window.rotacionaObjetos[0]):
+                KeyboardEvent.OnRotObj(window, 2)
+            elif window.ultimoDrawSelected != None:
                 window.ultimoDrawSelected.camera.visionOption = Vars.VISION_X_POS
                 window.ultimoDrawSelected.camera.visionAxis = Vars.ASCII_X  # 122 Codigo ASCII para 'z'
                 # Vars.visionItem.SetLabelText(Vars.visionModes[1])
                 window.ultimoDrawSelected.Refresh()
         elif (e.GetKeyCode() == Vars.NUM_3_PRESS or e.GetKeyCode() == Vars.N_3_PRESS):
-            if window.ultimoDrawSelected != None:
+            if (window.rotacionaObjetos[0]):
+                KeyboardEvent.OnRotObj(window, 3)
+            elif window.ultimoDrawSelected != None:
                 window.ultimoDrawSelected.camera.visionOption = Vars.VISION_X_NEG
                 window.ultimoDrawSelected.camera.visionAxis = Vars.ASCII_X  # 122 Codigo ASCII para 'z'
                 # Vars.visionItem.SetLabelText(Vars.visionModes[2])
                 window.ultimoDrawSelected.Refresh()
         elif (e.GetKeyCode() == Vars.NUM_4_PRESS or e.GetKeyCode() == Vars.N_4_PRESS):
-            if window.ultimoDrawSelected != None:
+            if (window.rotacionaObjetos[0]):
+                KeyboardEvent.OnRotObj(window, 4)
+            elif window.ultimoDrawSelected != None:
                 window.ultimoDrawSelected.camera.visionOption = Vars.VISION_Y_POS
                 window.ultimoDrawSelected.camera.visionAxis = Vars.ASCII_Y  # 122 Codigo ASCII para 'z'
                 # window.visionItem.SetLabelText(Vars.visionModes[3])
                 window.ultimoDrawSelected.Refresh()
         elif (e.GetKeyCode() == Vars.NUM_5_PRESS or e.GetKeyCode() == Vars.N_5_PRESS):
-            if window.ultimoDrawSelected != None:
+            if (window.rotacionaObjetos[0]):
+                KeyboardEvent.OnRotObj(window, 5)
+            elif window.ultimoDrawSelected != None:
                 window.ultimoDrawSelected.camera.visionOption = Vars.VISION_Y_NEG
                 window.ultimoDrawSelected.camera.visionAxis = Vars.ASCII_Y  # 122 Codigo ASCII para 'z'
                 # window.visionItem.SetLabelText(Vars.visionModes[4])
                 window.ultimoDrawSelected.Refresh()
+        elif (e.GetKeyCode() == Vars.NUM_6_PRESS or e.GetKeyCode() == Vars.N_6_PRESS):
+            if(window.rotacionaObjetos[0]):
+                KeyboardEvent.OnRotObj(window,6)
+        elif (e.GetKeyCode() == Vars.NUM_7_PRESS or e.GetKeyCode() == Vars.N_7_PRESS):
+            if(window.rotateObjetos[0]):
+                KeyboardEvent.OnRotObj(window,7)
+        elif (e.GetKeyCode() == Vars.NUM_8_PRESS or e.GetKeyCode() == Vars.N_8_PRESS):
+            if(window.rotacionaObjetos[0]):
+                KeyboardEvent.OnRotObj(window,8)
+        elif (e.GetKeyCode() == Vars.NUM_9_PRESS or e.GetKeyCode() == Vars.N_9_PRESS):
+            if(window.rotacionaObjetos[0]):
+                KeyboardEvent.OnRotObj(window,9)
+        elif (e.GetKeyCode() == Vars.BACK_SPACE):
+            if (window.rotacionaObjetos[0]):
+                KeyboardEvent.OnDeleteRotObj(window)
         elif (e.GetKeyCode() == Vars.ESC_PRESS):
             if window.moveObjetos[0]:
                 if window.botaoSelecionado != Vars.MOVETELA_SELECIONADO:
@@ -137,12 +164,14 @@ class KeyboardEvent(object):
                     Msg.limpaStatusBar()
             if window.rotacionaObjetos[0]:
                 if window.botaoSelecionado != Vars.MOVETELA_SELECIONADO:
+                    Vars.KitLib.cancelarRotacao()
                     window.rotacionaObjetos = (False, Vars.ASCII_0)
                     Vars.KitLib.deSelectAll()
                     Msg.limpaStatusBar()
             if window.botaoSelecionado != Vars.LIVRE_SELECIONADO:
                 window.botaoSelecionado = Vars.LIVRE_SELECIONADO
                 window.SetCursor(wx.StockCursor(wx.CURSOR_ARROW))
+            Msg.exibirStatusBar("", 0)
         elif (e.GetKeyCode() == Vars.T_PRESS):
             if window.showTabs or window.showToolbarSide:
                 window.showTabs = False
@@ -205,19 +234,23 @@ class KeyboardEvent(object):
             window.ultimoDrawSelected.OnZoomOut()
         elif (e.GetKeyCode() == e.GetKeyCode() == Vars.NUM_LESS or e.GetKeyCode() == e.GetKeyCode() == Vars.LESS_PRESS):
             window.ultimoDrawSelected.OnZoomIn()
-        elif (e.GetKeyCode() == 75):
-            if Vars.KitSim.getSSim():
+        elif (e.GetKeyCode() == Vars.K_PRESS):
+            """if Vars.KitSim.getSSim():
                 Vars.KitSim.stop()
             else:
                 Vars.KitSim.setListaObjetos(Vars.KitLib.getObjList())
-                Vars.KitSim.start()
+                Vars.KitSim.start()"""
+            Vars.KitSim.processarObjetos()
         elif (e.GetKeyCode() == Vars.R_PRESS):
             window.rotacionaObjetos = (not(window.rotacionaObjetos[0]), Vars.ASCII_0)
             if window.rotacionaObjetos[0]:
                 window.rotacionaSelectCentro = True
                 Msg.exibirStatusBar("Selecione um objeto com o botão esquerdo do mouse para ser o centro de rotacão", 10)
+            else:
+                Vars.KitLib.cancelarRotacao()
             if window.moveObjetos[0]:
                 window.moveObjetos = (False,Vars.ASCII_0)
+
 
         elif (e.GetKeyCode() == Vars.X_PRESS):
             if window.moveObjetos[0]:
@@ -228,34 +261,29 @@ class KeyboardEvent(object):
                 window.rotacionaObjetos = (window.rotacionaObjetos[0],Vars.ASCII_X)
                 window.rotacionaSelectCentro = False
                 Msg.exibirStatusBar("Use o botão esquerdo do mouse para rotacionar os objetos selecionados, ESC para cancelar, ou ENTER para confirmar a ação",10)
+                Vars.anguloRotacao = 0
 
         elif (e.GetKeyCode() == Vars.Y_PRESS):
             if window.moveObjetos[0]:
                 window.moveObjetos = (window.moveObjetos[0],Vars.ASCII_Y)
-                Msg.exibirStatusBar(
-                    "Use o botão esquerdo do mouse para movimentar os objetos selecionados, ESC para cancelar, ou ENTER para confirmar a ação",
-                    10)
+                Msg.exibirStatusBar("Use o botão esquerdo do mouse para movimentar os objetos selecionados, ESC para cancelar, ou ENTER para confirmar a ação",10)
 
             elif window.rotacionaObjetos[0]:
                 window.rotacionaObjetos = (window.rotacionaObjetos[0], Vars.ASCII_Y)
                 window.rotacionaSelectCentro = False
-                Msg.exibirStatusBar(
-                    "Use o botão esquerdo do mouse para rotacionar os objetos selecionados, ESC para cancelar, ou ENTER para confirmar a ação",
-                    10)
+                Msg.exibirStatusBar("Use o botão esquerdo do mouse para rotacionar os objetos selecionados, ESC para cancelar, ou ENTER para confirmar a ação",10)
+                Vars.anguloRotacao = 0
 
         elif (e.GetKeyCode() == Vars.Z_PRESS):
             if window.moveObjetos[0]:
                 window.moveObjetos = (window.moveObjetos[0], Vars.ASCII_Z)
-                Msg.exibirStatusBar(
-                    "Use o botão esquerdo do mouse para movimentar os objetos selecionados, ESC para cancelar, ou ENTER para confirmar a ação",
-                    10)
+                Msg.exibirStatusBar("Use o botão esquerdo do mouse para movimentar os objetos selecionados, ESC para cancelar, ou ENTER para confirmar a ação",10)
 
             elif window.rotacionaObjetos[0]:
                 window.rotacionaObjetos = (window.rotacionaObjetos[0], Vars.ASCII_Z)
                 window.rotacionaSelectCentro = False
-                Msg.exibirStatusBar(
-                    "Use o botão esquerdo do mouse para rotacionar os objetos selecionados, ESC para cancelar, ou ENTER para confirmar a ação",
-                    10)
+                Msg.exibirStatusBar("Use o botão esquerdo do mouse para rotacionar os objetos selecionados, ESC para cancelar, ou ENTER para confirmar a ação",10)
+                Vars.anguloRotacao = 0
             else:
                 Vars.KitLib.setWireframe(not (Vars.KitLib.getWireframe()))
         else:
@@ -280,9 +308,7 @@ class KeyboardEvent(object):
                 if window.botaoSelecionado == Vars.LAJE_SELECIONADO:
                     AdicionarObjetos.OnAddLaje(window)
                 elif window.botaoSelecionado == Vars.BAR9_SELECIONADO:
-                    AdicionarObjetos.OnAddSmallBar(None,window)
-                elif window.botaoSelecionado == Vars.BAR18_SELECIONADO:
-                    AdicionarObjetos.OnAddLargeBar(None,window)
+                    AdicionarObjetos.OnAddBar(None,window)
                 elif window.botaoSelecionado == Vars.TIRANTE9_SELECIONADO:
                     AdicionarObjetos.OnAddSmallDiag(None,window)
                 elif window.botaoSelecionado == Vars.TIRANTE18_SELECIONADO:
@@ -301,12 +327,69 @@ class KeyboardEvent(object):
                     window.rotacionaSelectCentro = False
                     Msg.exibirStatusBar("Selecione um eixo de mivimentação precionando x, y ou z", 10)
                 else:
-                    Vars.KitLib.terminaRotacao()
+                    Vars.KitLib.terminarRotacao()
                     window.rotacionaObjetos = (False, Vars.ASCII_0)
                     Vars.KitLib.deSelectAll()
                     Msg.limpaStatusBar()
 
             if window.ultimoDrawSelected != None:
                 window.ultimoDrawSelected.Refresh(True)
+
+            Msg.exibirStatusBar("",0)
         else:# Se  caso não for pressionado a tecla enter, o else libera o evento para que possa ser usado no wx.EVT_KEY_DOWN
             e.Skip()
+
+    @staticmethod
+    def OnRotObj(window, anguloAcrescimo):
+
+        stringEixo = ""
+
+        rot = False
+
+        if window.rotacionaObjetos[1] == Vars.ASCII_X:
+            Vars.KitLib.rotacionaSelect(True, False, False, c_float(-Vars.anguloRotacao))
+            rot = Vars.KitLib.rotacionaSelect(True, False, False, c_float(math.radians(math.degrees(Vars.anguloRotacao)*10 + anguloAcrescimo)))
+            stringEixo = "X = "
+        elif window.rotacionaObjetos[1] == Vars.ASCII_Y:
+            Vars.KitLib.rotacionaSelect(False, True, False, c_float(-Vars.anguloRotacao))
+            rot = Vars.KitLib.rotacionaSelect(False, True, False, c_float(math.radians(math.degrees(Vars.anguloRotacao)*10 + anguloAcrescimo)))
+            stringEixo = "Y = "
+        elif window.rotacionaObjetos[1] == Vars.ASCII_Z:
+            Vars.KitLib.rotacionaSelect(False, False, True, c_float(-Vars.anguloRotacao))
+            rot = Vars.KitLib.rotacionaSelect(False, False, True, c_float(math.radians(math.degrees(Vars.anguloRotacao)*10 + anguloAcrescimo)))
+            stringEixo = "Z = "
+
+        Vars.anguloRotacao = math.radians(math.degrees(Vars.anguloRotacao)*10 + anguloAcrescimo)
+        if not (rot):
+            Msg.exibirStatusBar("Bases só podem ser rotacionadas no eixo Z.", 10)
+        else:
+            angulo = math.degrees(Vars.anguloRotacao)
+            Msg.exibirStatusBar(stringEixo + str(round(angulo, 2)) + "º", 0)
+
+    @staticmethod
+    def OnDeleteRotObj(window):
+
+        stringEixo = ""
+
+        if window.rotacionaObjetos[1] == Vars.ASCII_X:
+            Vars.KitLib.rotacionaSelect(True, False, False, c_float(-Vars.anguloRotacao))
+            rot = Vars.KitLib.rotacionaSelect(True, False, False, c_float(
+                math.radians(int(math.degrees(Vars.anguloRotacao) / 10))))
+            stringEixo = "X = "
+        elif window.rotacionaObjetos[1] == Vars.ASCII_Y:
+            Vars.KitLib.rotacionaSelect(False, True, False, c_float(-Vars.anguloRotacao))
+            rot = Vars.KitLib.rotacionaSelect(False, True, False, c_float(
+                math.radians(int(math.degrees(Vars.anguloRotacao) / 10))))
+            stringEixo = "Y = "
+        elif window.rotacionaObjetos[1] == Vars.ASCII_Z:
+            Vars.KitLib.rotacionaSelect(False, False, True, c_float(-Vars.anguloRotacao))
+            rot = Vars.KitLib.rotacionaSelect(False, False, True, c_float(
+                math.radians(int(math.degrees(Vars.anguloRotacao) / 10))))
+            stringEixo = "Z = "
+
+        Vars.anguloRotacao = math.radians(int(math.degrees(Vars.anguloRotacao) / 10))
+        if not (rot):
+            Msg.exibirStatusBar("Bases só podem ser rotacionadas no eixo Z.", 10)
+        else:
+            angulo = math.degrees(Vars.anguloRotacao)
+            Msg.exibirStatusBar(stringEixo + str(round(angulo, 2)) + "º", 0)

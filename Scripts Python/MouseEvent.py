@@ -76,8 +76,6 @@ class MouseEvent(object):
                         ((canvas.lastx - canvas.x) * canvas.camera.orthoZoom * 0.5 / 300) * c_float(
                             Vars.KitLib.getEspacoGrid()).value + canvas.camera.orthoCenter[1])
 
-
-
         elif(evt.Dragging() and evt.LeftIsDown() and window.moveObjetos[0]):
             canvas.lastx, canvas.lasty = canvas.x, canvas.y
             canvas.x, canvas.y = evt.GetPosition()
@@ -127,9 +125,6 @@ class MouseEvent(object):
 
     @staticmethod
     def OnMouseDown(e, canvas, window):
-
-        if Vars.KitSim.getSSim():
-            return
         if window.botaoSelecionado == Vars.MOVETELA_SELECIONADO:
             if Vars.thema == "dark":
                 myCursor = wx.Cursor(Vars.dirExec + "icones/cursorMoveTelaClickdark.cur",
@@ -147,13 +142,12 @@ class MouseEvent(object):
         ponto = Vars.KitLib.getPonto3D(c_int(canvas.x), c_int(canvas.y))
         if not(Vars.shiftPress):
             if window.botaoSelecionado == Vars.SPHERE_SELECIONADO:
-
                 Vars.rightMouse = e.GetPosition()
                 AdicionarObjetos.OnAddSphere(canvas, window)
             if window.botaoSelecionado == Vars.BASE_SELECIONADO:
 
                 Vars.rightMouse = e.GetPosition()
-                AdicionarObjetos.OnAddBase(Vars.BASE_LIVRE,canvas, window)
+                AdicionarObjetos.OnAddBase(canvas, window)
             elif window.botaoSelecionado == Vars.LIVRE_SELECIONADO:
                 if window.moveObjetos[0] or window.rotacionaObjetos[0]:
                     Vars.toolBox.SetFocus()
@@ -170,30 +164,43 @@ class MouseEvent(object):
                     if idObj != 0:
                         obj = Vars.KitLib.getObjById(idObj)
                         centro = (obj.contents.centro.x, obj.contents.centro.y, obj.contents.centro.z)
-                        window.tabs.tabInfo.AlteraLayoutInfo(obj.contents.id, obj.contents.obj, centro, 0, 0)
+                        window.tabs.tabInfo.AlteraLayoutInfo(obj.contents.id, obj.contents.obj, centro, obj.contents.Tx,
+                                                             obj.contents.Ty, obj.contents.Tz, obj.contents.Rx,
+                                                             obj.contents.Ry, obj.contents.Rz, obj.contents.E,
+                                                             obj.contents.poisson, obj.contents.termico,
+                                                             obj.contents.largura, obj.contents.altura,
+                                                             obj.contents.raio, obj.contents.secao)
                     else:
-                        window.tabs.tabInfo.AlteraLayoutInfo(0, 0, None, None, None)
+                        window.tabs.tabInfo.AlteraLayoutInfo(0, 0, None, False, False, False, False, False, False, False, False, False, False, False, False, False)
             elif window.botaoSelecionado == Vars.ADDFORCA_SELECIONADO:
                 XYTela = e.GetPosition()
                 ponto = Vars.KitLib.getPonto3D(XYTela[0], XYTela[1])
-                Vars.KitSim.addForca(ponto,c_float(float(window.tabs.tabSim.txtX.GetValue())),
-                                     c_float(float(window.tabs.tabSim.txtY.GetValue())),
-                                     c_float(float(window.tabs.tabSim.txtZ.GetValue())))
+                Vars.KitLib.addForca(ponto,c_float(float(window.tabs.tabSim.txtX.GetValue())), c_float(float(window.tabs.tabSim.txtY.GetValue())), c_float(float(window.tabs.tabSim.txtZ.GetValue())))
             else:
                 idObj = Vars.KitLib.select(ponto, canvas.camera.visionAxis, canvas.camera.visionOption)
                 if idObj != 0:
                     obj = Vars.KitLib.getObjById(idObj)
                     centro = (obj.contents.centro.x, obj.contents.centro.y, obj.contents.centro.z)
-                    window.tabs.tabInfo.AlteraLayoutInfo(obj.contents.id, obj.contents.obj, centro, 0, 0)
+                    window.tabs.tabInfo.AlteraLayoutInfo(obj.contents.id, obj.contents.obj, centro, obj.contents.Tx,
+                                                         obj.contents.Ty, obj.contents.Tz, obj.contents.Rx,
+                                                         obj.contents.Ry, obj.contents.Rz, obj.contents.E,
+                                                         obj.contents.poisson, obj.contents.termico,
+                                                         obj.contents.largura, obj.contents.altura, obj.contents.raio,
+                                                         obj.contents.secao)
                 else:
-                    window.tabs.tabInfo.AlteraLayoutInfo(0, 0, None, None, None)
+                    window.tabs.tabInfo.AlteraLayoutInfo(0, 0, None, False, False, False, False, False, False, False,
+                                                         False, False, False, False, False, False)
 
         else:
             idObj = Vars.KitLib.select(ponto, canvas.camera.visionAxis, canvas.camera.visionOption)
             if idObj != 0:
                 obj = Vars.KitLib.getObjById(idObj)
                 centro = (obj.contents.centro.x, obj.contents.centro.y, obj.contents.centro.z)
-                window.tabs.tabInfo.AlteraLayoutInfo(obj.contents.id, obj.contents.obj, centro, 0, 0)
+                window.tabs.tabInfo.AlteraLayoutInfo(obj.contents.id, obj.contents.obj, centro, obj.contents.Tx,
+                                                     obj.contents.Ty, obj.contents.Tz, obj.contents.Rx, obj.contents.Ry,
+                                                     obj.contents.Rz, obj.contents.E, obj.contents.poisson,
+                                                     obj.contents.termico, obj.contents.largura, obj.contents.altura,
+                                                     obj.contents.raio, obj.contents.secao)
         window.OnRefreshAll()
 
     @staticmethod
@@ -287,6 +294,7 @@ class MouseEvent(object):
     def OnRotObjs(window, canvas):
 
         rot = False
+        stringEixo = ""
         if canvas.camera.visionOption == 0:  # e está em modo perspectiva
 
             dTheta = (-math.sin(canvas.camera.theta),
@@ -299,13 +307,21 @@ class MouseEvent(object):
             zDes = - dPhi[2] * (canvas.lasty - canvas.y) / 50
             if window.rotacionaObjetos[1] == Vars.ASCII_X:
                 rot = Vars.KitLib.rotacionaSelect(True,False,False, c_float(xDes))
+                Vars.anguloRotacao = Vars.anguloRotacao + xDes
+                stringEixo = "X = "
             elif window.rotacionaObjetos[1] == Vars.ASCII_Y:
                 rot = Vars.KitLib.rotacionaSelect(False,True,False, c_float(yDes))
+                Vars.anguloRotacao = Vars.anguloRotacao + yDes
+                stringEixo = "Y = "
             elif window.rotacionaObjetos[1] == Vars.ASCII_Z:
                 rot = Vars.KitLib.rotacionaSelect(False,False,True, c_float(zDes))
-
+                Vars.anguloRotacao = Vars.anguloRotacao + zDes
+                stringEixo = "Z = "
             if not(rot):
                 Msg.exibirStatusBar("Bases só podem ser rotacionadas no eixo Z.",10)
+            else:
+                angulo = math.degrees(Vars.anguloRotacao)
+                Msg.exibirStatusBar(stringEixo + str(round(angulo,2)) + "º", 0)
 
 
         elif canvas.camera.visionOption == 5:  # agora, se está na visao de cima, move os o objetos na direção correspondente

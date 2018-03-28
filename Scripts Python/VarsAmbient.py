@@ -33,14 +33,14 @@ class Vars(object):
     rightMouse = (0,0,0) #Variável que armazena a ultima posição do mouse ao clicar com o botao direito
     shiftPress = False #Variável que armazena se o shift está sendo pressionado nesse exato momento
     ctrlPress = False #Variável que armazena se o control está sendo pressionado nesse exato momento
+    anguloRotacao = 0 #Variável que armazena o angulo que foi, ou será rotacionado a seleção
 
     dirExec = '' # Variável que armazena o diretorio de execução do programa, necessário para abrir arquivos do sistema
     openFile = False #Variável que armazena o diretório da abertura de um arquivo, usado para abrir um arquivo ao iniciar o programa
 
     # Constantes
     SPHERE = 1
-    BAR_SMALL = 2
-    BAR_LARGE = 3
+    BAR = 2
     BASE = 4
     LAJE = 5
     DIAGONAL_SMALL = 6
@@ -75,18 +75,27 @@ class Vars(object):
     Y_PRESS = 89
     Z_PRESS = 90
     T_PRESS = 84
+    K_PRESS = 75
     NUM_0_PRESS = 324
     NUM_1_PRESS = 325
     NUM_2_PRESS = 326
     NUM_3_PRESS = 327
     NUM_4_PRESS = 328
     NUM_5_PRESS = 329
+    NUM_6_PRESS = 330
+    NUM_7_PRESS = 331
+    NUM_8_PRESS = 332
+    NUM_9_PRESS = 333
     N_0_PRESS = 48
     N_1_PRESS = 49
     N_2_PRESS = 50
     N_3_PRESS = 51
     N_4_PRESS = 52
     N_5_PRESS = 53
+    N_6_PRESS = 54
+    N_7_PRESS = 55
+    N_8_PRESS = 56
+    N_9_PRESS = 57
     ESC_PRESS = 27
     R_PRESS = 82
     NUM_PLUS = 388
@@ -95,6 +104,7 @@ class Vars(object):
     F1_PRESS = 340
     F2_PRESS = 341
     F3_PRESS = 342
+    BACK_SPACE = 8
     SPHERE_SELECIONADO = 0
     BAR9_SELECIONADO = 1
     BAR18_SELECIONADO = 2
@@ -123,7 +133,6 @@ class Vars(object):
         Vars.KitLib.getObjById.restype = POINTER(CObjeto3D)  # define o tipo de retorno da funcao
         Vars.KitLib.getCentroMBRSelect.restype = POINTER(CPonto)  # define o tipo de retorno da funcao
         Vars.KitSim = ctypes.CDLL(
-            Vars.dirExec + 'libs/ksim.dll')  # Variável que armazena uma referencia ao núcleo da simulacao em C
-        Vars.KitSim.getTempoTotal.restype = c_float
+            Vars.dirExec + 'libs/KSim.dll')  # Variável que armazena uma referencia ao núcleo da simulacao em C
 
 

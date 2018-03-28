@@ -104,7 +104,7 @@ class AdicionarObjetos(object):
         window.tabs.SetFocus()
 
     @staticmethod
-    def OnAddBase(tipo, drawArea, window):
+    def OnAddBase(drawArea, window):
 
         x, y = Vars.rightMouse
         if drawArea.camera.visionOption != Vars.VISION_Z_PERSP:
@@ -138,7 +138,7 @@ class AdicionarObjetos(object):
                             y = (int(y) + 1) * space
                         else:
                             y = (int(y) - 1) * space
-                Vars.KitLib.addBase(tipo, c_float(x), c_float(y), 0)
+                Vars.KitLib.addBase(c_float(x), c_float(y), 0)
             elif drawArea.camera.visionAxis == Vars.ASCII_X:  # 120 Codigo ASCII para 'x'
 
                 x = ponto[0]
@@ -166,9 +166,9 @@ class AdicionarObjetos(object):
                         else:
                             y = (int(y) - 1) * space
                 if drawArea.camera.visionOption == Vars.VISION_X_POS:
-                    Vars.KitLib.addBase(tipo, 0, ctypes.c_float(x), ctypes.c_float(y))
+                    Vars.KitLib.addBase(0, ctypes.c_float(x), ctypes.c_float(y))
                 else:
-                    Vars.KitLib.addBase(tipo, 0, ctypes.c_float(y), ctypes.c_float(x))
+                    Vars.KitLib.addBase(0, ctypes.c_float(y), ctypes.c_float(x))
             elif drawArea.camera.visionAxis == Vars.ASCII_Y:  # 121 Codigo ASCII para 'y'
                 x = ponto[0]
                 y = ponto[1]
@@ -195,7 +195,7 @@ class AdicionarObjetos(object):
                         else:
                             y = (int(y) - 1) * space
 
-                Vars.KitLib.addBase(tipo, ctypes.c_float(x), 0, ctypes.c_float(y))
+                Vars.KitLib.addBase(ctypes.c_float(x), 0, ctypes.c_float(y))
 
         window.OnRefreshAll()
         drawArea.Refresh()
@@ -205,33 +205,15 @@ class AdicionarObjetos(object):
         window.tabs.SetFocus()
 
     @staticmethod
-    def OnAddSmallBar(drawArea, window):
+    def OnAddBar(drawArea, window):
 
-        BAR_SMALL = 2
-        add = Vars.KitLib.addBar(BAR_SMALL)
+        add = Vars.KitLib.addBar()
         if not (add):
-            msg = "Para adicionar uma barra pequena certifique-se que tenha duas esferas selecionadas, ou uma esfera e uma base e que a distância entre elas seja de 7.5 cm."
+            msg = "Para adicionar uma barra pequena certifique-se que tenha duas esferas selecionadas, ou uma esfera e uma base."
             Msg.exibirStatusBar(msg,10)
 
         window.OnRefreshAll()
         if(drawArea is not None):
-            drawArea.Refresh()
-        window.toolbar.EnableTool(wx.ID_UNDO, True)
-        window.toolbar.EnableTool(wx.ID_REDO, False)
-        window.atualizaPrecisaSalvar(True)
-        window.tabs.SetFocus()
-
-    @staticmethod
-    def OnAddLargeBar(drawArea, window):
-
-        BAR_LARGE = 3
-        add = Vars.KitLib.addBar(BAR_LARGE)
-        if not (add):
-            msg = "Para adicionar uma barra grande certifique-se que tenha duas esferas selecionadas, ou uma esfera e uma base e que a distância entre elas seja de 16.5 cm."
-            Msg.exibirStatusBar(msg,10)
-
-        window.OnRefreshAll()
-        if (drawArea is not None):
             drawArea.Refresh()
         window.toolbar.EnableTool(wx.ID_UNDO, True)
         window.toolbar.EnableTool(wx.ID_REDO, False)

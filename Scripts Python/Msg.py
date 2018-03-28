@@ -1,6 +1,5 @@
 from VarsAmbient import *
 from threading import Timer
-import time
 
 
 class Msg(object):
@@ -15,8 +14,7 @@ class Msg(object):
 
     @staticmethod
     def exibirMensagem(mensagem, titulo, tipoMsg, tipoJanela):
-        msg = wx.MessageDialog(None,
-                               mensagem,
+        msg = wx.MessageDialog(None, mensagem,
                                titulo, tipoMsg | tipoJanela)
         option = msg.ShowModal()
         msg.Destroy()
@@ -26,11 +24,12 @@ class Msg(object):
     def exibirStatusBar(mensagem, tempo):
 
         if Msg.statusBar != None:
-            Msg.tmp = tempo
-            if Msg.timer != None:
-                Msg.limpaStatusBar()
-            Msg.timer = Timer(tempo, Msg.limpaStatusBar)
-            Msg.timer.start()
+            if tempo != 0:
+                Msg.tmp = tempo
+                if Msg.timer != None:
+                    Msg.limpaStatusBar()
+                Msg.timer = Timer(tempo, Msg.limpaStatusBar)
+                Msg.timer.start()
             Msg.statusBar.SetStatusText(mensagem)
 
     @staticmethod

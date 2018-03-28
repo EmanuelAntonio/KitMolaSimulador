@@ -25,20 +25,20 @@ class ToolBar(object):
             imgTirante9 = wx.Bitmap(Vars.dirExec + 'icones/tirante9.ico')
             imgTirante18 = wx.Bitmap(Vars.dirExec + 'icones/tirante18.ico')
 
-        window.addEsfera = window.toolbarside.AddTool(wx.ID_ANY, "Adicionar Esfera", imgEsfera, "Esfera")
+        window.addEsfera = window.toolbarside.AddTool(wx.ID_ANY, "Adicionar Nó", imgEsfera, "Nó")
         window.Bind(wx.EVT_TOOL, window.OnAddEsferaToolbar, window.addEsfera)
         window.addBase = window.toolbarside.AddTool(wx.ID_ANY, "Adicionar Base", imgBase, "Base")
         window.Bind(wx.EVT_TOOL, window.OnAddBaseToolbar, window.addBase)
         window.addBarra9 = window.toolbarside.AddTool(wx.ID_ANY, "Adicionar Barra de 9cm", imgBarra9, "Barra de 9cm")
         window.Bind(wx.EVT_TOOL, window.OnAddBarra9Toolbar, window.addBarra9)
-        window.addBarra18 = window.toolbarside.AddTool(wx.ID_ANY, "Adicionar Barra de 18cm", imgBarra18, "Barra de 18cm")
+        """window.addBarra18 = window.toolbarside.AddTool(wx.ID_ANY, "Adicionar Barra de 18cm", imgBarra18, "Barra de 18cm")
         window.Bind(wx.EVT_TOOL, window.OnAddBarra18Toolbar, window.addBarra18)
         window.addLaje = window.toolbarside.AddTool(wx.ID_ANY, "Adicionar Laje", imgLaje, "Laje")
         window.Bind(wx.EVT_TOOL, window.OnAddLajeToolbar, window.addLaje)
         window.addTirante9 = window.toolbarside.AddTool(wx.ID_ANY, "Adicionar Tirante de 9x9", imgTirante9, "Tirante de 9x9")
         window.Bind(wx.EVT_TOOL, window.OnAddTirante9Toolbar, window.addTirante9)
         window.addTirante18 = window.toolbarside.AddTool(wx.ID_ANY, "Adicionar Tirante de 18x9", imgTirante18, "Tirante de 18x18")
-        window.Bind(wx.EVT_TOOL, window.OnAddTirante18Toolbar, window.addTirante18)
+        window.Bind(wx.EVT_TOOL, window.OnAddTirante18Toolbar, window.addTirante18)"""
 
         window.toolbarside.Realize()
 

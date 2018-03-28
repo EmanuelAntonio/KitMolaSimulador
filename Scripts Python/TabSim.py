@@ -22,36 +22,43 @@ class TabSim(wx.lib.scrolledpanel.ScrolledPanel):
 
         self.sizerSim = wx.BoxSizer(wx.VERTICAL)
 
-        self.sizerSim.Add(wx.StaticText(self, wx.ID_ANY, "Opções de Simulação:"), 0, wx.ALIGN_CENTRE, 5)
-        self.sizerSim.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
-        self.sizerSim.Add(self.createTmpTotal(), 0, wx.ALIGN_CENTRE,5)
+        self.lblOp = wx.StaticText(self, wx.ID_ANY, "Opções de Simulação:")
+
+        self.sizerSim.Add(self.lblOp, 0, wx.ALIGN_CENTRE, 5)
         self.sizerSim.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
         self.sizerSim.Add(self.createAddForcas(), 0, wx.ALIGN_CENTRE, 5)
-        self.sizerSim.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), 0, wx.ALIGN_CENTER | wx.EXPAND, 5)
 
-
+        if Vars.thema == "dark":
+            self.themaDark()
 
         self.SetSizer(self.sizerSim)
 
-    def createTmpTotal(self):
 
-        self.sizerTmpTotal = wx.BoxSizer(wx.VERTICAL)
-        sizerAux = wx.BoxSizer(wx.HORIZONTAL)
+    def themaDark(self):
 
-        self.lblTmp = wx.StaticText(self, wx.ID_ANY, "\nTempo Total de Simulação: ")
-        self.txtTmp = wx.TextCtrl(self, wx.ID_ANY, str(Vars.KitSim.getTempoTotal()), style=wx.TE_PROCESS_ENTER)
-        self.lblUnid = wx.StaticText(self, wx.ID_ANY, "s")
-        self.btnTmp = wx.Button(self, wx.ID_ANY, "Alterar Tempo")
+        self.lblOp.SetForegroundColour("white")
+        self.lblOp.SetBackgroundColour(Vars.corThema)
 
-        self.Bind(wx.EVT_BUTTON, self.OnAlteraTmp, self.btnTmp)
+        self.lblFor.SetForegroundColour("white")
+        self.lblFor.SetBackgroundColour(Vars.corThema)
 
-        sizerAux.Add(self.txtTmp, 0, wx.ALIGN_CENTRE, 5)
-        sizerAux.Add(self.lblUnid, 0, wx.ALIGN_CENTRE, 5)
-        self.sizerTmpTotal.Add(self.lblTmp, 0, wx.ALIGN_CENTRE, 5)
-        self.sizerTmpTotal.Add(sizerAux, 0, wx.ALIGN_CENTRE, 5)
-        self.sizerTmpTotal.Add(self.btnTmp, 0, wx.ALIGN_CENTRE, 5)
+        self.lblX.SetForegroundColour("white")
+        self.lblX.SetBackgroundColour(Vars.corThema)
 
-        return self.sizerTmpTotal
+        self.lblY.SetForegroundColour("white")
+        self.lblY.SetBackgroundColour(Vars.corThema)
+
+        self.lblZ.SetForegroundColour("white")
+        self.lblZ.SetBackgroundColour(Vars.corThema)
+
+        self.lblNX.SetForegroundColour("white")
+        self.lblNX.SetBackgroundColour(Vars.corThema)
+
+        self.lblNY.SetForegroundColour("white")
+        self.lblNY.SetBackgroundColour(Vars.corThema)
+
+        self.lblNZ.SetForegroundColour("white")
+        self.lblNZ.SetBackgroundColour(Vars.corThema)
 
     def createAddForcas(self):
 
@@ -96,6 +103,7 @@ class TabSim(wx.lib.scrolledpanel.ScrolledPanel):
         self.Bind(wx.EVT_BUTTON, self.OnAddForca, self.btnAddForca)
 
         return self.sizerForca
+
     def OnAlteraTmp(self, e):
 
         Vars.KitSim.setTempoTotal(c_float(float(self.txtTmp.GetValue())))

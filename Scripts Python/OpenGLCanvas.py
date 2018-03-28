@@ -12,6 +12,8 @@ class CanvasBase(glcanvas.GLCanvas):
     def __init__(self, parent, ref):
         attrib = (glcanvas.WX_GL_RGBA,
                   glcanvas.WX_GL_DOUBLEBUFFER,
+                  glcanvas.WX_GL_SAMPLE_BUFFERS,GL_TRUE,
+                  glcanvas.WX_GL_SAMPLES,8,
                   glcanvas.WX_GL_DEPTH_SIZE,24)
         glcanvas.GLCanvas.__init__(self, parent, -1,attrib)
         self.parent = parent
@@ -43,11 +45,8 @@ class CanvasBase(glcanvas.GLCanvas):
 
 
     def OnIdle(self, e):
+        e.Skip()
 
-        if Vars.KitSim.getSSim():
-            self.Refresh(True)
-        else:
-            e.Skip()
 
     def OnScrollMotion(self, e):
         try:
@@ -253,18 +252,17 @@ class CanvasBase(glcanvas.GLCanvas):
     def OnDraw(self):
 
         self.camera.OnDrawCamera(self)
-        if Vars.KitSim.getSSim():
-            Vars.KitSim.drawSim()
-        else:
-            Vars.KitLib.drawCena(self.camera.visionAxis, self.camera.visionOption)
+        Vars.KitLib.drawCena(self.camera.visionAxis, self.camera.visionOption)
+
 
         Vars.KitLib.drawAxis(self.camera.visionAxis)
         Vars.KitLib.drawGrid(self.camera.visionAxis)
 
-        if self.parent.moveObjetos[0] and not(Vars.KitSim.getSSim()):
+        if self.parent.moveObjetos[0]:
             Vars.KitLib.drawMoveAxis(self.camera.visionAxis, self.camera.visionOption, self.parent.moveObjetos[1])
 
-        if self.parent.rotacionaObjetos[0] and not(Vars.KitSim.getSSim()):
+        if self.parent.rotacionaObjetos[0]:
             Vars.KitLib.drawRotAxis(self.camera.visionAxis, self.camera.visionOption, self.parent.rotacionaObjetos[1])
+            Vars.KitLib.drawRotCenter(self.camera.visionAxis, self.camera.visionOption, self.parent.rotacionaObjetos[1])
 
         self.SwapBuffers()

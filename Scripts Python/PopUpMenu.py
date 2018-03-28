@@ -18,43 +18,32 @@ class RightMenu(wx.Menu):
         #Submenu adicionar
 
         addMenu = wx.Menu()
-        addSphere = wx.MenuItem(self, wx.NewId(), 'Esfera')
-        addSBar = wx.MenuItem(self, wx.NewId(), 'Barra Pequena')
-        addLBar = wx.MenuItem(self, wx.NewId(), 'Barra Grande')
+        addSphere = wx.MenuItem(self, wx.NewId(), 'Nó')
+        addSBar = wx.MenuItem(self, wx.NewId(), 'Barra')
         addBase = wx.MenuItem(self, wx.NewId(), 'Base')
-        addBaseX = wx.MenuItem(self, wx.NewId(), 'Base Bloqueada em X')
-        addBaseY = wx.MenuItem(self, wx.NewId(), 'Base Bloqueada em Y')
-        addBaseXY = wx.MenuItem(self, wx.NewId(), 'Base Bloqueada em XY')
-        addLaje = wx.MenuItem(self, wx.NewId(), 'Laje')
+        """addLaje = wx.MenuItem(self, wx.NewId(), 'Laje')
         addSDiag = wx.MenuItem(self, wx.NewId(), 'Diagonal 9x9')
         addLDiag = wx.MenuItem(self, wx.NewId(), 'Diagonal 18x9')
-        addLigRigida = wx.MenuItem(self, wx.NewId(), 'Ligação Rígida')
+        addLigRigida = wx.MenuItem(self, wx.NewId(), 'Ligação Rígida')"""
         if self.parent.camera.visionOption != 0:
             addMenu.Append(addSphere)
             addMenu.Append(addBase)
-            addMenu.Append(addBaseX)
-            addMenu.Append(addBaseY)
-            addMenu.Append(addBaseXY)
         addMenu.Append(addSBar)
-        addMenu.Append(addLBar)
+        """addMenu.Append(addLBar)
         addMenu.Append(addLaje)
         addMenu.Append(addSDiag)
         addMenu.Append(addLDiag)
-        addMenu.Append(addLigRigida)
+        addMenu.Append(addLigRigida)"""
         self.AppendSubMenu(addMenu, 'Adicionar')
         if self.parent.camera.visionOption != 0:
             self.Bind(wx.EVT_MENU, self.OnAddSphere, addSphere)
             self.Bind(wx.EVT_MENU, self.OnAddBase, addBase)
-        self.Bind(wx.EVT_MENU, self.OnAddSmallBar, addSBar)
-        self.Bind(wx.EVT_MENU, self.OnAddLargeBar, addLBar)
-        self.Bind(wx.EVT_MENU, self.OnAddLaje, addLaje)
+        self.Bind(wx.EVT_MENU, self.OnAddBar, addSBar)
+        """self.Bind(wx.EVT_MENU, self.OnAddLaje, addLaje)
         self.Bind(wx.EVT_MENU, self.OnAddLaje, addLaje)
         self.Bind(wx.EVT_MENU, self.OnAddSmallDiag, addSDiag)
         self.Bind(wx.EVT_MENU, self.OnAddLargeDiag, addLDiag)
-        self.Bind(wx.EVT_MENU, self.OnAddLigRigida, addLigRigida)
-        self.Bind(wx.EVT_MENU, self.OnAddBaseX, addBaseX)
-        self.Bind(wx.EVT_MENU, self.OnAddBaseY, addBaseY)
-        self.Bind(wx.EVT_MENU, self.OnAddBaseXY, addBaseXY)
+        self.Bind(wx.EVT_MENU, self.OnAddLigRigida, addLigRigida)"""
 
         self.AppendSeparator()
 
@@ -334,17 +323,13 @@ class RightMenu(wx.Menu):
             -> 'e' : instância de evento, pode ou não ser usado para o tratamento do evento de saida
         -> Retorno: vazio
     """
-    def OnAddSmallBar(self,e):
+    def OnAddBar(self,e):
 
-        AdicionarObjetos.OnAddSmallBar(self.parent, self.parent.parent)
-
-    def OnAddLargeBar(self,e):
-
-        AdicionarObjetos.OnAddLargeBar(self.parent, self.parent.parent)
+        AdicionarObjetos.OnAddBar(self.parent, self.parent.parent)
 
     def OnAddBase(self,e):
 
-        AdicionarObjetos.OnAddBase(Vars.BASE_LIVRE, self.parent,self.parent.parent)
+        AdicionarObjetos.OnAddBase(self.parent,self.parent.parent)
 
     def OnAddSmallDiag(self,e):
         AdicionarObjetos.OnAddSmallDiag(self.parent,self.parent.parent)
@@ -354,15 +339,3 @@ class RightMenu(wx.Menu):
 
     def OnAddLigRigida(self,e):
         AdicionarObjetos.OnAddLigRigida(self.parent, self.parent.parent)
-
-    def OnAddBaseX(self, e):
-
-        AdicionarObjetos.OnAddBase(Vars.BASE_BLOQUEADA_X, self.parent, self.parent.parent)
-
-    def OnAddBaseY(self, e):
-
-        AdicionarObjetos.OnAddBase(Vars.BASE_BLOQUEADA_Y, self.parent, self.parent.parent)
-
-    def OnAddBaseXY(self, e):
-
-        AdicionarObjetos.OnAddBase(Vars.BASE_BLOQUEADA_XY, self.parent, self.parent.parent)

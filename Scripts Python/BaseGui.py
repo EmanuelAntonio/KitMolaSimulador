@@ -19,7 +19,7 @@ class WindowClass(wx.Frame):
 
         #Variaveis da classe:
         self.version = "0.8.9"  # Variável de controle de versão
-        self.dateModificacao = "26/07/2017"  # Data da última atualização do programa
+        self.dateModificacao = "14/09/2017"  # Data da última atualização do programa
         self.drawArea0 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
         self.drawArea1 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
         self.drawArea2 = None  # Variável que armazena uma referência a área de desenho do OpenGL, usado para corrigir o tamanho da área de desenho após um resize
@@ -46,7 +46,7 @@ class WindowClass(wx.Frame):
         self.statusSizer = wx.BoxSizer(wx.VERTICAL)
         Msg.statusBar = StatusBar(self)
         self.statusSizer.Add(Msg.statusBar, 0, wx.ALIGN_LEFT | wx.EXPAND, 5)
-        Msg.statusBar.SetColor(StatusBar.COLOR_RED)
+        Msg.statusBar.SetColor(StatusBar.COLOR_WHITE)
 
         self.programIcon = wx.EmptyIcon()
         self.programIcon.CopyFromBitmap(wx.Bitmap(Vars.dirExec + 'icones/icon.ico', wx.BITMAP_TYPE_ANY))
@@ -174,9 +174,8 @@ class WindowClass(wx.Frame):
                                          (wx.ACCEL_CTRL, ord('A'), selectId),
                                          (wx.ACCEL_SHIFT, ord('D'), duplicaId),
                                          (wx.ACCEL_SHIFT, ord('='), zoomOutId),
-                                         (wx.ACCEL_CTRL, ord('Q'), quitId)
+                                         (wx.ACCEL_CTRL, ord('Q'), quitId)])
 
-                                        ])
         self.SetAcceleratorTable(accel_tbl)
 
         self.SetAcceleratorTable(accel_tbl)
@@ -195,7 +194,7 @@ class WindowClass(wx.Frame):
         self.tabs.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
         self.tabs.Bind(wx.EVT_CHAR_HOOK, self.OnEnterKeyDown)
         self.Bind(wx.EVT_CLOSE, self.OnClose)
-        self.Bind(wx.EVT_SET_FOCUS, self.OnFocus, self)
+        self.Bind(wx.EVT_SET_FOCUS, self.OnFocus)
 
         Vars.toolBox = self.tabs
 
@@ -225,6 +224,8 @@ class WindowClass(wx.Frame):
     def OnFocus(self, e):
 
         self.tabs.SetFocus()
+        Vars.ctrlPress = False
+        Vars.shiftPress = False
         e.Skip()
 
     def createToolbar(self):
@@ -409,9 +410,7 @@ class WindowClass(wx.Frame):
         -> Retorno: vazio
     """
     def OnClose(self, e):
-        if Msg.timer != None:
-            Msg.timer.cancel()
-            del Msg.timer
+        Msg.limpaStatusBar()
         if self.salvar.precisaSalvar:
             option = Msg.exibirMensagem("Deseja sair do programa sem salvar?", "Fechar Programa", Msg.tipoYesNo, Msg.janelaWarning)
             if(option == wx.ID_YES):
